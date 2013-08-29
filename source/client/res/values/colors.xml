@@ -10,4 +10,6 @@
      <color name="blue">#00F4FF</color>
      <color name="dark_blue">#00C1CC</color>
      <color name="white">#FFF</color>
+     <color name="dull_yellow">#DFE200</color>
+     <color name="sign_up_grey">#A0A0A0</color>
 </resources>

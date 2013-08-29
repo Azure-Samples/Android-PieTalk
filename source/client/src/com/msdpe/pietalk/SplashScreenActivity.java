@@ -1,16 +1,43 @@
 package com.msdpe.pietalk;
 
-import android.os.Bundle;
 import android.app.Activity;
+import android.content.Intent;
+import android.os.Bundle;
 import android.view.Menu;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 
 public class SplashScreenActivity extends Activity {
+	
+	private Button mBtnSignup;
+	private Button mBtnLogin;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_splash_screen);
+		
+		mBtnSignup = (Button) findViewById(R.id.btnSignUp);
+		mBtnLogin = (Button) findViewById(R.id.btnLogin);
+		
+		mBtnSignup.setOnClickListener(signupListener);
+		mBtnLogin.setOnClickListener(loginListener);
 	}
+	
+	private OnClickListener signupListener = new OnClickListener() {		
+		@Override
+		public void onClick(View v) {
+			startActivity(new Intent(getApplicationContext(), SignupActivity.class));
+		}
+	};
+	
+	private OnClickListener loginListener = new OnClickListener() {		
+		@Override
+		public void onClick(View v) {
+			startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+		}
+	};
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {

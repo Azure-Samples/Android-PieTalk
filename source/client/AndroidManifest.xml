@@ -12,7 +12,7 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >       
+        android:theme="@style/AppTheme" >
         <activity
             android:name="com.msdpe.pietalk.SplashScreenActivity"
             android:label="@string/title_activity_splash_screen" >
@@ -21,6 +21,14 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name="com.msdpe.pietalk.LoginActivity"
+            android:label="@string/title_activity_login" >
+        </activity>
+        <activity
+            android:name="com.msdpe.pietalk.SignupActivity"
+            android:label="@string/title_activity_signup" >
         </activity>
     </application>
 
