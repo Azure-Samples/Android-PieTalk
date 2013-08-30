@@ -85,6 +85,6 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="18dp"
         android:gravity="center"
-        android:text="@string/sign_up_disclaimer" />
+        android:text="@string/set_in_code" />
 
 </RelativeLayout>

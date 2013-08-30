@@ -15,5 +15,6 @@
     <!-- <string name="sign_up_disclaimer">By creating an account, you agree to our &lt;a href="http://www.chrisrisner.com"&gt;Terms of Use&lt;a&gt; and understand our &lt;a href="http://chrisrisner.com"&gt;Privacy Policy&lt;a&gt;.</string> -->
     <string name="sign_up_disclaimer">By creating an account, you agree to our &lt;a href="http://www.chrisrisner.com">Terms of Use&lt;a> and understand our &lt;a href="http://chrisrisner.com">Privacy Policy&lt;a>.</string>
     <string name="born_in_future">You were not born in the future!</string>
+    <string name="set_in_code">Set in code!</string>
 
 </resources>
