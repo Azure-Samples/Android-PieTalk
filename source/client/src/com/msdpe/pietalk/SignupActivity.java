@@ -3,6 +3,9 @@ package com.msdpe.pietalk;
 
 import java.util.Calendar;
 
+import com.google.gson.JsonElement;
+import com.microsoft.windowsazure.mobileservices.ApiJsonOperationCallback;
+import com.microsoft.windowsazure.mobileservices.ServiceFilterResponse;
 import com.msdpe.pietalk.util.TextValidator;
 
 import android.app.Activity;
@@ -12,6 +15,7 @@ import android.app.DialogFragment;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -22,7 +26,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class SignupActivity extends Activity implements DatePickerDialog.OnDateSetListener {
+public class SignupActivity extends BaseActivity implements DatePickerDialog.OnDateSetListener {
+	private final String TAG = "SignupActivity";
 	private TextView mLblDisclaimer;
 	private EditText mTxtBirthday;
 	private EditText mTxtEmail;
@@ -30,6 +35,7 @@ public class SignupActivity extends Activity implements DatePickerDialog.OnDateS
 	private Button mBtnSignup;
 	private boolean mDateIsInFuture = false;
 	private ProgressBar mProgressSignup;
+	private Calendar mSelectedDate;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +75,21 @@ public class SignupActivity extends Activity implements DatePickerDialog.OnDateS
 				if (isValid()) {
 					mBtnSignup.setVisibility(View.GONE);
 					mProgressSignup.setVisibility(View.VISIBLE);
+					
+					mPieTalkService.registerUser(mTxtPassword.getText().toString(), 
+						mTxtBirthday.getText().toString(), mTxtEmail.getText().toString(), new ApiJsonOperationCallback() {								
+							@Override
+							public void onCompleted(JsonElement arg0, Exception exc,
+									ServiceFilterResponse arg2) {
+								Log.i(TAG, arg2.toString());
+								Log.i(TAG, arg0.toString());
+								if (exc != null) {
+									Log.e(TAG, "Error: " + exc.getMessage());
+								}
+								mBtnSignup.setVisibility(View.VISIBLE);
+								mProgressSignup.setVisibility(View.GONE);
+							}
+						});					
 				}
 			}
 		});
@@ -109,10 +130,10 @@ public class SignupActivity extends Activity implements DatePickerDialog.OnDateS
 		//TODO: consider formatting for region (i.e. MMDDYYYY vs DDMMYYYY)
 		mTxtBirthday.setText(month + "/" + day + "/" + year);
 		
-		Calendar selectedDate = Calendar.getInstance();
-		selectedDate.set(year, month, day);
+		mSelectedDate = Calendar.getInstance();
+		mSelectedDate.set(year, month, day);
 		
-		if (selectedDate.after(Calendar.getInstance())) {
+		if (mSelectedDate.after(Calendar.getInstance())) {
 			Toast.makeText(getApplicationContext(), R.string.born_in_future, Toast.LENGTH_LONG).show();
 			mTxtBirthday.setError("Date must be in the past");
 			mDateIsInFuture = true;

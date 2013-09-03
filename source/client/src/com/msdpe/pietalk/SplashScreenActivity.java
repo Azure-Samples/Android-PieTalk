@@ -8,7 +8,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 
-public class SplashScreenActivity extends Activity {
+public class SplashScreenActivity extends BaseActivity {
 	
 	private Button mBtnSignup;
 	private Button mBtnLogin;
