@@ -18,6 +18,7 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,6 +29,7 @@ public class SignupActivity extends Activity implements DatePickerDialog.OnDateS
 	private EditText mTxtPassword;
 	private Button mBtnSignup;
 	private boolean mDateIsInFuture = false;
+	private ProgressBar mProgressSignup;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +47,7 @@ public class SignupActivity extends Activity implements DatePickerDialog.OnDateS
 		mBtnSignup = (Button) findViewById(R.id.btnSignup);		
 		mTxtEmail = (EditText) findViewById(R.id.txtEmail);
 		mTxtPassword = (EditText) findViewById(R.id.txtPassword);
+		mProgressSignup = (ProgressBar) findViewById(R.id.progressSignup);
 		
 		mTxtEmail.addTextChangedListener(new TextValidator(mTxtEmail) {			
 			@Override
@@ -57,6 +60,16 @@ public class SignupActivity extends Activity implements DatePickerDialog.OnDateS
 			public void validate(TextView textView, String text) {
 				checkValid();
 				
+			}
+		});
+		
+		mBtnSignup.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (isValid()) {
+					mBtnSignup.setVisibility(View.GONE);
+					mProgressSignup.setVisibility(View.VISIBLE);
+				}
 			}
 		});
 	}
@@ -114,8 +127,12 @@ public class SignupActivity extends Activity implements DatePickerDialog.OnDateS
 	private void checkValid() {
 		if (this.isValid()) {
 			mBtnSignup.setBackgroundResource(R.drawable.sign_up_button_style);
+			//mBtnSignup.setVisibility(View.GONE);
+			//mProgressSignup.setVisibility(View.VISIBLE);
 		} else {
 			mBtnSignup.setBackgroundResource(R.drawable.second_sign_up_button_style);
+			//mBtnSignup.setVisibility(View.VISIBLE);
+			//mProgressSignup.setVisibility(View.GONE);
 		}
 	}
 	
