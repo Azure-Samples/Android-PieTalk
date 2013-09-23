@@ -31,7 +31,7 @@ public class SelectUsernameActivity extends BaseActivity {
 		
 		mTxtUsername = (EditText) findViewById(R.id.txtUsername);
 		mBtnNext = (Button) findViewById(R.id.btnNext);
-		mProgressSignup = (ProgressBar) findViewById(R.id.progressSignup);
+		mProgressSignup = (ProgressBar) findViewById(R.id.progressLogin);
 		
 		mBtnNext.setOnClickListener(nextListener);
 		

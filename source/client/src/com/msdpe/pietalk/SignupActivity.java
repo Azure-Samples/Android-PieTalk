@@ -54,8 +54,8 @@ public class SignupActivity extends BaseActivity implements DatePickerDialog.OnD
 		
 		mBtnSignup = (Button) findViewById(R.id.btnNext);		
 		mTxtEmail = (EditText) findViewById(R.id.txtEmail);
-		mTxtPassword = (EditText) findViewById(R.id.txtUsername);
-		mProgressSignup = (ProgressBar) findViewById(R.id.progressSignup);
+		mTxtPassword = (EditText) findViewById(R.id.txtPassword);
+		mProgressSignup = (ProgressBar) findViewById(R.id.progressLogin);
 		
 		mTxtEmail.addTextChangedListener(new TextValidator(mTxtEmail) {			
 			@Override
@@ -179,7 +179,7 @@ public class SignupActivity extends BaseActivity implements DatePickerDialog.OnD
 		if (!android.util.Patterns.EMAIL_ADDRESS.matcher(mTxtEmail.getText().toString()).matches()) {
 			return false;
 		}
-		if (mTxtPassword.getText().toString().equals(""))
+		if (mTxtPassword.getText().toString().length() < Constants.MIN_PASSWORD_LENGTH)
 			return false;
 		
 		return true;

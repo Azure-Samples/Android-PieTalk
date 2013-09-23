@@ -55,7 +55,7 @@
             android:textStyle="bold" />
 
         <ProgressBar
-            android:id="@+id/progressSignup"
+            android:id="@+id/progressLogin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/txtUsername"
