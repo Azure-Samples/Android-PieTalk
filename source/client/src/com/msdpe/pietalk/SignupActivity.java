@@ -3,15 +3,11 @@ package com.msdpe.pietalk;
 
 import java.util.Calendar;
 
-import com.google.gson.JsonElement;
-import com.microsoft.windowsazure.mobileservices.ApiJsonOperationCallback;
-import com.microsoft.windowsazure.mobileservices.ServiceFilterResponse;
-import com.msdpe.pietalk.util.TextValidator;
-
-import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
@@ -25,6 +21,13 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.microsoft.windowsazure.mobileservices.ApiJsonOperationCallback;
+import com.microsoft.windowsazure.mobileservices.ServiceFilterResponse;
+import com.msdpe.pietalk.util.PieTalkAlert;
+import com.msdpe.pietalk.util.TextValidator;
 
 public class SignupActivity extends BaseActivity implements DatePickerDialog.OnDateSetListener {
 	private final String TAG = "SignupActivity";
@@ -50,9 +53,9 @@ public class SignupActivity extends BaseActivity implements DatePickerDialog.OnD
 		mTxtBirthday.setClickable(true);
 		mTxtBirthday.setOnClickListener(birthdayListener);
 		
-		mBtnSignup = (Button) findViewById(R.id.btnSignup);		
+		mBtnSignup = (Button) findViewById(R.id.btnNext);		
 		mTxtEmail = (EditText) findViewById(R.id.txtEmail);
-		mTxtPassword = (EditText) findViewById(R.id.txtPassword);
+		mTxtPassword = (EditText) findViewById(R.id.txtUsername);
 		mProgressSignup = (ProgressBar) findViewById(R.id.progressSignup);
 		
 		mTxtEmail.addTextChangedListener(new TextValidator(mTxtEmail) {			
@@ -79,15 +82,25 @@ public class SignupActivity extends BaseActivity implements DatePickerDialog.OnD
 					mPieTalkService.registerUser(mTxtPassword.getText().toString(), 
 						mTxtBirthday.getText().toString(), mTxtEmail.getText().toString(), new ApiJsonOperationCallback() {								
 							@Override
-							public void onCompleted(JsonElement arg0, Exception exc,
+							public void onCompleted(JsonElement jsonData, Exception exc,
 									ServiceFilterResponse arg2) {
-								Log.i(TAG, arg2.toString());
-								Log.i(TAG, arg0.toString());
+								//Log.i(TAG, arg2.toString());
+								Log.i(TAG, jsonData.toString());
 								if (exc != null) {
 									Log.e(TAG, "Error: " + exc.getMessage());
+									mBtnSignup.setVisibility(View.VISIBLE);
+									mProgressSignup.setVisibility(View.GONE);
+									//Display error
+									
+									PieTalkAlert.showSimpleErrorDialog(mActivity, exc.getMessage());
+									
+								} else {
+									mPieTalkService.setUserAndSaveData(jsonData);
+										
+									finish();
+									startActivity(new Intent(getApplicationContext(), SelectUsernameActivity.class));
 								}
-								mBtnSignup.setVisibility(View.VISIBLE);
-								mProgressSignup.setVisibility(View.GONE);
+								
 							}
 						});					
 				}
@@ -98,7 +111,7 @@ public class SignupActivity extends BaseActivity implements DatePickerDialog.OnD
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.signup, menu);
+		//getMenuInflater().inflate(R.menu.signup, menu);
 		return true;
 	}
 	

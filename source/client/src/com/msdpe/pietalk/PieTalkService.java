@@ -1,14 +1,15 @@
 package com.msdpe.pietalk;
 
 import java.net.MalformedURLException;
-import java.util.Calendar;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.microsoft.windowsazure.mobileservices.ApiJsonOperationCallback;
+import com.microsoft.windowsazure.mobileservices.ApiOperationCallback;
 import com.microsoft.windowsazure.mobileservices.MobileServiceClient;
 import com.microsoft.windowsazure.mobileservices.MobileServiceUser;
 import com.microsoft.windowsazure.mobileservices.NextServiceFilterCallback;
@@ -16,11 +17,14 @@ import com.microsoft.windowsazure.mobileservices.ServiceFilter;
 import com.microsoft.windowsazure.mobileservices.ServiceFilterRequest;
 import com.microsoft.windowsazure.mobileservices.ServiceFilterResponse;
 import com.microsoft.windowsazure.mobileservices.ServiceFilterResponseCallback;
+import com.msdpe.pietalk.util.PieTalkResponse;
 
 public class PieTalkService {
 	private MobileServiceClient mClient;
 	private Context mContext;
 	private final String TAG = "PieTalkService";
+	private String mUsername;
+	
 	
 	public PieTalkService(Context context) {
 		mContext = context;
@@ -50,8 +54,9 @@ public class PieTalkService {
 		if (settings != null) {
 			String userId = settings.getString("userid", null);
 			String token = settings.getString("token", null);
+			String username = settings.getString("username", null);
 			if (userId != null && !userId.equals("")) {
-				setUserData(userId, token);
+				setUserData(userId, token, username);
 				return true;
 			}
 		}
@@ -64,20 +69,22 @@ public class PieTalkService {
 	 * @param userId
 	 * @param token
 	 */
-	public void setUserData(String userId, String token) {
+	public void setUserData(String userId, String token, String username) {
 		MobileServiceUser user = new MobileServiceUser(userId);
 		user.setAuthenticationToken(token);
-		mClient.setCurrentUser(user);				
+		mClient.setCurrentUser(user);		
+		mUsername = username;
 	}
 	
 	/***
 	 * Pulls the user ID and token out of a json object from the server
 	 * @param jsonObject
 	 */
-	public void setUserAndSaveData(JsonObject jsonObject) {			
-		String userId = jsonObject.getAsJsonPrimitive("userId").getAsString();
-		String token = jsonObject.getAsJsonPrimitive("token").getAsString();			
-		setUserData(userId, token);	
+	public void setUserAndSaveData(JsonElement jsonData) {
+		JsonObject userData = jsonData.getAsJsonObject();
+		String userId = userData.get("userId").getAsString();
+		String token = userData.get("token").getAsString();			
+		setUserData(userId, token, null);	
 		saveUserData();
 	}
 	
@@ -91,6 +98,19 @@ public class PieTalkService {
         SharedPreferences.Editor preferencesEditor = settings.edit();
         preferencesEditor.putString("userid", mClient.getCurrentUser().getUserId());
         preferencesEditor.putString("token", mClient.getCurrentUser().getAuthenticationToken());
+        preferencesEditor.commit();
+	}
+	
+	/**
+	 * Saves username SharedPreferences.
+	 * NOTE:  This is not secure and is just used as a storage mechanism.  In reality, you would want to 
+	 * come up with a more secure way of storing this information.
+	 */
+	public void saveUsername(String username) {
+		mUsername = username;
+		SharedPreferences settings = mContext.getSharedPreferences("UserData", 0);
+        SharedPreferences.Editor preferencesEditor = settings.edit();
+        preferencesEditor.putString("username", username);        
         preferencesEditor.commit();
 	}
 	
@@ -110,6 +130,14 @@ public class PieTalkService {
 		newUser.addProperty("dob", dob);		
 		//mClient.invokeApi("Register", callback);		
 		mClient.invokeApi("Register", newUser, callback);
+	}
+	
+	public void saveUsername(String username, ApiOperationCallback<PieTalkResponse> callback) {
+		JsonObject user = new JsonObject();
+		user.addProperty("username", username);
+		//mClient.invokeApi("SaveUsername", user, callback);
+		
+		mClient.invokeApi("SaveUsername", user, PieTalkResponse.class, callback);
 	}
 	
 	
