@@ -8,7 +8,6 @@ import android.util.Log;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.microsoft.windowsazure.mobileservices.ApiJsonOperationCallback;
 import com.microsoft.windowsazure.mobileservices.ApiOperationCallback;
 import com.microsoft.windowsazure.mobileservices.MobileServiceClient;
 import com.microsoft.windowsazure.mobileservices.MobileServiceUser;
@@ -17,6 +16,7 @@ import com.microsoft.windowsazure.mobileservices.ServiceFilter;
 import com.microsoft.windowsazure.mobileservices.ServiceFilterRequest;
 import com.microsoft.windowsazure.mobileservices.ServiceFilterResponse;
 import com.microsoft.windowsazure.mobileservices.ServiceFilterResponseCallback;
+import com.msdpe.pietalk.util.PieTalkRegisterResponse;
 import com.msdpe.pietalk.util.PieTalkResponse;
 
 public class PieTalkService {
@@ -88,6 +88,14 @@ public class PieTalkService {
 		saveUserData();
 	}
 	
+	public void setUserAndSaveData(PieTalkRegisterResponse registerData) {
+		//JsonObject userData = jsonData.getAsJsonObject();
+		String userId = registerData.userId;
+		String token = registerData.token;			
+		setUserData(userId, token, null);	
+		saveUserData();
+	}
+	
 	/**
 	 * Saves userId and token to SharedPreferences.
 	 * NOTE:  This is not secure and is just used as a storage mechanism.  In reality, you would want to 
@@ -123,13 +131,13 @@ public class PieTalkService {
 	 */
 	public void registerUser(String password, String dob,
 			String email,
-			ApiJsonOperationCallback callback) {
+			//ApiJsonOperationCallback callback) {
+			ApiOperationCallback<PieTalkRegisterResponse> callback) {
 		JsonObject newUser = new JsonObject();
 		newUser.addProperty("password", password);
 		newUser.addProperty("email", email);
-		newUser.addProperty("dob", dob);		
-		//mClient.invokeApi("Register", callback);		
-		mClient.invokeApi("Register", newUser, callback);
+		newUser.addProperty("dob", dob);			
+		mClient.invokeApi("Register", newUser, PieTalkRegisterResponse.class, callback);
 	}
 	
 	public void saveUsername(String username, ApiOperationCallback<PieTalkResponse> callback) {

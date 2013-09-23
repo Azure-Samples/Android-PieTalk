@@ -3,7 +3,6 @@ package com.msdpe.pietalk;
 
 import java.util.Calendar;
 
-import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
@@ -23,10 +22,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.microsoft.windowsazure.mobileservices.ApiJsonOperationCallback;
+import com.microsoft.windowsazure.mobileservices.ApiOperationCallback;
 import com.microsoft.windowsazure.mobileservices.ServiceFilterResponse;
 import com.msdpe.pietalk.util.PieTalkAlert;
+import com.msdpe.pietalk.util.PieTalkRegisterResponse;
 import com.msdpe.pietalk.util.TextValidator;
 
 public class SignupActivity extends BaseActivity implements DatePickerDialog.OnDateSetListener {
@@ -80,28 +79,32 @@ public class SignupActivity extends BaseActivity implements DatePickerDialog.OnD
 					mProgressSignup.setVisibility(View.VISIBLE);
 					
 					mPieTalkService.registerUser(mTxtPassword.getText().toString(), 
-						mTxtBirthday.getText().toString(), mTxtEmail.getText().toString(), new ApiJsonOperationCallback() {								
+						mTxtBirthday.getText().toString(), mTxtEmail.getText().toString(), new ApiOperationCallback<PieTalkRegisterResponse>() {
+
 							@Override
-							public void onCompleted(JsonElement jsonData, Exception exc,
-									ServiceFilterResponse arg2) {
+							public void onCompleted(
+									PieTalkRegisterResponse response,
+									Exception exc, ServiceFilterResponse arg2) {
 								//Log.i(TAG, arg2.toString());
-								Log.i(TAG, jsonData.toString());
-								if (exc != null) {
-									Log.e(TAG, "Error: " + exc.getMessage());
+								//Log.i(TAG, jsonData.toString());
+								if (exc != null || response.Error != null) {
 									mBtnSignup.setVisibility(View.VISIBLE);
 									mProgressSignup.setVisibility(View.GONE);
 									//Display error
 									
-									PieTalkAlert.showSimpleErrorDialog(mActivity, exc.getMessage());
+									if (exc != null) 
+										PieTalkAlert.showSimpleErrorDialog(mActivity, exc.getCause().getMessage());
+									else
+										PieTalkAlert.showSimpleErrorDialog(mActivity, response.Error);									
 									
 								} else {
-									mPieTalkService.setUserAndSaveData(jsonData);
+									mPieTalkService.setUserAndSaveData(response);
+									//mPieTalkService.setUserAndSaveData(jsonData);
 										
 									finish();
 									startActivity(new Intent(getApplicationContext(), SelectUsernameActivity.class));
 								}
-								
-							}
+							}															
 						});					
 				}
 			}
