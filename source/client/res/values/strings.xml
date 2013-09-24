@@ -22,5 +22,8 @@
     <string name="select_username_instrutions">Please select a unique username.\nYour username identifies you on Pietalk.</string>
     <string name="error">Error</string>
     <string name="ok">OK</string>
+    <string name="email_or_username">Email or Username</string>
+    <string name="title_activity_record">RecordActivity</string>
+    <string name="title_activity_access_friends">AccessFriends</string>
 
 </resources>

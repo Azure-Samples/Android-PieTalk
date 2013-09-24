@@ -95,6 +95,10 @@ public class SelectUsernameActivity extends BaseActivity {
 							//Finish all existing activities (including splashscreen)
 							
 							//startActivity(new Intent(getApplicationContext(), SelectUsernameActivity.class));
+							
+							Intent intent = new Intent(mActivity, AccessFriendsActivity.class);
+							intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+							startActivity(intent);
 						}
 						
 					}								

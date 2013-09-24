@@ -37,6 +37,14 @@
             android:name="com.msdpe.pietalk.SelectUsernameActivity"
             android:label="@string/title_activity_select_username" >
         </activity>
+        <activity
+            android:name="com.msdpe.pietalk.RecordActivity"
+            android:label="@string/title_activity_record" >
+        </activity>
+        <activity
+            android:name="com.msdpe.pietalk.AccessFriendsActivity"
+            android:label="@string/title_activity_access_friends" >
+        </activity>
     </application>
 
 </manifest>

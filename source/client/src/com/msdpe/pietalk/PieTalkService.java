@@ -140,6 +140,13 @@ public class PieTalkService {
 		mClient.invokeApi("Register", newUser, PieTalkRegisterResponse.class, callback);
 	}
 	
+	public void loginUser(String emailOrUsername, String password, ApiOperationCallback<PieTalkRegisterResponse> callback) {
+		JsonObject user = new JsonObject();
+		user.addProperty("emailOrUsername", emailOrUsername);
+		user.addProperty("password", password);
+		mClient.invokeApi("Login", user, PieTalkRegisterResponse.class, callback);
+	}
+	
 	public void saveUsername(String username, ApiOperationCallback<PieTalkResponse> callback) {
 		JsonObject user = new JsonObject();
 		user.addProperty("username", username);
