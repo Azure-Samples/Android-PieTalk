@@ -9,14 +9,26 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:layout_weight="1"
-    />
+    >
 
-	<Button
-	  android:id="@+id/button_capture"
-	  android:text="Capture"
-	  android:layout_width="wrap_content"
-	  android:layout_height="wrap_content"
-	  android:layout_gravity="center"
-	  />
+    </FrameLayout>
+
+    <ImageButton
+        android:id="@+id/btnFlash"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/device_access_flash_off"
+        android:layout_alignParentTop="true" 
+        android:layout_alignParentLeft="true"
+        android:onClick="tappedFlash"/>
+
+    <ImageButton
+        android:id="@+id/btnSwitchCamera"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/device_access_switch_camera" 
+        android:layout_alignParentTop="true" 
+        android:layout_alignParentRight="true"
+        android:onClick="tappedSwitchCamera"/>
 
 </RelativeLayout>

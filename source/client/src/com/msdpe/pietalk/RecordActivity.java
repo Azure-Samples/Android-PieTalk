@@ -4,9 +4,11 @@ import android.app.Activity;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 
 import com.msdpe.pietalk.util.PieTalkLogger;
 
@@ -15,6 +17,9 @@ public class RecordActivity extends Activity {
 	private final String TAG = "RecordActivity";
 	private Camera mCamera;
 	private CameraPreview mCameraPreview;
+	private ImageButton mBtnSwitchCamera;
+	private ImageButton mBtnFlash;
+	private int mCameraNumber;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -25,6 +30,10 @@ public class RecordActivity extends Activity {
 				WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		setContentView(R.layout.activity_record);
 		
+		mBtnSwitchCamera = (ImageButton) findViewById(R.id.btnSwitchCamera);
+		mBtnFlash = (ImageButton) findViewById(R.id.btnFlash);
+		
+		
 		
 	}
 	
@@ -33,7 +42,16 @@ public class RecordActivity extends Activity {
 		// TODO Auto-generated method stub
 		super.onResume();
 		
-		mCamera = getCameraInstance();
+		int numberOfCams = Camera.getNumberOfCameras();
+		mCameraNumber = 0;
+		if (numberOfCams <2 )
+			mBtnSwitchCamera.setVisibility(View.GONE);
+		else 
+			mCameraNumber = PreferencesHandler.GetCameraPreference(getApplicationContext());
+		
+		
+		
+		mCamera = getCameraInstance(mCameraNumber);
 		mCameraPreview = new CameraPreview(this, mCamera);
 		FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
 		preview.removeAllViews();
@@ -54,14 +72,33 @@ public class RecordActivity extends Activity {
 		return true;
 	}
 	
-	public Camera getCameraInstance() {
+	public Camera getCameraInstance(int cameraNumber) {
 		Camera c = null;
 		try { 
-			c = Camera.open();
+			c = Camera.open(cameraNumber);
 		} catch (Exception ex) {
 			PieTalkLogger.e(TAG, ex.getMessage());
 		}
 		return c;
+	}
+	
+	public void tappedFlash(View view) {
+		
+	}
+	
+	public void tappedSwitchCamera(View view) {
+		mCamera.release();
+
+		if (mCameraNumber == 0)
+			mCameraNumber = 1;
+		else
+			mCameraNumber = 0;
+		mCamera = getCameraInstance(mCameraNumber);
+		PreferencesHandler.SaveCameraPreference(getApplicationContext(), mCameraNumber);
+		mCameraPreview = new CameraPreview(this, mCamera);
+		FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
+		preview.removeAllViews();
+		preview.addView(mCameraPreview);
 	}
 
 }
