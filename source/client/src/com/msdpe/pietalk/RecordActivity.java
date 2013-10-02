@@ -87,6 +87,7 @@ public class RecordActivity extends Activity {
 	}
 	
 	public void tappedSwitchCamera(View view) {
+		mCamera.stopPreview();
 		mCamera.release();
 
 		if (mCameraNumber == 0)
