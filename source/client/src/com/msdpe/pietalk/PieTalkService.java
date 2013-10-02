@@ -2,9 +2,14 @@ package com.msdpe.pietalk;
 
 import java.net.MalformedURLException;
 
+import org.apache.http.StatusLine;
+
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.util.Log;
+import android.webkit.CookieManager;
+import android.webkit.CookieSyncManager;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -16,6 +21,8 @@ import com.microsoft.windowsazure.mobileservices.ServiceFilter;
 import com.microsoft.windowsazure.mobileservices.ServiceFilterRequest;
 import com.microsoft.windowsazure.mobileservices.ServiceFilterResponse;
 import com.microsoft.windowsazure.mobileservices.ServiceFilterResponseCallback;
+import com.msdpe.authenticationdemo.AuthenticationActivity;
+import com.msdpe.pietalk.util.PieTalkLogger;
 import com.msdpe.pietalk.util.PieTalkRegisterResponse;
 import com.msdpe.pietalk.util.PieTalkResponse;
 
@@ -155,6 +162,24 @@ public class PieTalkService {
 		mClient.invokeApi("SaveUsername", user, PieTalkResponse.class, callback);
 	}
 	
+	public void logout(boolean shouldRedirectToLogin) {
+		//Clear the cookies so they won't auto login to a provider again
+		CookieSyncManager.createInstance(mContext);
+		CookieManager cookieManager = CookieManager.getInstance();
+		cookieManager.removeAllCookie();			
+		//Clear the user id and token from the shared preferences
+		SharedPreferences settings = mContext.getSharedPreferences("UserData", 0);
+        SharedPreferences.Editor preferencesEditor = settings.edit();
+        preferencesEditor.clear();
+        preferencesEditor.commit();						
+		mClient.logout();			
+		//Take the user back to the splash screen activity to relogin if requested
+		if (shouldRedirectToLogin) {
+			Intent logoutIntent = new Intent(mContext, SplashScreenActivity.class);
+			logoutIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+			mContext.startActivity(logoutIntent);		
+		}
+	}
 	
 	private class MyServiceFilter implements ServiceFilter {		
 		@Override
@@ -163,6 +188,13 @@ public class PieTalkService {
 			nextServiceFilterCallback.onNext(request, new ServiceFilterResponseCallback() {				
 				@Override
 				public void onResponse(ServiceFilterResponse response, Exception exception) {
+					StatusLine status = response.getStatus();
+					int statusCode = status.getStatusCode();						
+					if (statusCode == 401) {
+						//Kick user out 
+						PieTalkLogger.i(TAG, "401 received, forcing logout");
+					}
+					
 					if (responseCallback != null)  responseCallback.onResponse(response, exception);
 				}
 			});

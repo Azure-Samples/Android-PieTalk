@@ -18,6 +18,16 @@ public class SplashScreenActivity extends BaseActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_splash_screen);
 		
+		mApplication.setSplashScreenActivity(this);	
+		
+		if (mPieTalkService.isUserAuthenticated()) {
+			finish();
+			//Launch application
+			Intent intent = new Intent(mActivity, RecordActivity.class);
+			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			startActivity(intent);
+		}
+		
 		mBtnSignup = (Button) findViewById(R.id.btnSignUp);
 		mBtnLogin = (Button) findViewById(R.id.btnLogin);
 		

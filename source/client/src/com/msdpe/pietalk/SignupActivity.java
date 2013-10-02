@@ -144,7 +144,8 @@ public class SignupActivity extends BaseActivity implements DatePickerDialog.OnD
 	
 	public void onDateSet(DatePicker view, int year, int month, int day) {
 		//TODO: consider formatting for region (i.e. MMDDYYYY vs DDMMYYYY)
-		mTxtBirthday.setText(month + "/" + day + "/" + year);
+		
+		mTxtBirthday.setText(month+1 + "/" + day + "/" + year);
 		
 		mSelectedDate = Calendar.getInstance();
 		mSelectedDate.set(year, month, day);

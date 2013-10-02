@@ -101,6 +101,7 @@ public class SelectUsernameActivity extends BaseActivity {
 							//intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
 							startActivity(intent);
 							finish();
+							mApplication.getSplashScreenActivity().finish();
 						}
 						
 					}								

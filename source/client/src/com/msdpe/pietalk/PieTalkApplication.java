@@ -6,6 +6,7 @@ import android.app.Application;
 public class PieTalkApplication extends Application {
 	private PieTalkService mPieTalkService;
 	private Activity mCurrentActivity;
+	private SplashScreenActivity mSplashScreenActivity;
 	
 	public PieTalkApplication() {}
 	
@@ -22,5 +23,13 @@ public class PieTalkApplication extends Application {
 	
 	public Activity getCurrentActivity() {
 		return mCurrentActivity;
+	}
+	
+	public void setSplashScreenActivity(SplashScreenActivity activity) {
+		mSplashScreenActivity = activity;
+	}
+	
+	public SplashScreenActivity getSplashScreenActivity() {
+		return mSplashScreenActivity;
 	}
 }

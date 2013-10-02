@@ -7,6 +7,7 @@ public abstract class BaseActivity extends Activity {
 
 	protected PieTalkService mPieTalkService;
 	protected BaseActivity mActivity;
+	protected PieTalkApplication mApplication;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -14,8 +15,8 @@ public abstract class BaseActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		mActivity = this;
 		
-		PieTalkApplication myApp = (PieTalkApplication) getApplication();
-		myApp.setCurrentActivity(this);
-		mPieTalkService = myApp.getPieTalkService();
+		mApplication = (PieTalkApplication) getApplication();
+		mApplication.setCurrentActivity(this);
+		mPieTalkService = mApplication.getPieTalkService();
 	}
 }

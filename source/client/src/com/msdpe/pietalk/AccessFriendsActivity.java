@@ -1,17 +1,13 @@
 package com.msdpe.pietalk;
 
-import com.msdpe.pietalk.SignupActivity.DatePickerFragment;
 import com.msdpe.pietalk.util.PieTalkAlert;
 
 import android.os.Bundle;
-import android.app.Activity;
-import android.app.DialogFragment;
+import android.content.Intent;
 import android.view.Menu;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
 
-public class AccessFriendsActivity extends Activity {
+public class AccessFriendsActivity extends BaseActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +35,8 @@ public class AccessFriendsActivity extends Activity {
 	}
 	
 	private void goToCamera() {
+		Intent intent = new Intent(mActivity, RecordActivity.class);
+		startActivity(intent);
 		finish();
 		//Show the camera!
 		
