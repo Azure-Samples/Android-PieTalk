@@ -12,4 +12,6 @@
      <color name="white">#FFF</color>
      <color name="dull_yellow">#DFE200</color>
      <color name="sign_up_grey">#A0A0A0</color>
+     <color name="dull_purple">#876A96</color>
+     <color name="light_purple">#C59BDB</color>
 </resources>

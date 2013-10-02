@@ -98,7 +98,9 @@ public class SelectUsernameActivity extends BaseActivity {
 							
 							Intent intent = new Intent(mActivity, AccessFriendsActivity.class);
 							intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+							//intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
 							startActivity(intent);
+							finish();
 						}
 						
 					}								

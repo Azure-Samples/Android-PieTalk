@@ -1,8 +1,15 @@
 package com.msdpe.pietalk;
 
+import com.msdpe.pietalk.SignupActivity.DatePickerFragment;
+import com.msdpe.pietalk.util.PieTalkAlert;
+
 import android.os.Bundle;
 import android.app.Activity;
+import android.app.DialogFragment;
 import android.view.Menu;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 
 public class AccessFriendsActivity extends Activity {
 
@@ -18,5 +25,22 @@ public class AccessFriendsActivity extends Activity {
 		//getMenuInflater().inflate(R.menu.access_friends, menu);
 		return true;
 	}
-
+	
+	public void tappedAllowAccess(View view) {
+		PieTalkAlert.showSimpleErrorDialog(this, "Need to import friends now!");
+	}
+	
+	public void tappedSkip(View view) {
+		goToCamera();
+	}
+	@Override
+	public void onBackPressed() {
+		goToCamera();
+	}
+	
+	private void goToCamera() {
+		finish();
+		//Show the camera!
+		
+	}
 }
