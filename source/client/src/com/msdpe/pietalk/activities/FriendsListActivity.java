@@ -12,15 +12,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Filter.FilterListener;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.SearchView.OnQueryTextListener;
 
 import com.msdpe.pietalk.R;
-import com.msdpe.pietalk.R.anim;
-import com.msdpe.pietalk.R.id;
-import com.msdpe.pietalk.R.layout;
-import com.msdpe.pietalk.R.menu;
 import com.msdpe.pietalk.base.BaseActivity;
 import com.msdpe.pietalk.util.PieTalkLogger;
 
@@ -29,6 +27,7 @@ public class FriendsListActivity extends BaseActivity {
 	private final String TAG = "FriendsListActivity";
 	private ListView mLvFriends;
 	private ArrayAdapter<String> mAdapter;
+	private LinearLayout mLayoutAddFriend;
 	
 //	String[] values = new String[] { "Android", "iPhone", "WindowsMobile",
 //	        "Blackberry", "WebOS", "Ubuntu", "Windows7", "Max OS X",
@@ -45,9 +44,11 @@ public class FriendsListActivity extends BaseActivity {
 		// Show the Up button in the action bar.
 		setupActionBar();
 		
+		mLayoutAddFriend = (LinearLayout) findViewById(R.id.layoutAddFriend);
+		mLayoutAddFriend.setVisibility(View.GONE);
+		
 		mLvFriends = (ListView) findViewById(R.id.lvFriends);
 		mLvFriends.setOverScrollMode(View.OVER_SCROLL_NEVER);
-		
 		
 		final ArrayList<String> list = new ArrayList<String>();
 	    for (int i = 0; i < values.length; ++i) {
@@ -89,10 +90,25 @@ public class FriendsListActivity extends BaseActivity {
 			}
 			
 			@Override
-			public boolean onQueryTextChange(String newText) {
+			public boolean onQueryTextChange(final String newText) {
 				PieTalkLogger.i(TAG, "Text: " + newText);
 				
-				mAdapter.getFilter().filter(newText);
+				mAdapter.getFilter().filter(newText, new FilterListener() {					
+					@Override
+					public void onFilterComplete(int count) {
+						if (mAdapter.getCount() > 0) 
+							mLvFriends.setVisibility(View.VISIBLE);
+						else
+							mLvFriends.setVisibility(View.GONE);
+						
+						if (!newText.equals("")) {
+							mLayoutAddFriend.setVisibility(View.VISIBLE);
+						} else {
+							mLayoutAddFriend.setVisibility(View.GONE);
+						}
+					}
+				});
+				
 				
 				return true;
 			}
