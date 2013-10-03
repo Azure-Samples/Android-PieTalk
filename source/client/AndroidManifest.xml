@@ -59,10 +59,20 @@
         <activity
             android:name="com.msdpe.pietalk.FriendsListActivity"
             android:label="@string/title_activity_friends_list"
-            android:parentActivityName="com.msdpe.pietalk.RecordActivity" >
+            android:parentActivityName="com.msdpe.pietalk.RecordActivity" 
+            android:launchMode="singleTop">
+            <intent-filter>
+		        <action android:name="android.intent.action.SEARCH" />
+		    </intent-filter>
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.msdpe.pietalk.RecordActivity" />
+            <meta-data 
+                android:name="android.app.searchable"
+            	android:resource="@xml/searchable" />
+            <meta-data
+            android:name="android.app.default_searchable"
+            android:value="com.msdpe.pietalk.FriendsListActivity" />
         </activity>
     </application>
 

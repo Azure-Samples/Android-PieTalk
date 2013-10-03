@@ -121,6 +121,8 @@ public class RecordActivity extends Activity {
 	
 	public void tappedFriendsList(View view) {
 		startActivity(new Intent(getApplicationContext(), FriendsListActivity.class));
+		
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
 	}
 
 }
