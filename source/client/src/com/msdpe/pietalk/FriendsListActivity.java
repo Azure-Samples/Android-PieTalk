@@ -1,5 +1,7 @@
 package com.msdpe.pietalk;
 
+import java.util.ArrayList;
+
 import android.app.ActionBar;
 import android.app.SearchManager;
 import android.content.Context;
@@ -8,6 +10,9 @@ import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.SearchView.OnQueryTextListener;
 
@@ -16,6 +21,16 @@ import com.msdpe.pietalk.util.PieTalkLogger;
 public class FriendsListActivity extends BaseActivity {
 	
 	private final String TAG = "FriendsListActivity";
+	private ListView mLvFriends;
+	private ArrayAdapter<String> mAdapter;
+	
+//	String[] values = new String[] { "Android", "iPhone", "WindowsMobile",
+//	        "Blackberry", "WebOS", "Ubuntu", "Windows7", "Max OS X",
+//	        "Linux", "OS/2", "Ubuntu", "Windows7", "Max OS X", "Linux",
+//	        "OS/2", "Ubuntu", "Windows7", "Max OS X", "Linux", "OS/2",
+//	        "Android", "iPhone", "WindowsMobile" };
+	
+	String[] values = new String[] { "Aaa", "Abc", "Abd", "Bcx", "Bdy", "Cdd" };
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -23,6 +38,19 @@ public class FriendsListActivity extends BaseActivity {
 		setContentView(R.layout.activity_friends_list);
 		// Show the Up button in the action bar.
 		setupActionBar();
+		
+		mLvFriends = (ListView) findViewById(R.id.lvFriends);
+		mLvFriends.setOverScrollMode(View.OVER_SCROLL_NEVER);
+		
+		
+		final ArrayList<String> list = new ArrayList<String>();
+	    for (int i = 0; i < values.length; ++i) {
+	      list.add(values[i]);
+	    }
+	    
+	    mAdapter = new ArrayAdapter<String>(this,
+	        android.R.layout.simple_list_item_1, list);
+	    mLvFriends.setAdapter(mAdapter);
 	}
 
 	/**
@@ -57,6 +85,16 @@ public class FriendsListActivity extends BaseActivity {
 			@Override
 			public boolean onQueryTextChange(String newText) {
 				PieTalkLogger.i(TAG, "Text: " + newText);
+				
+
+//	            mAdapter.clear();
+				mAdapter.getFilter().filter(newText);
+//	            //mLvFriends.setAdapter(mAdapter);
+//	        	    mAdapter.notifyDataSetChanged();
+//	        	    mAdapter.notifyAll();
+//	        	    mAdapter.notify();
+//	        	    mAdapter.notifyDataSetInvalidated();
+				
 				return true;
 			}
 		});		
@@ -102,6 +140,8 @@ public class FriendsListActivity extends BaseActivity {
 		if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = intent.getStringExtra(SearchManager.QUERY);
             PieTalkLogger.i(TAG, "Search for: " + query);
+            
+        	    
         }
 	}
 
