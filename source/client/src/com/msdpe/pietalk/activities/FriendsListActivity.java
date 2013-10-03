@@ -1,11 +1,15 @@
 package com.msdpe.pietalk.activities;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import android.app.ActionBar;
 import android.app.SearchManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.view.Menu;
@@ -23,6 +27,7 @@ import android.widget.Toast;
 
 import com.microsoft.windowsazure.mobileservices.ApiOperationCallback;
 import com.microsoft.windowsazure.mobileservices.ServiceFilterResponse;
+import com.msdpe.pietalk.Constants;
 import com.msdpe.pietalk.R;
 import com.msdpe.pietalk.base.BaseActivity;
 import com.msdpe.pietalk.util.PieTalkAlert;
@@ -68,10 +73,37 @@ public class FriendsListActivity extends BaseActivity {
 	      list.add(values[i]);
 	    }
 	    
+	    //mAdapter = new ArrayAdapter<String>(this,
+	    //    android.R.layout.simple_list_item_1, list);
 	    mAdapter = new ArrayAdapter<String>(this,
-	        android.R.layout.simple_list_item_1, list);
+	    	        android.R.layout.simple_list_item_1, mPieTalkService.getLocalFriendNames());
 	    mLvFriends.setAdapter(mAdapter);
 	}
+	
+	@Override
+	protected void onResume() {
+		IntentFilter filter = new IntentFilter();
+		filter.addAction(Constants.BROADCAST_FRIENDS_UPDATED);
+		registerReceiver(receiver, filter);
+		super.onResume();
+	}
+	
+	@Override
+	protected void onPause() {
+		unregisterReceiver(receiver);
+		super.onPause();
+	}
+	
+	private BroadcastReceiver receiver = new BroadcastReceiver() {
+		public void onReceive(Context context, android.content.Intent intent) {
+			PieTalkLogger.i(TAG, "Broadcast received");
+			mAdapter.clear();
+
+			for (String item : mPieTalkService.getLocalFriendNames()) {
+				mAdapter.add(item);
+			}		
+		}
+	};
 
 	/**
 	 * Set up the {@link android.app.ActionBar}.
@@ -107,6 +139,7 @@ public class FriendsListActivity extends BaseActivity {
 				PieTalkLogger.i(TAG, "Text: " + newText);
 				mCurrentName = newText;
 				mBtnAddFriend.setEnabled(true);
+				mBtnAddFriend.setVisibility(View.VISIBLE);
 				mAdapter.getFilter().filter(newText, new FilterListener() {					
 					@Override
 					public void onFilterComplete(int count) {
@@ -192,7 +225,10 @@ public class FriendsListActivity extends BaseActivity {
 					else 
 						Toast.makeText(mActivity, response.Error, Toast.LENGTH_SHORT).show();
 				} else {
-					//
+					Toast.makeText(mActivity, response.Status, Toast.LENGTH_SHORT).show();
+					mBtnAddFriend.setVisibility(View.GONE);
+					mPieTalkService.getFriends();
+					
 				}
 			}
 		});
@@ -206,5 +242,4 @@ public class FriendsListActivity extends BaseActivity {
 		
 		//On other side, don't show friend in friend list, show request in message list
 	}
-
 }

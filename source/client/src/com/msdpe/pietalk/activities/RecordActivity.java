@@ -18,9 +18,10 @@ import com.msdpe.pietalk.R.anim;
 import com.msdpe.pietalk.R.drawable;
 import com.msdpe.pietalk.R.id;
 import com.msdpe.pietalk.R.layout;
+import com.msdpe.pietalk.base.BaseActivity;
 import com.msdpe.pietalk.util.PieTalkLogger;
 
-public class RecordActivity extends Activity {
+public class RecordActivity extends BaseActivity {
 	
 	private final String TAG = "RecordActivity";
 	private Camera mCamera;
@@ -42,7 +43,7 @@ public class RecordActivity extends Activity {
 		mBtnSwitchCamera = (ImageButton) findViewById(R.id.btnSwitchCameras);
 		mBtnFlash = (ImageButton) findViewById(R.id.btnFlash);
 		
-		
+		mPieTalkService.getFriends();
 		
 	}
 	

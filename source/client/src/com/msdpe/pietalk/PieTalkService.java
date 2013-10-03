@@ -1,6 +1,8 @@
 package com.msdpe.pietalk;
 
 import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.http.StatusLine;
 
@@ -10,27 +12,38 @@ import android.content.SharedPreferences;
 import android.util.Log;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
+import android.widget.Toast;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.microsoft.windowsazure.mobileservices.ApiOperationCallback;
 import com.microsoft.windowsazure.mobileservices.MobileServiceClient;
+import com.microsoft.windowsazure.mobileservices.MobileServiceTable;
 import com.microsoft.windowsazure.mobileservices.MobileServiceUser;
 import com.microsoft.windowsazure.mobileservices.NextServiceFilterCallback;
 import com.microsoft.windowsazure.mobileservices.ServiceFilter;
 import com.microsoft.windowsazure.mobileservices.ServiceFilterRequest;
 import com.microsoft.windowsazure.mobileservices.ServiceFilterResponse;
 import com.microsoft.windowsazure.mobileservices.ServiceFilterResponseCallback;
+import com.microsoft.windowsazure.mobileservices.TableQueryCallback;
 import com.msdpe.pietalk.activities.SplashScreenActivity;
+import com.msdpe.pietalk.datamodels.Friend;
 import com.msdpe.pietalk.util.PieTalkLogger;
 import com.msdpe.pietalk.util.PieTalkRegisterResponse;
 import com.msdpe.pietalk.util.PieTalkResponse;
 
-public class PieTalkService {
-	private MobileServiceClient mClient;
+public class PieTalkService {	
 	private Context mContext;
 	private final String TAG = "PieTalkService";
 	private String mUsername;
+	
+	//Mobile Services objects
+	private MobileServiceClient mClient;
+	private MobileServiceTable<Friend> mFriendTable;	
+	
+	//Local data
+	private List<Friend> mFriends;
+	private List<String> mFriendNames;
 	
 	
 	public PieTalkService(Context context) {
@@ -39,6 +52,11 @@ public class PieTalkService {
 			mClient = new MobileServiceClient("https://pietalk.azure-mobile.net/", 
 					"fPcjjyAxIIIGxPSxgzMfIHxOiQIKWA95", mContext)
 					.withFilter(new MyServiceFilter());
+			
+			mFriendTable = mClient.getTable("Friends", Friend.class);
+			
+			mFriends = new ArrayList<Friend>();
+			mFriendNames = new ArrayList<String>();
 		} catch (MalformedURLException e) {
 			Log.e(TAG, "There was an error creating the Mobile Service.  Verify the URL");
 		}
@@ -50,6 +68,14 @@ public class PieTalkService {
 	
 	public String getUserId() {
 		return mClient.getCurrentUser().getUserId();
+	}
+	
+	public List<Friend> getLocalFriends() {
+		return mFriends;
+	}
+	
+	public List<String> getLocalFriendNames() {
+		return mFriendNames;
 	}
 	
 	/**
@@ -185,6 +211,32 @@ public class PieTalkService {
 		JsonObject friendRequest = new JsonObject();	
 		friendRequest.addProperty("username", username);
 		mClient.invokeApi("RequestFriend", friendRequest, PieTalkRegisterResponse.class, callback);
+	}
+	
+	public void getFriends() {
+		mFriendTable.where().execute(new TableQueryCallback<Friend>() {			
+			@Override
+			public void onCompleted(List<Friend> results, int count, Exception ex,
+					ServiceFilterResponse response) {
+				if (ex != null) {
+					Toast.makeText(mContext, "Error getting friends", Toast.LENGTH_SHORT).show();
+					PieTalkLogger.e(TAG, "Error getting friends: " + ex.getCause().getMessage());
+				} else {
+					PieTalkLogger.i(TAG, "Friends received");
+					mFriends = results;
+					//Loop through and pull out names
+					//TODO: remove this when we switch to custom adapter
+					for (int i = 0; i < results.size(); i++) {
+						mFriendNames.add(results.get(i).getToUsername());
+					}
+					PieTalkLogger.i(TAG, "Sending broadcast");
+					//Broadcast that we've updated our friends list
+					Intent broadcast = new Intent();
+					broadcast.setAction(Constants.BROADCAST_FRIENDS_UPDATED);
+					mContext.sendBroadcast(broadcast);					
+				}				
+			}
+		});
 	}
 	
 	private class MyServiceFilter implements ServiceFilter {		

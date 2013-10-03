@@ -28,5 +28,6 @@ public abstract class BaseActivity extends Activity {
 		mApplication = (PieTalkApplication) getApplication();
 		mApplication.setCurrentActivity(this);
 		mPieTalkService = mApplication.getPieTalkService();
+		mPieTalkService.setContext(this);
 	}
 }

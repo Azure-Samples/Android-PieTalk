@@ -28,5 +28,6 @@ public class BaseListActivity extends ListActivity {
 		mApplication = (PieTalkApplication) getApplication();
 		mApplication.setCurrentActivity(this);
 		mPieTalkService = mApplication.getPieTalkService();
+		mPieTalkService.setContext(this);
 	}
 }

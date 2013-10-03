@@ -42,7 +42,7 @@
             android:screenOrientation="portrait" >
         </activity>
         <activity
-    		android:name="com.msdpe.pietalk.activities.SelectUsernameActivitySelectUsernameActivity"
+    		android:name="com.msdpe.pietalk.activities.SelectUsernameActivity"
             android:label="@string/title_activity_select_username"
             android:screenOrientation="portrait" >
         </activity>
