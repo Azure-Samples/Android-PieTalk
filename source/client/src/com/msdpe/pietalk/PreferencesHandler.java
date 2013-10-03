@@ -18,4 +18,16 @@ public class PreferencesHandler {
 		SharedPreferences settings = context.getSharedPreferences(PREFERENCES_NAME, 0);
 		return settings.getInt("cameraType", 0);
 	}
+	
+	public static void SaveFlashPreference(Context context, boolean flashOn) {		
+		SharedPreferences settings = context.getSharedPreferences(PREFERENCES_NAME, 0);
+        SharedPreferences.Editor preferencesEditor = settings.edit();
+        preferencesEditor.putBoolean("flashOn", flashOn);
+        preferencesEditor.commit();
+	}
+	
+	public static boolean GetFlashPreference(Context context) {
+		SharedPreferences settings = context.getSharedPreferences(PREFERENCES_NAME, 0);
+		return settings.getBoolean("flashOn", false);
+	}
 }

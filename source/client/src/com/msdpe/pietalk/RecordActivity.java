@@ -20,6 +20,7 @@ public class RecordActivity extends Activity {
 	private ImageButton mBtnSwitchCamera;
 	private ImageButton mBtnFlash;
 	private int mCameraNumber;
+	private boolean mFlashOn;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +45,13 @@ public class RecordActivity extends Activity {
 		
 		int numberOfCams = Camera.getNumberOfCameras();
 		mCameraNumber = 0;
+		mFlashOn = PreferencesHandler.GetFlashPreference(getApplicationContext());
+		if (mFlashOn)
+			mBtnFlash.setImageResource(R.drawable.device_access_flash_on);
+			//mBtnFlash.setBackgroundDrawable(getResources().getDrawable(R.drawable.device_access_flash_on));
+		else
+			mBtnFlash.setImageResource(R.drawable.device_access_flash_off);
+			//mBtnFlash.setBackgroundDrawable(getResources().getDrawable(R.drawable.device_access_flash_off));
 		if (numberOfCams <2 )
 			mBtnSwitchCamera.setVisibility(View.GONE);
 		else 
@@ -83,7 +91,15 @@ public class RecordActivity extends Activity {
 	}
 	
 	public void tappedFlash(View view) {
+		mFlashOn = !mFlashOn;
+		PreferencesHandler.SaveFlashPreference(getApplicationContext(), mFlashOn);
 		
+		if (mFlashOn)
+			mBtnFlash.setImageResource(R.drawable.device_access_flash_on);
+			//mBtnFlash.setBackgroundDrawable(getResources().getDrawable(R.drawable.device_access_flash_on));			
+		else
+			mBtnFlash.setImageResource(R.drawable.device_access_flash_off);
+			//mBtnFlash.setBackgroundDrawable(getResources().getDrawable(R.drawable.device_access_flash_off));
 	}
 	
 	public void tappedSwitchCamera(View view) {

@@ -17,7 +17,7 @@
         android:id="@+id/btnFlash"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/device_access_flash_off"
+        
         android:layout_alignParentTop="true" 
         android:layout_alignParentLeft="true"
         android:onClick="tappedFlash"/>
