@@ -9,6 +9,7 @@ import android.support.v4.app.NavUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.SearchView;
+import android.widget.SearchView.OnQueryTextListener;
 
 import com.msdpe.pietalk.util.PieTalkLogger;
 
@@ -47,8 +48,18 @@ public class FriendsListActivity extends BaseActivity {
 	    searchView.setSearchableInfo(
 	            searchManager.getSearchableInfo(getComponentName()));
 	    //searchView.setQueryHint("test");
-	    
-		
+	    searchView.setOnQueryTextListener(new OnQueryTextListener() {			
+	    		@Override
+			public boolean onQueryTextSubmit(String query) {
+				return true;
+			}
+			
+			@Override
+			public boolean onQueryTextChange(String newText) {
+				PieTalkLogger.i(TAG, "Text: " + newText);
+				return true;
+			}
+		});		
 		return true;
 	}
 
