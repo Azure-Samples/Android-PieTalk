@@ -33,5 +33,7 @@
     <string name="search">Search</string>
     <string name="search_for_friends">Search for friends</string>
     <string name="add_friend">Add Friend</string>
+    <string name="title_activity_pies_list">PiesListActivity</string>
+    <string name="settings">Settings</string>
 
 </resources>

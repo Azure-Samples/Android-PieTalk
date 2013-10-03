@@ -37,17 +37,17 @@
             android:screenOrientation="portrait" >
         </activity>
         <activity
-    		android:name="com.msdpe.pietalk.activities.SignupActivity"
+            android:name="com.msdpe.pietalk.activities.SignupActivity"
             android:label="@string/title_activity_signup"
             android:screenOrientation="portrait" >
         </activity>
         <activity
-    		android:name="com.msdpe.pietalk.activities.SelectUsernameActivity"
+            android:name="com.msdpe.pietalk.activities.SelectUsernameActivity"
             android:label="@string/title_activity_select_username"
             android:screenOrientation="portrait" >
         </activity>
         <activity
-			android:name="com.msdpe.pietalk.activities.RecordActivity"
+            android:name="com.msdpe.pietalk.activities.RecordActivity"
             android:label="@string/title_activity_record"
             android:screenOrientation="portrait" >
         </activity>
@@ -59,19 +59,28 @@
         <activity
             android:name="com.msdpe.pietalk.activities.FriendsListActivity"
             android:label="@string/title_activity_friends_list"
-            android:launchMode="singleTop">
+            android:launchMode="singleTop" >
             <intent-filter>
-		        <action android:name="android.intent.action.SEARCH" />
-		    </intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.msdpe.pietalk.activities.RecordActivity" />
-            <meta-data 
-                android:name="android.app.searchable"
-            	android:resource="@xml/searchable" />
             <meta-data
-            android:name="android.app.default_searchable"
-            android:value="com.msdpe.pietalk.FriendsListActivity" />
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
+            <meta-data
+                android:name="android.app.default_searchable"
+                android:value="com.msdpe.pietalk.FriendsListActivity" />
+        </activity>
+        <activity
+            android:name="com.msdpe.pietalk.activities.PiesListActivity"
+            android:label="@string/title_activity_pies_list"
+            android:parentActivityName="com.msdpe.pietalk.activities.RecordActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.msdpe.pietalk.activities.RecordActivity" />
         </activity>
     </application>
 

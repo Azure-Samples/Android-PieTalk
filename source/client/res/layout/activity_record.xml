@@ -48,6 +48,7 @@
         android:src="@drawable/collections_collection" 
         android:layout_alignParentBottom="true" 
         android:layout_alignParentLeft="true"
+        android:onClick="tappedPies"
         />
 
     <ImageButton

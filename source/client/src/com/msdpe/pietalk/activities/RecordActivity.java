@@ -127,9 +127,13 @@ public class RecordActivity extends BaseActivity {
 		preview.addView(mCameraPreview);
 	}
 	
+	public void tappedPies(View view) {
+		startActivity(new Intent(getApplicationContext(), PiesListActivity.class));		
+        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right);
+	}
+	
 	public void tappedFriendsList(View view) {
-		startActivity(new Intent(getApplicationContext(), FriendsListActivity.class));
-		
+		startActivity(new Intent(getApplicationContext(), FriendsListActivity.class));		
         overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
 	}
 

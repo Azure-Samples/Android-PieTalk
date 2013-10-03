@@ -15,6 +15,7 @@ import android.support.v4.app.NavUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.Filter.FilterListener;
 import android.widget.ImageButton;
@@ -54,6 +55,8 @@ public class FriendsListActivity extends BaseActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN);
+		getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
 		super.onCreate(savedInstanceState, true);
 		setContentView(R.layout.activity_friends_list);
 		// Show the Up button in the action bar.
@@ -110,8 +113,7 @@ public class FriendsListActivity extends BaseActivity {
 	 */
 	private void setupActionBar() {
 
-		ActionBar bar = getActionBar();
-		bar.setDisplayHomeAsUpEnabled(true);
+		getActionBar().setDisplayHomeAsUpEnabled(true);
 
 	}
 
@@ -198,13 +200,10 @@ public class FriendsListActivity extends BaseActivity {
 	@Override
 	protected void onNewIntent(Intent intent) {
 		// TODO Auto-generated method stub
-		super.onNewIntent(intent);		
-		
+		super.onNewIntent(intent);				
 		if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = intent.getStringExtra(SearchManager.QUERY);
             PieTalkLogger.i(TAG, "Search for: " + query);
-            
-        	    
         }
 	}
 	
