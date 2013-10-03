@@ -1,4 +1,4 @@
-package com.msdpe.pietalk;
+package com.msdpe.pietalk.activities;
 
 
 import java.util.Calendar;
@@ -24,6 +24,13 @@ import android.widget.Toast;
 import com.google.gson.JsonElement;
 import com.microsoft.windowsazure.mobileservices.ApiOperationCallback;
 import com.microsoft.windowsazure.mobileservices.ServiceFilterResponse;
+import com.msdpe.pietalk.Constants;
+import com.msdpe.pietalk.R;
+import com.msdpe.pietalk.R.drawable;
+import com.msdpe.pietalk.R.id;
+import com.msdpe.pietalk.R.layout;
+import com.msdpe.pietalk.R.string;
+import com.msdpe.pietalk.base.BaseActivity;
 import com.msdpe.pietalk.util.PieTalkAlert;
 import com.msdpe.pietalk.util.PieTalkRegisterResponse;
 import com.msdpe.pietalk.util.TextValidator;

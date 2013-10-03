@@ -1,4 +1,4 @@
-package com.msdpe.pietalk;
+package com.msdpe.pietalk.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,6 +13,11 @@ import android.widget.TextView;
 
 import com.microsoft.windowsazure.mobileservices.ApiOperationCallback;
 import com.microsoft.windowsazure.mobileservices.ServiceFilterResponse;
+import com.msdpe.pietalk.R;
+import com.msdpe.pietalk.R.drawable;
+import com.msdpe.pietalk.R.id;
+import com.msdpe.pietalk.R.layout;
+import com.msdpe.pietalk.base.BaseActivity;
 import com.msdpe.pietalk.util.PieTalkAlert;
 import com.msdpe.pietalk.util.PieTalkResponse;
 import com.msdpe.pietalk.util.TextValidator;

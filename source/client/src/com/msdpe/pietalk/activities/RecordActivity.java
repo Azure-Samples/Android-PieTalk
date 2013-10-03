@@ -1,4 +1,4 @@
-package com.msdpe.pietalk;
+package com.msdpe.pietalk.activities;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -11,6 +11,13 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 
+import com.msdpe.pietalk.CameraPreview;
+import com.msdpe.pietalk.PreferencesHandler;
+import com.msdpe.pietalk.R;
+import com.msdpe.pietalk.R.anim;
+import com.msdpe.pietalk.R.drawable;
+import com.msdpe.pietalk.R.id;
+import com.msdpe.pietalk.R.layout;
 import com.msdpe.pietalk.util.PieTalkLogger;
 
 public class RecordActivity extends Activity {

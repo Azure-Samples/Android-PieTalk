@@ -1,4 +1,4 @@
-package com.msdpe.pietalk;
+package com.msdpe.pietalk.activities;
 
 import java.util.ArrayList;
 
@@ -16,6 +16,12 @@ import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.SearchView.OnQueryTextListener;
 
+import com.msdpe.pietalk.R;
+import com.msdpe.pietalk.R.anim;
+import com.msdpe.pietalk.R.id;
+import com.msdpe.pietalk.R.layout;
+import com.msdpe.pietalk.R.menu;
+import com.msdpe.pietalk.base.BaseActivity;
 import com.msdpe.pietalk.util.PieTalkLogger;
 
 public class FriendsListActivity extends BaseActivity {

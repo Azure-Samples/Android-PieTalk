@@ -1,4 +1,7 @@
-package com.msdpe.pietalk;
+package com.msdpe.pietalk.base;
+
+import com.msdpe.pietalk.PieTalkApplication;
+import com.msdpe.pietalk.PieTalkService;
 
 import android.app.Activity;
 import android.os.Bundle;

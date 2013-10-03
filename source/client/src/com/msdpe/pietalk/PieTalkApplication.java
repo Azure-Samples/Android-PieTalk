@@ -1,5 +1,7 @@
 package com.msdpe.pietalk;
 
+import com.msdpe.pietalk.activities.SplashScreenActivity;
+
 import android.app.Activity;
 import android.app.Application;
 
