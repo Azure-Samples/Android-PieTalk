@@ -1,6 +1,7 @@
 package com.msdpe.pietalk;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.view.Menu;
@@ -31,7 +32,7 @@ public class RecordActivity extends Activity {
 				WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		setContentView(R.layout.activity_record);
 		
-		mBtnSwitchCamera = (ImageButton) findViewById(R.id.btnSwitchCamera);
+		mBtnSwitchCamera = (ImageButton) findViewById(R.id.btnSwitchCameras);
 		mBtnFlash = (ImageButton) findViewById(R.id.btnFlash);
 		
 		
@@ -116,6 +117,10 @@ public class RecordActivity extends Activity {
 		FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
 		preview.removeAllViews();
 		preview.addView(mCameraPreview);
+	}
+	
+	public void tappedFriendsList(View view) {
+		startActivity(new Intent(getApplicationContext(), FriendsListActivity.class));
 	}
 
 }
