@@ -86,14 +86,7 @@ public class FriendsListActivity extends BaseActivity {
 			public boolean onQueryTextChange(String newText) {
 				PieTalkLogger.i(TAG, "Text: " + newText);
 				
-
-//	            mAdapter.clear();
 				mAdapter.getFilter().filter(newText);
-//	            //mLvFriends.setAdapter(mAdapter);
-//	        	    mAdapter.notifyDataSetChanged();
-//	        	    mAdapter.notifyAll();
-//	        	    mAdapter.notify();
-//	        	    mAdapter.notifyDataSetInvalidated();
 				
 				return true;
 			}

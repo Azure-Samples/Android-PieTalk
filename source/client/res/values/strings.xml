@@ -32,5 +32,6 @@
     <string name="title_activity_friends_list">My Friends</string>
     <string name="search">Search</string>
     <string name="search_for_friends">Search for friends</string>
+    <string name="add_friend">Add Friend</string>
 
 </resources>

@@ -13,7 +13,25 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true" >
+        android:layout_alignParentTop="true"
+        android:paddingBottom="@dimen/medium_margin" >
+
     </ListView>
+
+    <LinearLayout
+        android:id="@+id/layoutAddFriend"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/lvFriends"
+        android:layout_alignLeft="@+id/lvFriends"
+        android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/lblAddFriend"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/add_friend" />
+
+    </LinearLayout>
 
 </RelativeLayout>
