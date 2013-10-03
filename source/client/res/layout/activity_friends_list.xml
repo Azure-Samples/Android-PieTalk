@@ -14,13 +14,13 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:paddingBottom="@dimen/medium_margin" >
+        android:paddingBottom="@dimen/add_friend_padding" >
 
     </ListView>
 
     <LinearLayout
         android:id="@+id/layoutAddFriend"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignBottom="@+id/lvFriends"
         android:layout_alignLeft="@+id/lvFriends"
@@ -31,6 +31,38 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/add_friend" />
+
+        <LinearLayout
+            android:id="@+id/layoutDivider"
+            android:layout_width="match_parent"
+            android:layout_height="2dp" 
+            android:orientation="horizontal"
+            android:background="@color/dull_purple">
+
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <ImageButton
+                android:id="@+id/btnAddFriend"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/dark_social_add_person" 
+                android:layout_alignParentRight="true"
+                android:onClick="tappedAddFriend"/>
+
+            <TextView
+                android:id="@+id/lblNewFriendName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:paddingLeft="@dimen/medium_margin"
+                android:text="@string/set_in_code" />
+
+        </RelativeLayout>
 
     </LinearLayout>
 

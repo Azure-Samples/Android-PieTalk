@@ -13,14 +13,21 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Filter.FilterListener;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.SearchView.OnQueryTextListener;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import com.microsoft.windowsazure.mobileservices.ApiOperationCallback;
+import com.microsoft.windowsazure.mobileservices.ServiceFilterResponse;
 import com.msdpe.pietalk.R;
 import com.msdpe.pietalk.base.BaseActivity;
+import com.msdpe.pietalk.util.PieTalkAlert;
 import com.msdpe.pietalk.util.PieTalkLogger;
+import com.msdpe.pietalk.util.PieTalkRegisterResponse;
 
 public class FriendsListActivity extends BaseActivity {
 	
@@ -28,6 +35,9 @@ public class FriendsListActivity extends BaseActivity {
 	private ListView mLvFriends;
 	private ArrayAdapter<String> mAdapter;
 	private LinearLayout mLayoutAddFriend;
+	private TextView mLblNewFriendName;
+	private String mCurrentName;
+	private ImageButton mBtnAddFriend;
 	
 //	String[] values = new String[] { "Android", "iPhone", "WindowsMobile",
 //	        "Blackberry", "WebOS", "Ubuntu", "Windows7", "Max OS X",
@@ -46,6 +56,9 @@ public class FriendsListActivity extends BaseActivity {
 		
 		mLayoutAddFriend = (LinearLayout) findViewById(R.id.layoutAddFriend);
 		mLayoutAddFriend.setVisibility(View.GONE);
+		
+		mLblNewFriendName = (TextView) findViewById(R.id.lblNewFriendName);
+		mBtnAddFriend = (ImageButton) findViewById(R.id.btnAddFriend);
 		
 		mLvFriends = (ListView) findViewById(R.id.lvFriends);
 		mLvFriends.setOverScrollMode(View.OVER_SCROLL_NEVER);
@@ -90,9 +103,10 @@ public class FriendsListActivity extends BaseActivity {
 			}
 			
 			@Override
-			public boolean onQueryTextChange(final String newText) {
+			public boolean onQueryTextChange(String newText) {
 				PieTalkLogger.i(TAG, "Text: " + newText);
-				
+				mCurrentName = newText;
+				mBtnAddFriend.setEnabled(true);
 				mAdapter.getFilter().filter(newText, new FilterListener() {					
 					@Override
 					public void onFilterComplete(int count) {
@@ -101,13 +115,14 @@ public class FriendsListActivity extends BaseActivity {
 						else
 							mLvFriends.setVisibility(View.GONE);
 						
-						if (!newText.equals("")) {
+						if (!mCurrentName.equals("")) {
 							mLayoutAddFriend.setVisibility(View.VISIBLE);
 						} else {
 							mLayoutAddFriend.setVisibility(View.GONE);
 						}
 					}
 				});
+				mLblNewFriendName.setText(mCurrentName);
 				
 				
 				return true;
@@ -158,6 +173,38 @@ public class FriendsListActivity extends BaseActivity {
             
         	    
         }
+	}
+	
+	public void tappedAddFriend(View view) {
+		Toast.makeText(this, "Adding " + mCurrentName +"...", Toast.LENGTH_SHORT).show();
+		mBtnAddFriend.setEnabled(false);
+		
+		mPieTalkService.requestFriend(mCurrentName, new ApiOperationCallback<PieTalkRegisterResponse>() {			
+			@Override
+			public void onCompleted(PieTalkRegisterResponse response, Exception ex,
+					ServiceFilterResponse arg2) {
+				PieTalkLogger.i(TAG, "Response received");
+				if (ex != null || response.Error != null) {
+					mBtnAddFriend.setEnabled(true);										
+					//Display error					
+					if (ex != null)
+						PieTalkAlert.showSimpleErrorDialog(mActivity, ex.getCause().getMessage());
+					else 
+						Toast.makeText(mActivity, response.Error, Toast.LENGTH_SHORT).show();
+				} else {
+					//
+				}
+			}
+		});
+		
+		//Make friend request
+		//if error, show error in toast
+		//if success, save friend request, show this toast
+		//"username is private.  Friend request sent."
+		//remove button
+		//when pulling down friends, pull down pending too, show "pending..." under username in friends list
+		
+		//On other side, don't show friend in friend list, show request in message list
 	}
 
 }

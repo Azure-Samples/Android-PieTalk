@@ -181,6 +181,12 @@ public class PieTalkService {
 		}
 	}
 	
+	public void requestFriend(String username, ApiOperationCallback<PieTalkRegisterResponse> callback) {
+		JsonObject friendRequest = new JsonObject();	
+		friendRequest.addProperty("username", username);
+		mClient.invokeApi("RequestFriend", friendRequest, PieTalkRegisterResponse.class, callback);
+	}
+	
 	private class MyServiceFilter implements ServiceFilter {		
 		@Override
 		public void handleRequest(ServiceFilterRequest request, NextServiceFilterCallback nextServiceFilterCallback,

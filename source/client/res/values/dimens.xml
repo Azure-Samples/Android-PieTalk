@@ -9,5 +9,6 @@
     <dimen name="small_margin">5dp</dimen>
     <dimen name="medium_margin">10dp</dimen>
     <dimen name="button_text_padding">8dp</dimen>
+    <dimen name="add_friend_padding">64dp</dimen>
 
 </resources>
