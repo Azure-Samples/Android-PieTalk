@@ -37,6 +37,7 @@ public class PieTalkService {
 	private Context mContext;
 	private final String TAG = "PieTalkService";
 	private String mUsername;
+	private String mEmail;
 	
 	//Mobile Services objects
 	private MobileServiceClient mClient;
@@ -72,6 +73,14 @@ public class PieTalkService {
 	
 	public String getUserId() {
 		return mClient.getCurrentUser().getUserId();
+	}
+	
+	public String getUsername() {
+		return mUsername; 
+	}
+	
+	public String getEmail() {
+		return mEmail;
 	}
 	
 	public List<Friend> getLocalFriends() {
@@ -110,8 +119,9 @@ public class PieTalkService {
 			String userId = settings.getString("userid", null);
 			String token = settings.getString("token", null);
 			String username = settings.getString("username", null);
+			String email = settings.getString("email", null);
 			if (userId != null && !userId.equals("")) {
-				setUserData(userId, token, username);
+				setUserData(userId, token, username, email);
 				return true;
 			}
 		}
@@ -124,11 +134,12 @@ public class PieTalkService {
 	 * @param userId
 	 * @param token
 	 */
-	public void setUserData(String userId, String token, String username) {
+	public void setUserData(String userId, String token, String username, String email) {
 		MobileServiceUser user = new MobileServiceUser(userId);
 		user.setAuthenticationToken(token);
 		mClient.setCurrentUser(user);		
 		mUsername = username;
+		mEmail = email;
 	}
 	
 	/***
@@ -138,16 +149,19 @@ public class PieTalkService {
 	public void setUserAndSaveData(JsonElement jsonData) {
 		JsonObject userData = jsonData.getAsJsonObject();
 		String userId = userData.get("userId").getAsString();
-		String token = userData.get("token").getAsString();			
-		setUserData(userId, token, null);	
+		String token = userData.get("token").getAsString();
+		String email = userData.get("email").getAsString();
+		setUserData(userId, token, null, email);	
 		saveUserData();
 	}
 	
 	public void setUserAndSaveData(PieTalkRegisterResponse registerData) {
 		//JsonObject userData = jsonData.getAsJsonObject();
 		String userId = registerData.userId;
-		String token = registerData.token;			
-		setUserData(userId, token, null);	
+		String token = registerData.token;		
+		String username = registerData.username;
+		String email = registerData.email;
+		setUserData(userId, token, username, email);	
 		saveUserData();
 	}
 	
@@ -161,6 +175,8 @@ public class PieTalkService {
         SharedPreferences.Editor preferencesEditor = settings.edit();
         preferencesEditor.putString("userid", mClient.getCurrentUser().getUserId());
         preferencesEditor.putString("token", mClient.getCurrentUser().getAuthenticationToken());
+        preferencesEditor.putString("username", mUsername);
+        preferencesEditor.putString("email", mEmail);
         preferencesEditor.commit();
 	}
 	

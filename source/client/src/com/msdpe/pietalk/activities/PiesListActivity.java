@@ -18,7 +18,7 @@ import android.widget.ListView;
 
 import com.msdpe.pietalk.Constants;
 import com.msdpe.pietalk.R;
-import com.msdpe.pietalk.SettingsActivity;
+import com.msdpe.pietalk.TestSettingsActivity;
 import com.msdpe.pietalk.base.BaseActivity;
 import com.msdpe.pietalk.util.PieTalkLogger;
 
@@ -114,10 +114,10 @@ public class PiesListActivity extends BaseActivity {
 			overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right);
 			return true;		
 		case R.id.menuSettings:
-			PieTalkLogger.i(TAG, "Need to implement settings");
-			//Intent intent = new Intent(mActivity, SettingsActivity.class);
-			//startActivity(intent);
-			//finish();
+			
+			Intent intent = new Intent(mActivity, TestSettingsActivity.class);
+			startActivity(intent);
+			finish();
 			//mPieTalkService.getPies();
 			//mPullToRefreshAttacher.setRefreshing(true);
 			

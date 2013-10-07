@@ -10,5 +10,6 @@
     <dimen name="medium_margin">10dp</dimen>
     <dimen name="button_text_padding">8dp</dimen>
     <dimen name="add_friend_padding">64dp</dimen>
+    <dimen name="bar_height">1dp</dimen>
 
 </resources>
