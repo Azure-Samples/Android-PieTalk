@@ -28,6 +28,7 @@ import com.microsoft.windowsazure.mobileservices.ServiceFilterResponseCallback;
 import com.microsoft.windowsazure.mobileservices.TableQueryCallback;
 import com.msdpe.pietalk.activities.SplashScreenActivity;
 import com.msdpe.pietalk.datamodels.Friend;
+import com.msdpe.pietalk.datamodels.Pie;
 import com.msdpe.pietalk.util.PieTalkLogger;
 import com.msdpe.pietalk.util.PieTalkRegisterResponse;
 import com.msdpe.pietalk.util.PieTalkResponse;
@@ -40,13 +41,12 @@ public class PieTalkService {
 	//Mobile Services objects
 	private MobileServiceClient mClient;
 	private MobileServiceTable<Friend> mFriendTable;	
+	private MobileServiceTable<Pie> mPieTable;
 	
 	//Local data
 	private List<Friend> mFriends;
 	private List<String> mFriendNames;
-	
-	
-	public List<Friend> removeMethodGetFriends() { return mFriends; }
+	private List<Pie> mPies;
 	
 	public PieTalkService(Context context) {
 		mContext = context;
@@ -56,9 +56,11 @@ public class PieTalkService {
 					.withFilter(new MyServiceFilter());
 			
 			mFriendTable = mClient.getTable("Friends", Friend.class);
+			mPieTable = mClient.getTable("Messages", Pie.class);
 			
 			mFriends = new ArrayList<Friend>();
 			mFriendNames = new ArrayList<String>();
+			mPies = new ArrayList<Pie>();
 		} catch (MalformedURLException e) {
 			Log.e(TAG, "There was an error creating the Mobile Service.  Verify the URL");
 		}
@@ -74,6 +76,18 @@ public class PieTalkService {
 	
 	public List<Friend> getLocalFriends() {
 		return mFriends;
+	}
+	
+	public List<Pie> getLocalPies() {
+		return mPies;
+	}
+	
+	public List<String> getLocalPieUsernames() {
+		List<String> mPieNames = new ArrayList<String>();
+		for (int i = 0; i < mPies.size(); i++) {
+			mPieNames.add(mPies.get(i).getFromUsername() + ":ttl: " + mPies.get(i).getTimeToLive());
+		}
+		return mPieNames;
 	}
 	
 	public List<String> getLocalFriendNames() {
@@ -243,6 +257,28 @@ public class PieTalkService {
 					//Broadcast that we've updated our friends list
 					Intent broadcast = new Intent();
 					broadcast.setAction(Constants.BROADCAST_FRIENDS_UPDATED);
+					mContext.sendBroadcast(broadcast);					
+				}				
+			}
+		});
+	}
+	
+	public void getPies() {
+		mPieTable.where().execute(new TableQueryCallback<Pie>() {			
+			@Override
+			public void onCompleted(List<Pie> results, int count, Exception ex,
+					ServiceFilterResponse response) {
+				if (ex != null) {
+					Toast.makeText(mContext, "Error getting pies", Toast.LENGTH_SHORT).show();
+					PieTalkLogger.e(TAG, "Error getting pies: " + ex.getCause().getMessage());
+				} else {
+					PieTalkLogger.i(TAG, "Pies received");
+					mPies = results;
+					
+					PieTalkLogger.i(TAG, "Sending broadcast");
+					//Broadcast that we've updated our pies list
+					Intent broadcast = new Intent();
+					broadcast.setAction(Constants.BROADCAST_PIES_UPDATED);
 					mContext.sendBroadcast(broadcast);					
 				}				
 			}

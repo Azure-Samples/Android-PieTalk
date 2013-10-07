@@ -44,6 +44,7 @@ public class RecordActivity extends BaseActivity {
 		mBtnFlash = (ImageButton) findViewById(R.id.btnFlash);
 		
 		mPieTalkService.getFriends();
+		mPieTalkService.getPies();
 		
 	}
 	

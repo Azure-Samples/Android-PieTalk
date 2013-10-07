@@ -45,13 +45,13 @@ public class PiesListActivity extends BaseActivity {
 			@Override
 			public void onRefreshStarted(View arg0) {
 				// TODO Auto-generated method stub
-				mPieTalkService.getFriends();
+				mPieTalkService.getPies();
 				
 			}
 		});
 		
 		mAdapter = new ArrayAdapter<String>(this,
-    	        android.R.layout.simple_list_item_1, mPieTalkService.getLocalFriendNames());
+    	        android.R.layout.simple_list_item_1, mPieTalkService.getLocalPieUsernames());
 		mLvPies.setAdapter(mAdapter);
 	}
 	
@@ -59,7 +59,7 @@ public class PiesListActivity extends BaseActivity {
 	protected void onResume() {
 		IntentFilter filter = new IntentFilter();
 		//filter.addAction(Constants.BROADCAST_PIES_UPDATED);
-		filter.addAction(Constants.BROADCAST_FRIENDS_UPDATED);
+		filter.addAction(Constants.BROADCAST_PIES_UPDATED);
 		registerReceiver(receiver, filter);
 		super.onResume();	
 	}
@@ -73,11 +73,12 @@ public class PiesListActivity extends BaseActivity {
 	private BroadcastReceiver receiver = new BroadcastReceiver() {
 		public void onReceive(Context context, android.content.Intent intent) {
 			mAdapter.clear();			
-			for (String item : mPieTalkService.getLocalFriendNames()) {
+			for (String item : mPieTalkService.getLocalPieUsernames()) {
 				mAdapter.add(item);
 			}		
 			PieTalkLogger.i(TAG, "Refresh complete");
 			mPullToRefreshAttacher.setRefreshComplete();
+			mPullToRefreshAttacher.setRefreshing(false);
 			
 		}
 	};
@@ -117,7 +118,9 @@ public class PiesListActivity extends BaseActivity {
 			//Intent intent = new Intent(mActivity, SettingsActivity.class);
 			//startActivity(intent);
 			//finish();
-			mPieTalkService.getFriends();
+			//mPieTalkService.getPies();
+			//mPullToRefreshAttacher.setRefreshing(true);
+			
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
