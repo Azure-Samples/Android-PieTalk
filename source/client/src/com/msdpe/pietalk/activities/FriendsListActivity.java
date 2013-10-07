@@ -51,7 +51,7 @@ public class FriendsListActivity extends BaseActivity {
 //	        "OS/2", "Ubuntu", "Windows7", "Max OS X", "Linux", "OS/2",
 //	        "Android", "iPhone", "WindowsMobile" };
 	
-	String[] values = new String[] { "Aaa", "Abc", "Abd", "Bcx", "Bdy", "Cdd" };
+//	String[] values = new String[] { "Aaa", "Abc", "Abd", "Bcx", "Bdy", "Cdd" };
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -71,10 +71,10 @@ public class FriendsListActivity extends BaseActivity {
 		mLvFriends = (ListView) findViewById(R.id.lvFriends);
 		mLvFriends.setOverScrollMode(View.OVER_SCROLL_NEVER);
 		
-		final ArrayList<String> list = new ArrayList<String>();
-	    for (int i = 0; i < values.length; ++i) {
-	      list.add(values[i]);
-	    }
+//		final ArrayList<String> list = new ArrayList<String>();
+//	    for (int i = 0; i < values.length; ++i) {
+//	      list.add(values[i]);
+//	    }
 	    
 	    //mAdapter = new ArrayAdapter<String>(this,
 	    //    android.R.layout.simple_list_item_1, list);

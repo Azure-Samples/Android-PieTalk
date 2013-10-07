@@ -46,6 +46,8 @@ public class PieTalkService {
 	private List<String> mFriendNames;
 	
 	
+	public List<Friend> removeMethodGetFriends() { return mFriends; }
+	
 	public PieTalkService(Context context) {
 		mContext = context;
 		try {
@@ -75,6 +77,12 @@ public class PieTalkService {
 	}
 	
 	public List<String> getLocalFriendNames() {
+//		return mFriendNames;
+		mFriendNames = new ArrayList<String>();
+		PieTalkLogger.i(TAG, "Processing " + mFriends.size() + " friends");
+		for (int i = 0; i < mFriends.size(); i++) {
+			mFriendNames.add(mFriends.get(i).getToUsername());
+		}
 		return mFriendNames;
 	}
 	
@@ -226,9 +234,11 @@ public class PieTalkService {
 					mFriends = results;
 					//Loop through and pull out names
 					//TODO: remove this when we switch to custom adapter
-					for (int i = 0; i < results.size(); i++) {
-						mFriendNames.add(results.get(i).getToUsername());
-					}
+//					mFriendNames.clear();
+//					PieTalkLogger.i(TAG, "Processing " + results.size() + " friends");
+//					for (int i = 0; i < results.size(); i++) {
+//						mFriendNames.add(results.get(i).getToUsername());
+//					}
 					PieTalkLogger.i(TAG, "Sending broadcast");
 					//Broadcast that we've updated our friends list
 					Intent broadcast = new Intent();

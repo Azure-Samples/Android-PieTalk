@@ -1,8 +1,11 @@
 package com.msdpe.pietalk.activities;
 
+import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher;
+import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher.OnRefreshListener;
 import android.app.ActionBar;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
@@ -15,6 +18,7 @@ import android.widget.ListView;
 
 import com.msdpe.pietalk.Constants;
 import com.msdpe.pietalk.R;
+import com.msdpe.pietalk.SettingsActivity;
 import com.msdpe.pietalk.base.BaseActivity;
 import com.msdpe.pietalk.util.PieTalkLogger;
 
@@ -23,27 +27,39 @@ public class PiesListActivity extends BaseActivity {
 	private final String TAG = "PiesListActivity";
 	private ListView mLvPies;
 	private ArrayAdapter<String> mAdapter;	
+	private PullToRefreshAttacher mPullToRefreshAttacher;
 	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		//getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
-		//getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN);
-		getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
-		
+		getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);		
 		super.onCreate(savedInstanceState, true);
 		setContentView(R.layout.activity_pies_list);
 		// Show the Up button in the action bar.
 		setupActionBar();
 		
+		mLvPies = (ListView) findViewById(R.id.lvPies);
+		mPullToRefreshAttacher = PullToRefreshAttacher.get(this);
+		mPullToRefreshAttacher.addRefreshableView(mLvPies, new OnRefreshListener() {			
+			@Override
+			public void onRefreshStarted(View arg0) {
+				// TODO Auto-generated method stub
+				mPieTalkService.getFriends();
+				
+			}
+		});
 		
+		mAdapter = new ArrayAdapter<String>(this,
+    	        android.R.layout.simple_list_item_1, mPieTalkService.getLocalFriendNames());
+		mLvPies.setAdapter(mAdapter);
 	}
 	
 	@Override
 	protected void onResume() {
 		IntentFilter filter = new IntentFilter();
-		filter.addAction(Constants.BROADCAST_PIES_UPDATED);
+		//filter.addAction(Constants.BROADCAST_PIES_UPDATED);
+		filter.addAction(Constants.BROADCAST_FRIENDS_UPDATED);
 		registerReceiver(receiver, filter);
 		super.onResume();	
 	}
@@ -56,12 +72,13 @@ public class PiesListActivity extends BaseActivity {
 	
 	private BroadcastReceiver receiver = new BroadcastReceiver() {
 		public void onReceive(Context context, android.content.Intent intent) {
-			PieTalkLogger.i(TAG, "Broadcast received");
-			mAdapter.clear();
-
+			mAdapter.clear();			
 			for (String item : mPieTalkService.getLocalFriendNames()) {
 				mAdapter.add(item);
 			}		
+			PieTalkLogger.i(TAG, "Refresh complete");
+			mPullToRefreshAttacher.setRefreshComplete();
+			
 		}
 	};
 
@@ -97,6 +114,10 @@ public class PiesListActivity extends BaseActivity {
 			return true;		
 		case R.id.menuSettings:
 			PieTalkLogger.i(TAG, "Need to implement settings");
+			//Intent intent = new Intent(mActivity, SettingsActivity.class);
+			//startActivity(intent);
+			//finish();
+			mPieTalkService.getFriends();
 			return true;
 		}
 		return super.onOptionsItemSelected(item);

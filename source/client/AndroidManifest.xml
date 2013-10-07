@@ -82,6 +82,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.msdpe.pietalk.activities.RecordActivity" />
         </activity>
+        <activity
+            android:name="com.msdpe.pietalk.SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:parentActivityName="com.msdpe.pietalk.activities.RecordActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.msdpe.pietalk.activities.RecordActivity" />
+        </activity>
     </application>
 
 </manifest>
