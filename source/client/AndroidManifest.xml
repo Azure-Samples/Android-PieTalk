@@ -24,11 +24,11 @@
         <activity
             android:name="com.msdpe.pietalk.activities.SplashScreenActivity"
             android:label="@string/title_activity_splash_screen"
+             android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen"
             android:screenOrientation="portrait" 
             android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

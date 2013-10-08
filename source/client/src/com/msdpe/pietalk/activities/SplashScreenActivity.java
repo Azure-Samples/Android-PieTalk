@@ -10,6 +10,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 
@@ -19,19 +21,22 @@ public class SplashScreenActivity extends BaseActivity {
 	private Button mBtnLogin;
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	protected void onCreate(Bundle savedInstanceState) {		
+//		getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN);
+//		getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_splash_screen);
-		
-		mApplication.setSplashScreenActivity(this);	
-		
-		if (mPieTalkService.isUserAuthenticated()) {
-			finish();
+		mApplication.setSplashScreenActivity(this);			
+		if (mPieTalkService.isUserAuthenticated()) {			
 			//Launch application
 			Intent intent = new Intent(mActivity, RecordActivity.class);
-			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			//intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			startActivity(intent);
+			finish();
 		}
+		
+		setContentView(R.layout.activity_splash_screen);
+		
+		
 		
 		mBtnSignup = (Button) findViewById(R.id.btnSignUp);
 		mBtnLogin = (Button) findViewById(R.id.btnLogin);
