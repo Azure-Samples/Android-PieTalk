@@ -5,7 +5,11 @@ import android.content.Intent;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.View.OnLongClickListener;
+import android.view.View.OnTouchListener;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
@@ -28,8 +32,10 @@ public class RecordActivity extends BaseActivity {
 	private CameraPreview mCameraPreview;
 	private ImageButton mBtnSwitchCamera;
 	private ImageButton mBtnFlash;
+	private ImageButton mBtnTakePicture;
 	private int mCameraNumber;
 	private boolean mFlashOn;
+	private boolean mTakingVideo;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -42,11 +48,52 @@ public class RecordActivity extends BaseActivity {
 		
 		mBtnSwitchCamera = (ImageButton) findViewById(R.id.btnSwitchCameras);
 		mBtnFlash = (ImageButton) findViewById(R.id.btnFlash);
+		mBtnTakePicture = (ImageButton) findViewById(R.id.btnTakePicture);
+		
+		mBtnTakePicture.setOnClickListener(takePictureListener);
+		mBtnTakePicture.setOnLongClickListener(takeVideoListener);
+		mBtnTakePicture.setOnTouchListener(touchListener);
 		
 		mPieTalkService.getFriends();
 		mPieTalkService.getPies();
 		
+		mTakingVideo = false;
 	}
+	
+	private OnClickListener takePictureListener = new OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			// TODO Auto-generated method stub
+			PieTalkLogger.i(TAG, "TakePic");
+		}	
+	};
+	
+	private OnLongClickListener takeVideoListener = new OnLongClickListener() {
+		@Override
+		public boolean onLongClick(View v) {
+			PieTalkLogger.i(TAG, "Video start");
+			mTakingVideo = true;
+			return true;
+		}		
+	};
+	
+	private OnTouchListener touchListener = new OnTouchListener() {
+
+		@Override
+		public boolean onTouch(View v, MotionEvent event) {
+			if(event.getAction() == MotionEvent.ACTION_DOWN) {
+	            //PieTalkLogger.i(TAG, "Down");
+	        } else if (event.getAction() == MotionEvent.ACTION_UP) {
+	        		
+	        		if (mTakingVideo) {
+	        			PieTalkLogger.i(TAG, "Finished video");
+	        			mTakingVideo = false;
+	        		}
+	        }
+			return false;
+		}
+		
+	};
 	
 	@Override
 	protected void onResume() {
