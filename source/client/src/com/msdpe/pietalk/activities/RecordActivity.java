@@ -1,8 +1,10 @@
 package com.msdpe.pietalk.activities;
 
-import android.app.Activity;
+import java.util.List;
+
 import android.content.Intent;
 import android.hardware.Camera;
+import android.hardware.Camera.PictureCallback;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MotionEvent;
@@ -18,10 +20,6 @@ import android.widget.ImageButton;
 import com.msdpe.pietalk.CameraPreview;
 import com.msdpe.pietalk.PreferencesHandler;
 import com.msdpe.pietalk.R;
-import com.msdpe.pietalk.R.anim;
-import com.msdpe.pietalk.R.drawable;
-import com.msdpe.pietalk.R.id;
-import com.msdpe.pietalk.R.layout;
 import com.msdpe.pietalk.base.BaseActivity;
 import com.msdpe.pietalk.util.PieTalkLogger;
 
@@ -65,6 +63,8 @@ public class RecordActivity extends BaseActivity {
 		public void onClick(View v) {
 			// TODO Auto-generated method stub
 			PieTalkLogger.i(TAG, "TakePic");
+			mCamera.takePicture(null, null, mPictureCallback);
+			
 		}	
 	};
 	
@@ -73,6 +73,7 @@ public class RecordActivity extends BaseActivity {
 		public boolean onLongClick(View v) {
 			PieTalkLogger.i(TAG, "Video start");
 			mTakingVideo = true;
+			mCamera.startPreview();
 			return true;
 		}		
 	};
@@ -91,8 +92,14 @@ public class RecordActivity extends BaseActivity {
 	        		}
 	        }
 			return false;
+		}		
+	};
+	
+	private PictureCallback mPictureCallback = new PictureCallback() {
+		@Override
+		public void onPictureTaken(byte[] data, Camera camera) {
+			PieTalkLogger.i(TAG, "pic taken");
 		}
-		
 	};
 	
 	@Override
@@ -101,14 +108,7 @@ public class RecordActivity extends BaseActivity {
 		super.onResume();
 		
 		int numberOfCams = Camera.getNumberOfCameras();
-		mCameraNumber = 0;
-		mFlashOn = PreferencesHandler.GetFlashPreference(getApplicationContext());
-		if (mFlashOn)
-			mBtnFlash.setImageResource(R.drawable.device_access_flash_on);
-			//mBtnFlash.setBackgroundDrawable(getResources().getDrawable(R.drawable.device_access_flash_on));
-		else
-			mBtnFlash.setImageResource(R.drawable.device_access_flash_off);
-			//mBtnFlash.setBackgroundDrawable(getResources().getDrawable(R.drawable.device_access_flash_off));
+		mCameraNumber = 0;		
 		if (numberOfCams <2 )
 			mBtnSwitchCamera.setVisibility(View.GONE);
 		else 
@@ -121,6 +121,22 @@ public class RecordActivity extends BaseActivity {
 		FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
 		preview.removeAllViews();
 		preview.addView(mCameraPreview);
+		
+		mFlashOn = PreferencesHandler.GetFlashPreference(getApplicationContext());
+		Camera.Parameters params = mCamera.getParameters();
+		List<String> flashModes = params.getSupportedFlashModes();
+		
+		if (mFlashOn)
+			mBtnFlash.setImageResource(R.drawable.device_access_flash_on);
+			//mBtnFlash.setBackgroundDrawable(getResources().getDrawable(R.drawable.device_access_flash_on));
+		else
+			mBtnFlash.setImageResource(R.drawable.device_access_flash_off);
+			//mBtnFlash.setBackgroundDrawable(getResources().getDrawable(R.drawable.device_access_flash_off));
+		if (flashModes == null || flashModes.size() == 0) {
+			mBtnFlash.setVisibility(View.GONE);
+		} else {
+			setCameraFlash(params);
+		}
 	}
 	
 	@Override
@@ -157,6 +173,9 @@ public class RecordActivity extends BaseActivity {
 		else
 			mBtnFlash.setImageResource(R.drawable.device_access_flash_off);
 			//mBtnFlash.setBackgroundDrawable(getResources().getDrawable(R.drawable.device_access_flash_off));
+		
+		Camera.Parameters params = mCamera.getParameters();
+		setCameraFlash(params);
 	}
 	
 	public void tappedSwitchCamera(View view) {
@@ -173,6 +192,25 @@ public class RecordActivity extends BaseActivity {
 		FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
 		preview.removeAllViews();
 		preview.addView(mCameraPreview);
+		
+		Camera.Parameters params = mCamera.getParameters();
+		List<String> flashModes = params.getSupportedFlashModes();
+		if (flashModes == null || flashModes.size() == 0) {
+			mBtnFlash.setVisibility(View.GONE);
+		} else {
+			mBtnFlash.setVisibility(View.VISIBLE);
+			setCameraFlash(params);
+		}
+	}
+	
+	private void setCameraFlash(Camera.Parameters parameters) {
+		if (mFlashOn) {
+			parameters.setFlashMode(parameters.FLASH_MODE_ON);
+			mCamera.setParameters(parameters);
+		} else {
+			parameters.setFlashMode(parameters.FLASH_MODE_OFF);
+			mCamera.setParameters(parameters);
+		}			
 	}
 	
 	public void tappedPies(View view) {
