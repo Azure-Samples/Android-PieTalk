@@ -74,7 +74,7 @@ public class RecordActivity extends BaseActivity {
 		mBtnTakePicture = (ImageButton) findViewById(R.id.btnTakePicture);
 		mBtnPies = (ImageButton) findViewById(R.id.btnPies);
 		mBtnFriends = (ImageButton) findViewById(R.id.btnFriends);
-		//mVideoView = (VideoView) findViewById(R.id.videoView);
+		mVideoView = (VideoView) findViewById(R.id.videoView);
 		
 		mBtnTakePicture.setOnClickListener(takePictureListener);
 		mBtnTakePicture.setOnLongClickListener(takeVideoListener);
@@ -136,7 +136,8 @@ public class RecordActivity extends BaseActivity {
 			
 			mCameraPreview.setVisibility(View.GONE);
 			//mFrameLayout.removeAllViews();
-			mFrameLayout.addView(mVideoView);
+			//Todo add this back in when necessary
+//			mFrameLayout.addView(mVideoView);
 //			DisplayMetrics metrics = new DisplayMetrics(); getWindowManager().getDefaultDisplay().getMetrics(metrics);
 //		    android.widget.FrameLayout.LayoutParams params = (android.widget.FrameLayout.LayoutParams) mVideoView.getLayoutParams();
 //		    params.width =  metrics.widthPixels;
@@ -240,8 +241,8 @@ public class RecordActivity extends BaseActivity {
 		mMediaRecorder.setOutputFile(getOutputMediaFile(MEDIA_TYPE_VIDEO).toString());
 		mMediaRecorder.setPreviewDisplay(mCameraPreview.getHolder().getSurface());
 		mMediaRecorder.setOrientationHint(90);
-//		mMediaRecorder.setVideoSize(720,480);
-		mMediaRecorder.setVideoSize(480, 720);
+		mMediaRecorder.setVideoSize(720,480);
+//		mMediaRecorder.setVideoSize(480, 720);
 //		mMediaRecorder.setVideoSize(1184,768);
 //		mMediaRecorder.setVideoSize(768, 1184);
 		
@@ -347,10 +348,10 @@ public class RecordActivity extends BaseActivity {
 		List<String> flashModes = params.getSupportedFlashModes();
 		
 		
-		List<Size> sizes = params.getSupportedVideoSizes();
-		for (Size size : sizes) {
-			PieTalkLogger.i(TAG, "Wid: " + size.width + "  Hei: " + size.height);
-		}
+//		List<Size> sizes = params.getSupportedVideoSizes();
+//		for (Size size : sizes) {
+//			PieTalkLogger.i(TAG, "Wid: " + size.width + "  Hei: " + size.height);
+//		}
 		
 		if (mFlashOn)
 			mBtnFlash.setImageResource(R.drawable.device_access_flash_on);
