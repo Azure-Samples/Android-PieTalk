@@ -6,4 +6,12 @@ public final class Constants {
 	
 	public static String BROADCAST_FRIENDS_UPDATED = "friends.updated";
 	public static String BROADCAST_PIES_UPDATED = "pies.updated";
+	
+	public static enum CameraUIMode {
+        UI_MODE_PRE_PICTURE,
+		UI_MODE_TAKING_PICTURE,
+		UI_MODE_REVIEW_PICTURE,
+		UI_MODE_REVIEW_VIDEO,
+		UI_MODE_TAKING_VIDEO
+    }
 }

@@ -32,6 +32,7 @@ public class AccessFriendsActivity extends BaseActivity {
 	public void tappedSkip(View view) {
 		goToCamera();
 	}
+	
 	@Override
 	public void onBackPressed() {
 		goToCamera();

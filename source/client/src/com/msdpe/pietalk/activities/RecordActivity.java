@@ -18,6 +18,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 
 import com.msdpe.pietalk.CameraPreview;
+import com.msdpe.pietalk.Constants;
 import com.msdpe.pietalk.PreferencesHandler;
 import com.msdpe.pietalk.R;
 import com.msdpe.pietalk.base.BaseActivity;
@@ -31,9 +32,13 @@ public class RecordActivity extends BaseActivity {
 	private ImageButton mBtnSwitchCamera;
 	private ImageButton mBtnFlash;
 	private ImageButton mBtnTakePicture;
+	private ImageButton mBtnPies;
+	private ImageButton mBtnFriends;
 	private int mCameraNumber;
 	private boolean mFlashOn;
 	private boolean mTakingVideo;
+	private boolean mReviewingPicture;
+	private boolean mReviewingVideo;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +52,8 @@ public class RecordActivity extends BaseActivity {
 		mBtnSwitchCamera = (ImageButton) findViewById(R.id.btnSwitchCameras);
 		mBtnFlash = (ImageButton) findViewById(R.id.btnFlash);
 		mBtnTakePicture = (ImageButton) findViewById(R.id.btnTakePicture);
+		mBtnPies = (ImageButton) findViewById(R.id.btnPies);
+		mBtnFriends = (ImageButton) findViewById(R.id.btnFriends);
 		
 		mBtnTakePicture.setOnClickListener(takePictureListener);
 		mBtnTakePicture.setOnLongClickListener(takeVideoListener);
@@ -56,6 +63,8 @@ public class RecordActivity extends BaseActivity {
 		mPieTalkService.getPies();
 		
 		mTakingVideo = false;
+		mReviewingPicture = false;
+		mReviewingVideo = false;
 	}
 	
 	private OnClickListener takePictureListener = new OnClickListener() {
@@ -64,9 +73,50 @@ public class RecordActivity extends BaseActivity {
 			// TODO Auto-generated method stub
 			PieTalkLogger.i(TAG, "TakePic");
 			mCamera.takePicture(null, null, mPictureCallback);
-			
+			//Hide UI
+			setUIMode(Constants.CameraUIMode.UI_MODE_TAKING_PICTURE);
 		}	
 	};
+	
+	
+	
+	private void setUIMode(Constants.CameraUIMode uiMode) {
+		switch (uiMode) {
+		case UI_MODE_PRE_PICTURE:
+			mBtnFlash.setVisibility(View.VISIBLE);
+			mBtnFriends.setVisibility(View.VISIBLE);
+			mBtnPies.setVisibility(View.VISIBLE);
+			mBtnSwitchCamera.setVisibility(View.VISIBLE);
+			mBtnTakePicture.setVisibility(View.VISIBLE);
+			break;
+		case UI_MODE_REVIEW_PICTURE:
+			mBtnFlash.setVisibility(View.GONE);
+			mBtnFriends.setVisibility(View.GONE);
+			mBtnPies.setVisibility(View.GONE);
+			mBtnSwitchCamera.setVisibility(View.GONE);
+			mBtnTakePicture.setVisibility(View.GONE);
+			break;
+		case UI_MODE_REVIEW_VIDEO:
+			mBtnFlash.setVisibility(View.GONE);
+			mBtnFriends.setVisibility(View.GONE);
+			mBtnPies.setVisibility(View.GONE);
+			mBtnSwitchCamera.setVisibility(View.GONE);
+			mBtnTakePicture.setVisibility(View.GONE);
+			break;
+		case UI_MODE_TAKING_PICTURE:
+			mBtnFlash.setVisibility(View.GONE);
+			mBtnFriends.setVisibility(View.GONE);
+			mBtnPies.setVisibility(View.GONE);
+			mBtnSwitchCamera.setVisibility(View.GONE);
+			mBtnTakePicture.setVisibility(View.GONE);
+			break;
+		case UI_MODE_TAKING_VIDEO:
+			mBtnFriends.setVisibility(View.GONE);
+			mBtnPies.setVisibility(View.GONE);
+			mBtnTakePicture.setVisibility(View.GONE);
+			break;
+		}
+	}
 	
 	private OnLongClickListener takeVideoListener = new OnLongClickListener() {
 		@Override
@@ -99,6 +149,14 @@ public class RecordActivity extends BaseActivity {
 		@Override
 		public void onPictureTaken(byte[] data, Camera camera) {
 			PieTalkLogger.i(TAG, "pic taken");
+			if (mTakingVideo) {
+				mReviewingPicture = true;
+				setUIMode(Constants.CameraUIMode.UI_MODE_REVIEW_VIDEO);
+			}
+			else {
+				mReviewingVideo = true;
+				setUIMode(Constants.CameraUIMode.UI_MODE_REVIEW_PICTURE);
+			}
 		}
 	};
 	
@@ -221,6 +279,19 @@ public class RecordActivity extends BaseActivity {
 	public void tappedFriendsList(View view) {
 		startActivity(new Intent(getApplicationContext(), FriendsListActivity.class));		
         overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
+	}
+	
+	@Override
+	public void onBackPressed() {
+		if (mReviewingPicture || mReviewingVideo) {
+			mCamera.startPreview();
+			mReviewingPicture = false;
+			mReviewingVideo = false;
+			setUIMode(Constants.CameraUIMode.UI_MODE_PRE_PICTURE);
+			
+		} else {
+			finish();
+		}
 	}
 
 }
