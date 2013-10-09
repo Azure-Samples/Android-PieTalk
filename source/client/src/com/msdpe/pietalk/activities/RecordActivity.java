@@ -241,7 +241,7 @@ public class RecordActivity extends BaseActivity {
 		mMediaRecorder.setOutputFile(getOutputMediaFile(MEDIA_TYPE_VIDEO).toString());
 		mMediaRecorder.setPreviewDisplay(mCameraPreview.getHolder().getSurface());
 		mMediaRecorder.setOrientationHint(90);
-		mMediaRecorder.setVideoSize(720,480);
+//		mMediaRecorder.setVideoSize(720,480);
 //		mMediaRecorder.setVideoSize(480, 720);
 //		mMediaRecorder.setVideoSize(1184,768);
 //		mMediaRecorder.setVideoSize(768, 1184);
