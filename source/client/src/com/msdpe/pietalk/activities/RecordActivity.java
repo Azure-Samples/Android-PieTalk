@@ -1,11 +1,25 @@
 package com.msdpe.pietalk.activities;
 
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import android.content.Intent;
 import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
+import android.hardware.Camera.Size;
+import android.media.CamcorderProfile;
+import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnPreparedListener;
+import android.media.MediaRecorder;
+import android.media.MediaRecorder.OnErrorListener;
+import android.media.MediaRecorder.OnInfoListener;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
@@ -16,6 +30,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.VideoView;
 
 import com.msdpe.pietalk.CameraPreview;
 import com.msdpe.pietalk.Constants;
@@ -29,6 +44,8 @@ public class RecordActivity extends BaseActivity {
 	private final String TAG = "RecordActivity";
 	private Camera mCamera;
 	private CameraPreview mCameraPreview;
+	private VideoView mVideoView;
+	private MediaRecorder mMediaRecorder;
 	private ImageButton mBtnSwitchCamera;
 	private ImageButton mBtnFlash;
 	private ImageButton mBtnTakePicture;
@@ -39,6 +56,9 @@ public class RecordActivity extends BaseActivity {
 	private boolean mTakingVideo;
 	private boolean mReviewingPicture;
 	private boolean mReviewingVideo;
+	private String  mVideoFileName;
+	private File mMediaStorageDir;
+	private FrameLayout mFrameLayout;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +74,7 @@ public class RecordActivity extends BaseActivity {
 		mBtnTakePicture = (ImageButton) findViewById(R.id.btnTakePicture);
 		mBtnPies = (ImageButton) findViewById(R.id.btnPies);
 		mBtnFriends = (ImageButton) findViewById(R.id.btnFriends);
+		//mVideoView = (VideoView) findViewById(R.id.videoView);
 		
 		mBtnTakePicture.setOnClickListener(takePictureListener);
 		mBtnTakePicture.setOnLongClickListener(takeVideoListener);
@@ -102,6 +123,70 @@ public class RecordActivity extends BaseActivity {
 			mBtnPies.setVisibility(View.GONE);
 			mBtnSwitchCamera.setVisibility(View.GONE);
 			mBtnTakePicture.setVisibility(View.GONE);
+			
+			if (mVideoView == null)
+				mVideoView = new VideoView(this);
+			
+			
+		
+			
+			mVideoView.setVideoPath(mMediaStorageDir.getPath() + File.separator +
+			        mVideoFileName);
+			
+			
+			mCameraPreview.setVisibility(View.GONE);
+			//mFrameLayout.removeAllViews();
+			mFrameLayout.addView(mVideoView);
+//			DisplayMetrics metrics = new DisplayMetrics(); getWindowManager().getDefaultDisplay().getMetrics(metrics);
+//		    android.widget.FrameLayout.LayoutParams params = (android.widget.FrameLayout.LayoutParams) mVideoView.getLayoutParams();
+//		    params.width =  metrics.widthPixels;
+//		    params.height = metrics.heightPixels;
+//		    params.rightMargin = 00;
+		    //params.gravity = Gravity.CENTER;
+//		    mVideoView.setLayoutParams(params);
+		    
+		    mVideoView.setOnPreparedListener(new OnPreparedListener() {				
+				@Override
+				public void onPrepared(MediaPlayer mp) {
+					mp.setLooping(true);
+					
+					
+//					Display display = getWindowManager().getDefaultDisplay(); 
+//				    int childWidthMeasureSpec = MeasureSpec.makeMeasureSpec(display.getWidth(),
+//				            MeasureSpec.UNSPECIFIED);
+//				    int childHeightMeasureSpec = MeasureSpec.makeMeasureSpec(display.getHeight(),
+//				            MeasureSpec.UNSPECIFIED);
+//				    mVideoView.measure(childWidthMeasureSpec, childHeightMeasureSpec);
+//					
+//					int videoWidth = mp.getVideoWidth();
+//				    int videoHeight = mp.getVideoHeight();
+//				    float videoProportion = (float) videoWidth / (float) videoHeight;       
+//				    int screenWidth = getWindowManager().getDefaultDisplay().getWidth();
+//				    int screenHeight = getWindowManager().getDefaultDisplay().getHeight();
+//				    float screenProportion = (float) screenWidth / (float) screenHeight;
+//				    android.view.ViewGroup.LayoutParams lp = mFrameLayout.getLayoutParams();
+//
+//				    if (videoProportion > screenProportion) {
+//				        lp.width = screenWidth;
+//				        lp.height = (int) ((float) screenWidth / videoProportion);
+//				    } else {
+//				        lp.width = (int) (videoProportion * (float) screenHeight);
+//				        lp.height = screenHeight;
+//				    }
+//				    mFrameLayout.setLayoutParams(lp);
+					
+					
+					
+					
+					
+					
+				}
+			});
+		    
+		    
+			mVideoView.start();
+			
+			
 			break;
 		case UI_MODE_TAKING_PICTURE:
 			mBtnFlash.setVisibility(View.GONE);
@@ -111,9 +196,8 @@ public class RecordActivity extends BaseActivity {
 			mBtnTakePicture.setVisibility(View.GONE);
 			break;
 		case UI_MODE_TAKING_VIDEO:
-			mBtnFriends.setVisibility(View.GONE);
-			mBtnPies.setVisibility(View.GONE);
-			mBtnTakePicture.setVisibility(View.GONE);
+			mBtnFlash.setVisibility(View.GONE);
+			mBtnSwitchCamera.setVisibility(View.GONE);			
 			break;
 		}
 	}
@@ -121,12 +205,85 @@ public class RecordActivity extends BaseActivity {
 	private OnLongClickListener takeVideoListener = new OnLongClickListener() {
 		@Override
 		public boolean onLongClick(View v) {
-			PieTalkLogger.i(TAG, "Video start");
+			PieTalkLogger.i(TAG, "Video start");			
 			mTakingVideo = true;
-			mCamera.startPreview();
+			if (prepareVideoRecorder()) {
+				
+				mMediaRecorder.start();
+				setUIMode(Constants.CameraUIMode.UI_MODE_TAKING_VIDEO);
+			} else {
+				//TODO: show an error to the user
+				releaseMediaRecorder();
+			}
 			return true;
 		}		
 	};
+	
+	private void releaseMediaRecorder() {
+		if (mMediaRecorder != null) {
+			mMediaRecorder.reset();
+			mMediaRecorder.release();
+			mMediaRecorder = null;
+			
+		}
+	}
+	
+	private boolean prepareVideoRecorder() {
+		
+		mMediaRecorder = new MediaRecorder();
+		mCamera.unlock();
+		mMediaRecorder.setCamera(mCamera);
+		mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
+		mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
+		
+		mMediaRecorder.setProfile(CamcorderProfile.get(mCameraNumber, CamcorderProfile.QUALITY_HIGH));
+		mMediaRecorder.setOutputFile(getOutputMediaFile(MEDIA_TYPE_VIDEO).toString());
+		mMediaRecorder.setPreviewDisplay(mCameraPreview.getHolder().getSurface());
+		mMediaRecorder.setOrientationHint(90);
+//		mMediaRecorder.setVideoSize(720,480);
+		mMediaRecorder.setVideoSize(480, 720);
+//		mMediaRecorder.setVideoSize(1184,768);
+//		mMediaRecorder.setVideoSize(768, 1184);
+		
+		
+		
+		
+		DisplayMetrics metrics = new DisplayMetrics(); 
+		getWindowManager().getDefaultDisplay().getMetrics(metrics);
+		PieTalkLogger.d(TAG, "Width: " + metrics.widthPixels);
+		PieTalkLogger.d(TAG, "Height: " + metrics.heightPixels);
+//	    params.width =  metrics.widthPixels;
+//	    params.height = metrics.heightPixels;
+		
+		mMediaRecorder.setOnErrorListener(new OnErrorListener() {							
+			@Override
+			public void onError(MediaRecorder mr, int what, int extra) {
+				PieTalkLogger.e(TAG, "MediaRecorder error");
+				
+			}
+		});
+		mMediaRecorder.setOnInfoListener(new OnInfoListener() {
+			
+			@Override
+			public void onInfo(MediaRecorder mr, int what, int extra) {
+				PieTalkLogger.i(TAG, "MediaRecorer info");
+			}
+		});
+		
+		
+		try {
+			mMediaRecorder.prepare();
+		} catch (IllegalStateException ex) {
+			PieTalkLogger.e(TAG, "IllegalStateException preparing MediaRecorder: " + ex.getMessage());
+			releaseMediaRecorder();
+			return false;
+		} catch (IOException ex) {
+			PieTalkLogger.e(TAG, "IOException preparing MediaRecorder: " + ex.getMessage());
+			releaseMediaRecorder();
+			return false;
+		}
+		return true;
+	}
 	
 	private OnTouchListener touchListener = new OnTouchListener() {
 
@@ -139,6 +296,11 @@ public class RecordActivity extends BaseActivity {
 	        		if (mTakingVideo) {
 	        			PieTalkLogger.i(TAG, "Finished video");
 	        			mTakingVideo = false;
+	        			mReviewingVideo = true;
+	        			mMediaRecorder.stop();
+	        			releaseMediaRecorder();
+	        			
+	        			setUIMode(Constants.CameraUIMode.UI_MODE_REVIEW_VIDEO);
 	        		}
 	        }
 			return false;
@@ -176,13 +338,19 @@ public class RecordActivity extends BaseActivity {
 		
 		mCamera = getCameraInstance(mCameraNumber);
 		mCameraPreview = new CameraPreview(this, mCamera);
-		FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
-		preview.removeAllViews();
-		preview.addView(mCameraPreview);
+		mFrameLayout = (FrameLayout) findViewById(R.id.camera_preview);
+		//mFrameLayout.removeAllViews();
+		mFrameLayout.addView(mCameraPreview);
 		
 		mFlashOn = PreferencesHandler.GetFlashPreference(getApplicationContext());
 		Camera.Parameters params = mCamera.getParameters();
 		List<String> flashModes = params.getSupportedFlashModes();
+		
+		
+		List<Size> sizes = params.getSupportedVideoSizes();
+		for (Size size : sizes) {
+			PieTalkLogger.i(TAG, "Wid: " + size.width + "  Hei: " + size.height);
+		}
 		
 		if (mFlashOn)
 			mBtnFlash.setImageResource(R.drawable.device_access_flash_on);
@@ -292,6 +460,51 @@ public class RecordActivity extends BaseActivity {
 		} else {
 			finish();
 		}
+	}
+	
+	public static final int MEDIA_TYPE_IMAGE = 1;
+	public static final int MEDIA_TYPE_VIDEO = 2;
+
+	/** Create a file Uri for saving an image or video */
+	private  Uri getOutputMediaFileUri(int type){
+	      return Uri.fromFile(getOutputMediaFile(type));
+	}
+
+	/** Create a File for saving an image or video */
+	private  File getOutputMediaFile(int type){
+	    // To be safe, you should check that the SDCard is mounted
+	    // using Environment.getExternalStorageState() before doing this.
+		
+	    mMediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
+	              Environment.DIRECTORY_PICTURES), getResources().getString(R.string.app_name));
+	    // This location works best if you want the created images to be shared
+	    // between applications and persist after your app has been uninstalled.
+
+	    // Create the storage directory if it does not exist
+	    if (! mMediaStorageDir.exists()){
+	        if (! mMediaStorageDir.mkdirs()){
+	            PieTalkLogger.d(TAG, "failed to create directory");
+	            return null;
+	        }
+	    }
+
+	    // Create a media file name
+	    String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+	    File mediaFile;
+	    if (type == MEDIA_TYPE_IMAGE){
+	    		String imageFileName = "IMG_"+ timeStamp + ".jpg";
+	        mediaFile = new File(mMediaStorageDir.getPath() + File.separator +
+	        imageFileName);
+	    } else if(type == MEDIA_TYPE_VIDEO) {
+	    		mVideoFileName = "VID_"+ timeStamp + ".mp4";
+	        mediaFile = new File(mMediaStorageDir.getPath() + File.separator +
+	        mVideoFileName);
+	        
+	    } else {
+	        return null;
+	    }
+
+	    return mediaFile;
 	}
 
 }

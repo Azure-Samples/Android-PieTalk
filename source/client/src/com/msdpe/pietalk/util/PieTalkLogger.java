@@ -10,4 +10,8 @@ public class PieTalkLogger {
 	public static void e(String tag, String msg) {
 		Log.e(tag, msg);
 	}
+	
+	public static void d(String tag, String msg) {
+		Log.d(tag, msg);
+	}
 }
