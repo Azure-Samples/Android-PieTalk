@@ -1,6 +1,8 @@
 package com.msdpe.pietalk.activities;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -94,6 +96,7 @@ public class RecordActivity extends BaseActivity {
 		public void onClick(View v) {
 			// TODO Auto-generated method stub
 			PieTalkLogger.i(TAG, "TakePic");
+			
 			mCamera.takePicture(null, null, mPictureCallback);
 			//Hide UI
 			setUIMode(Constants.CameraUIMode.UI_MODE_TAKING_PICTURE);
@@ -322,6 +325,20 @@ public class RecordActivity extends BaseActivity {
 			else {
 				mReviewingPicture = true;
 				setUIMode(Constants.CameraUIMode.UI_MODE_REVIEW_PICTURE);
+				
+				File pictureFile = getOutputMediaFile(MEDIA_TYPE_IMAGE);
+				if (pictureFile == null) {
+					PieTalkLogger.d(TAG, "Error creating media file, check storage permissions");
+				}
+				try {
+					FileOutputStream fos = new FileOutputStream(pictureFile);
+					fos.write(data);
+					fos.close();
+				} catch (FileNotFoundException ex) {
+					PieTalkLogger.d(TAG, "File not found: " + ex.getMessage());
+				} catch (IOException ex) {
+					PieTalkLogger.d(TAG, "Error accessing file: " + ex.getMessage());
+				}
 			}
 		}
 	};
@@ -350,7 +367,7 @@ public class RecordActivity extends BaseActivity {
 		mFlashOn = PreferencesHandler.GetFlashPreference(getApplicationContext());
 		Camera.Parameters params = mCamera.getParameters();
 		List<String> flashModes = params.getSupportedFlashModes();
-		
+		params.setRotation(90);
 		
 //		List<Size> sizes = params.getSupportedVideoSizes();
 //		for (Size size : sizes) {
@@ -463,12 +480,13 @@ public class RecordActivity extends BaseActivity {
 			if (mReviewingVideo) {
 				mVideoView.stopPlayback();
 				mCameraPreview.setVisibility(View.VISIBLE);
-				mVideoView.setVisibility(View.GONE);
-				File file = new File(mFileFullPath);
-				if (!file.delete()) {
-					PieTalkLogger.e(TAG, "Unable to delete file");
-				}
+				mVideoView.setVisibility(View.GONE);				
 			}
+			File file = new File(mFileFullPath);
+			if (!file.delete()) {
+				PieTalkLogger.e(TAG, "Unable to delete file");
+			}
+			
 			mCamera.startPreview();
 			mReviewingPicture = false;
 			mReviewingVideo = false;
