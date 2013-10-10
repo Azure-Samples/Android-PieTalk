@@ -13,6 +13,8 @@
 		    android:layout_alignParentLeft="true"
 		    android:layout_alignParentRight="true"/>
     
+    
+    
     <FrameLayout
     android:id="@+id/camera_preview"
     android:layout_width="fill_parent"
@@ -22,6 +24,17 @@
 
     </FrameLayout>
 
+    <ImageView
+            android:id="@+id/pictureView2"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent" 
+            android:layout_alignParentTop="true"
+		    android:layout_alignParentBottom="true"
+		    android:layout_alignParentLeft="true"
+		    android:layout_alignParentRight="true"
+		    android:scaleType="fitXY"
+		    />
+    
     <ImageButton
         android:id="@+id/btnFlash"
         android:layout_width="wrap_content"
@@ -30,6 +43,8 @@
         android:layout_alignParentTop="true" 
         android:layout_alignParentLeft="true"
         android:onClick="tappedFlash"/>
+    
+    
 
     <ImageButton
         android:id="@+id/btnSwitchCameras"

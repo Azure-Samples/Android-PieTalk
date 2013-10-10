@@ -9,9 +9,10 @@ import java.util.Date;
 import java.util.List;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
-import android.hardware.Camera.Size;
 import android.media.CamcorderProfile;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnPreparedListener;
@@ -32,6 +33,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.VideoView;
 
 import com.msdpe.pietalk.CameraPreview;
@@ -47,6 +49,7 @@ public class RecordActivity extends BaseActivity {
 	private Camera mCamera;
 	private CameraPreview mCameraPreview;
 	private VideoView mVideoView;
+	private ImageView mImageView;
 	private MediaRecorder mMediaRecorder;
 	private ImageButton mBtnSwitchCamera;
 	private ImageButton mBtnFlash;
@@ -62,6 +65,7 @@ public class RecordActivity extends BaseActivity {
 	private String  mFileFullPath;
 	private File mMediaStorageDir;
 	private FrameLayout mFrameLayout;
+	private byte[] mPictureData;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +82,7 @@ public class RecordActivity extends BaseActivity {
 		mBtnPies = (ImageButton) findViewById(R.id.btnPies);
 		mBtnFriends = (ImageButton) findViewById(R.id.btnFriends);
 		mVideoView = (VideoView) findViewById(R.id.videoView);
+		mImageView = (ImageView) findViewById(R.id.pictureView2);
 		
 		mBtnTakePicture.setOnClickListener(takePictureListener);
 		mBtnTakePicture.setOnLongClickListener(takeVideoListener);
@@ -113,6 +118,10 @@ public class RecordActivity extends BaseActivity {
 			mBtnPies.setVisibility(View.VISIBLE);
 			mBtnSwitchCamera.setVisibility(View.VISIBLE);
 			mBtnTakePicture.setVisibility(View.VISIBLE);
+			
+			mCameraPreview.setVisibility(View.VISIBLE);
+			mVideoView.setVisibility(View.GONE);
+			mImageView.setVisibility(View.GONE);
 			break;
 		case UI_MODE_REVIEW_PICTURE:
 			mBtnFlash.setVisibility(View.GONE);
@@ -120,6 +129,17 @@ public class RecordActivity extends BaseActivity {
 			mBtnPies.setVisibility(View.GONE);
 			mBtnSwitchCamera.setVisibility(View.GONE);
 			mBtnTakePicture.setVisibility(View.GONE);
+			
+			
+			
+			Bitmap myBitmap = BitmapFactory.decodeByteArray(mPictureData, 0, mPictureData.length);
+			mImageView.setImageBitmap(myBitmap);
+			
+			
+			mImageView.setVisibility(View.VISIBLE);
+			mCameraPreview.setVisibility(View.GONE);
+			mVideoView.setVisibility(View.GONE);
+						
 			break;
 		case UI_MODE_REVIEW_VIDEO:
 			mBtnFlash.setVisibility(View.GONE);
@@ -324,6 +344,7 @@ public class RecordActivity extends BaseActivity {
 			}
 			else {
 				mReviewingPicture = true;
+				mPictureData = data;
 				setUIMode(Constants.CameraUIMode.UI_MODE_REVIEW_PICTURE);
 				
 				File pictureFile = getOutputMediaFile(MEDIA_TYPE_IMAGE);
@@ -348,6 +369,7 @@ public class RecordActivity extends BaseActivity {
 		// TODO Auto-generated method stub
 		super.onResume();
 		PieTalkLogger.i(TAG, "onResume");
+		PieTalkLogger.i(TAG, "Full filepath: " + mFileFullPath);
 		
 		int numberOfCams = Camera.getNumberOfCameras();
 		mCameraNumber = 0;		
@@ -384,6 +406,28 @@ public class RecordActivity extends BaseActivity {
 			mBtnFlash.setVisibility(View.GONE);
 		} else {
 			setCameraFlash(params);
+		}
+		
+		if (mReviewingPicture) {			
+			//TODO: Set preview to show picture from file path
+			PieTalkLogger.i(TAG, "Path: " + mFileFullPath);
+//			File imgFile = new File(mFileFullPath);
+//			if (imgFile.exists()) {
+//				Bitmap myBitmap = BitmapFactory.decodeByteArray(mPictureData, 0, mPictureData.length);
+//				mImageView.setImageBitmap(myBitmap);
+//			}
+//			
+//			mImageView.setVisibility(View.VISIBLE);
+//			mCameraPreview.setVisibility(View.GONE);
+//			mVideoView.setVisibility(View.GONE);
+			setUIMode(Constants.CameraUIMode.UI_MODE_REVIEW_PICTURE);
+		} else if (mReviewingVideo) {
+			//TODO: Set video to play from file path
+			mVideoView.setVideoPath(mFileFullPath);
+			mVideoView.start();
+			mVideoView.setVisibility(View.VISIBLE);
+			mCameraPreview.setVisibility(View.GONE);
+			setUIMode(Constants.CameraUIMode.UI_MODE_REVIEW_VIDEO);
 		}
 	}
 	
@@ -483,6 +527,7 @@ public class RecordActivity extends BaseActivity {
 				mVideoView.setVisibility(View.GONE);				
 			}
 			File file = new File(mFileFullPath);
+			mFileFullPath = "";
 			if (!file.delete()) {
 				PieTalkLogger.e(TAG, "Unable to delete file");
 			}
