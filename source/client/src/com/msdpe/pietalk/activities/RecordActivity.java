@@ -57,6 +57,7 @@ public class RecordActivity extends BaseActivity {
 	private boolean mReviewingPicture;
 	private boolean mReviewingVideo;
 	private String  mVideoFileName;
+	private String  mFileFullPath;
 	private File mMediaStorageDir;
 	private FrameLayout mFrameLayout;
 
@@ -130,11 +131,13 @@ public class RecordActivity extends BaseActivity {
 			
 		
 			
-			mVideoView.setVideoPath(mMediaStorageDir.getPath() + File.separator +
-			        mVideoFileName);
+			//mVideoView.setVideoPath(mMediaStorageDir.getPath() + File.separator +
+//			        mVideoFileName);
+			mVideoView.setVideoPath(mFileFullPath);
 			
 			
 			mCameraPreview.setVisibility(View.GONE);
+			mVideoView.setVisibility(View.VISIBLE);
 			//mFrameLayout.removeAllViews();
 			//Todo add this back in when necessary
 //			mFrameLayout.addView(mVideoView);
@@ -313,11 +316,11 @@ public class RecordActivity extends BaseActivity {
 		public void onPictureTaken(byte[] data, Camera camera) {
 			PieTalkLogger.i(TAG, "pic taken");
 			if (mTakingVideo) {
-				mReviewingPicture = true;
+				mReviewingVideo = true;
 				setUIMode(Constants.CameraUIMode.UI_MODE_REVIEW_VIDEO);
 			}
 			else {
-				mReviewingVideo = true;
+				mReviewingPicture = true;
 				setUIMode(Constants.CameraUIMode.UI_MODE_REVIEW_PICTURE);
 			}
 		}
@@ -327,6 +330,7 @@ public class RecordActivity extends BaseActivity {
 	protected void onResume() {
 		// TODO Auto-generated method stub
 		super.onResume();
+		PieTalkLogger.i(TAG, "onResume");
 		
 		int numberOfCams = Camera.getNumberOfCameras();
 		mCameraNumber = 0;		
@@ -335,9 +339,9 @@ public class RecordActivity extends BaseActivity {
 		else 
 			mCameraNumber = PreferencesHandler.GetCameraPreference(getApplicationContext());
 		
-		
-		
+				
 		mCamera = getCameraInstance(mCameraNumber);
+		
 		mCameraPreview = new CameraPreview(this, mCamera);
 		mFrameLayout = (FrameLayout) findViewById(R.id.camera_preview);
 		//mFrameLayout.removeAllViews();
@@ -370,6 +374,8 @@ public class RecordActivity extends BaseActivity {
 	protected void onPause() {
 		// TODO Auto-generated method stub
 		super.onPause();
+		PieTalkLogger.i(TAG, "onPause");
+		mCameraPreview.getHolder().removeCallback(mCameraPreview);
 		mCamera.release();
 	}
 
@@ -453,6 +459,16 @@ public class RecordActivity extends BaseActivity {
 	@Override
 	public void onBackPressed() {
 		if (mReviewingPicture || mReviewingVideo) {
+			//releaseMediaRecorder();
+			if (mReviewingVideo) {
+				mVideoView.stopPlayback();
+				mCameraPreview.setVisibility(View.VISIBLE);
+				mVideoView.setVisibility(View.GONE);
+				File file = new File(mFileFullPath);
+				if (!file.delete()) {
+					PieTalkLogger.e(TAG, "Unable to delete file");
+				}
+			}
 			mCamera.startPreview();
 			mReviewingPicture = false;
 			mReviewingVideo = false;
@@ -494,12 +510,14 @@ public class RecordActivity extends BaseActivity {
 	    File mediaFile;
 	    if (type == MEDIA_TYPE_IMAGE){
 	    		String imageFileName = "IMG_"+ timeStamp + ".jpg";
-	        mediaFile = new File(mMediaStorageDir.getPath() + File.separator +
-	        imageFileName);
+	    		mFileFullPath = mMediaStorageDir.getPath() + File.separator +
+	    		        imageFileName;
+	        mediaFile = new File(mFileFullPath);
 	    } else if(type == MEDIA_TYPE_VIDEO) {
 	    		mVideoFileName = "VID_"+ timeStamp + ".mp4";
-	        mediaFile = new File(mMediaStorageDir.getPath() + File.separator +
-	        mVideoFileName);
+	    		mFileFullPath = mMediaStorageDir.getPath() + File.separator +
+	    		        mVideoFileName;
+	        mediaFile = new File(mFileFullPath);
 	        
 	    } else {
 	        return null;

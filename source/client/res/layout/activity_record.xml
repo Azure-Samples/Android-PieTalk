@@ -20,8 +20,6 @@
     android:layout_weight="1"
     >
 
-        <!-- 
- -->
     </FrameLayout>
 
     <ImageButton

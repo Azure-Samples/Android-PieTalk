@@ -307,15 +307,20 @@ public class PieTalkService {
 				final ServiceFilterResponseCallback responseCallback) {				
 			nextServiceFilterCallback.onNext(request, new ServiceFilterResponseCallback() {				
 				@Override
-				public void onResponse(ServiceFilterResponse response, Exception exception) {
-					StatusLine status = response.getStatus();
-					int statusCode = status.getStatusCode();						
-					if (statusCode == 401) {
-						//Kick user out 
-						PieTalkLogger.i(TAG, "401 received, forcing logout");
+				public void onResponse(ServiceFilterResponse response, Exception ex) {
+					if (ex == null) { 
+						StatusLine status = response.getStatus();
+						int statusCode = status.getStatusCode();						
+						if (statusCode == 401) {
+							//Kick user out 
+							PieTalkLogger.i(TAG, "401 received, forcing logout");
+							//TODO force logout
+						}
+					} else {
+						PieTalkLogger.e(TAG, "Error in handle request: " + ex.getMessage());
 					}
 					
-					if (responseCallback != null)  responseCallback.onResponse(response, exception);
+					if (responseCallback != null)  responseCallback.onResponse(response, ex);
 				}
 			});
 		}
