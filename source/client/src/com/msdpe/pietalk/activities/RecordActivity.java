@@ -8,6 +8,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import android.app.Dialog;
+import android.app.DialogFragment;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnKeyListener;
+import android.content.res.Configuration;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -23,17 +28,23 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.DisplayMetrics;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnFocusChangeListener;
 import android.view.View.OnLongClickListener;
 import android.view.View.OnTouchListener;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.NumberPicker;
+import android.widget.TextView;
+import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 import android.widget.VideoView;
 
@@ -44,7 +55,7 @@ import com.msdpe.pietalk.R;
 import com.msdpe.pietalk.base.BaseActivity;
 import com.msdpe.pietalk.util.PieTalkLogger;
 
-public class RecordActivity extends BaseActivity {
+public class RecordActivity extends BaseActivity implements NumberPicker.OnValueChangeListener {
 	
 	private final String TAG = "RecordActivity";
 	private Camera mCamera;
@@ -59,6 +70,8 @@ public class RecordActivity extends BaseActivity {
 	private ImageButton mBtnFriends;
 	private ImageButton mBtnSend;
 	private ImageButton mBtnDelete;
+	private ImageButton mBtnTime;
+	private TextView mLblTime;
 	private int mCameraNumber;
 	private boolean mFlashOn;
 	private boolean mTakingVideo;
@@ -88,6 +101,9 @@ public class RecordActivity extends BaseActivity {
 		mImageView = (ImageView) findViewById(R.id.pictureView2);
 		mBtnSend = (ImageButton) findViewById(R.id.btnSend);
 		mBtnDelete = (ImageButton) findViewById(R.id.btnDelete);
+		mBtnTime = (ImageButton) findViewById(R.id.btnTime);
+		
+		mLblTime = (TextView) findViewById(R.id.lblTime);
 		
 		mBtnTakePicture.setOnClickListener(takePictureListener);
 		mBtnTakePicture.setOnLongClickListener(takeVideoListener);
@@ -543,6 +559,98 @@ public class RecordActivity extends BaseActivity {
 		returnToCameraPreview();
 	}
 	
+	public void tappedTime(View view) {
+		DialogFragment newFragment = new NumberPickerFragment();
+		newFragment.show(getFragmentManager(), "timePicker");
+	}
+	
+	public static class NumberPickerFragment extends DialogFragment {
+		
+		@Override
+		public void onConfigurationChanged(Configuration newConfig) {
+			PieTalkLogger.i("TEST", "Configchanged");
+			super.onConfigurationChanged(newConfig);
+		}
+		@Override
+		public Dialog onCreateDialog(Bundle savedInstanceState) {
+			NumberPicker picker = new NumberPicker(getActivity());
+			picker.setMinValue(1);
+			picker.setMaxValue(10);
+			picker.setWrapSelectorWheel(false);
+			Dialog dialog = new Dialog(getActivity());
+			dialog.setContentView(picker);
+			dialog.setTitle("How long to share?");
+			
+			dialog.setOnKeyListener(new OnKeyListener() {
+				
+				@Override
+				public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
+					PieTalkLogger.i("Test", "onKey");
+					return false;
+				}
+			});
+			
+			picker.setOnValueChangedListener((RecordActivity) getActivity());
+			//picker.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
+			picker.setClickable(true);
+			
+			picker.setOnFocusChangeListener(new OnFocusChangeListener() {
+				
+				@Override
+				public void onFocusChange(View v, boolean hasFocus) {
+					PieTalkLogger.i("TEST", "onFCL");
+				}
+			});
+			
+			String[] numbers = new String[] {"1 second", "2 seconds", "3 seconds", "4 seconds", "5 seconds", "6 seconds", "7 seconds", "8 seconds", "9 seconds", "10 seconds" };
+			picker.setDisplayedValues(numbers);
+			picker.setOnClickListener(new OnClickListener() {				
+				@Override
+				public void onClick(View v) {
+					PieTalkLogger.i("Test", "test");
+				}
+			});
+//			picker.setOnTouchListener(new OnTouchListener() {				
+//				@Override
+//				public boolean onTouch(View v, MotionEvent event) {
+//					PieTalkLogger.i("Test", "ONTOUCH");
+//					return false;
+//				}
+//			});
+			
+			for (int i = 0; i < picker.getChildCount(); i++) {
+				View view = picker.getChildAt(i);
+				view.setClickable(true);
+				EditText et = (EditText) view;
+				et.setOnTouchListener(new OnTouchListener() {
+					
+					@Override
+					public boolean onTouch(View v, MotionEvent event) {
+						PieTalkLogger.i("TEST", "ont2");
+						return false;
+					}
+				});
+				et.setOnEditorActionListener(new OnEditorActionListener() {					
+					@Override
+					public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+						PieTalkLogger.i("Test", "OEAL");
+						return false;
+					}
+				});
+				//CustomEditText cet = (CustomEditText) view;
+				
+				view.setOnClickListener(new OnClickListener() {
+					
+					@Override
+					public void onClick(View v) {
+						PieTalkLogger.i("Test", "viewoncl");						
+					}
+				});
+			}
+			return dialog;			
+		}
+	}
+	
 	@Override
 	public void onBackPressed() {
 		if (mReviewingPicture || mReviewingVideo) {
@@ -619,6 +727,12 @@ public class RecordActivity extends BaseActivity {
 	    }
 
 	    return mediaFile;
+	}
+
+	@Override
+	public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
+		//Toast.makeText(mActivity, "Value change", Toast.LENGTH_SHORT).show();
+		PieTalkLogger.i(TAG, "New value: " + newVal);
 	}
 
 }

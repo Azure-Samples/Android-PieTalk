@@ -83,6 +83,40 @@
         android:layout_alignParentLeft="true"
         android:onClick="tappedPies"
         />
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="75dp"
+        android:layout_alignParentBottom="true" 
+        android:layout_alignParentLeft="true"
+        >
+	    <ImageButton
+	        android:id="@+id/btnTime"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:src="@drawable/transparent_circle" 
+	        android:layout_alignParentBottom="true" 
+	        android:layout_alignParentLeft="true"
+	        android:onClick="tappedTime"
+	    	/>
+    	<TextView    
+    	    android:id="@+id/lblTime"    
+	        android:layout_centerInParent="true"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:textColor="@android:color/white"
+	        android:text="3"
+        />    
+    </RelativeLayout>
+    
+    <!--  -->
+        
+        <!-- <Button
+            android:background="@drawable/transparent_circle"
+            android:layout_alignParentBottom="true" 
+        android:layout_alignParentLeft="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="10"/> -->
     
     <ImageButton
         android:id="@+id/btnSend"
