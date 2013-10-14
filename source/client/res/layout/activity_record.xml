@@ -74,6 +74,16 @@
         android:layout_alignParentLeft="true"
         android:onClick="tappedPies"
         />
+    
+    <ImageButton
+        android:id="@+id/btnSend"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/social_send_now" 
+        android:layout_alignParentBottom="true" 
+        android:layout_alignParentRight="true"
+        android:onClick="tappedSend"
+        />
 
     <ImageButton
         android:id="@+id/btnTakePicture"

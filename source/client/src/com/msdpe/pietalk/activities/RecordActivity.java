@@ -34,6 +34,7 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.msdpe.pietalk.CameraPreview;
@@ -56,6 +57,7 @@ public class RecordActivity extends BaseActivity {
 	private ImageButton mBtnTakePicture;
 	private ImageButton mBtnPies;
 	private ImageButton mBtnFriends;
+	private ImageButton mBtnSend;
 	private int mCameraNumber;
 	private boolean mFlashOn;
 	private boolean mTakingVideo;
@@ -83,6 +85,7 @@ public class RecordActivity extends BaseActivity {
 		mBtnFriends = (ImageButton) findViewById(R.id.btnFriends);
 		mVideoView = (VideoView) findViewById(R.id.videoView);
 		mImageView = (ImageView) findViewById(R.id.pictureView2);
+		mBtnSend = (ImageButton) findViewById(R.id.btnSend);
 		
 		mBtnTakePicture.setOnClickListener(takePictureListener);
 		mBtnTakePicture.setOnLongClickListener(takeVideoListener);
@@ -118,6 +121,8 @@ public class RecordActivity extends BaseActivity {
 			mBtnPies.setVisibility(View.VISIBLE);
 			mBtnSwitchCamera.setVisibility(View.VISIBLE);
 			mBtnTakePicture.setVisibility(View.VISIBLE);
+			mBtnSend.setVisibility(View.GONE);
+			
 			
 			mCameraPreview.setVisibility(View.VISIBLE);
 			mVideoView.setVisibility(View.GONE);
@@ -129,7 +134,7 @@ public class RecordActivity extends BaseActivity {
 			mBtnPies.setVisibility(View.GONE);
 			mBtnSwitchCamera.setVisibility(View.GONE);
 			mBtnTakePicture.setVisibility(View.GONE);
-			
+			mBtnSend.setVisibility(View.VISIBLE);
 			
 			
 			Bitmap myBitmap = BitmapFactory.decodeByteArray(mPictureData, 0, mPictureData.length);
@@ -147,6 +152,7 @@ public class RecordActivity extends BaseActivity {
 			mBtnPies.setVisibility(View.GONE);
 			mBtnSwitchCamera.setVisibility(View.GONE);
 			mBtnTakePicture.setVisibility(View.GONE);
+			mBtnSend.setVisibility(View.VISIBLE);
 			
 			if (mVideoView == null)
 				mVideoView = new VideoView(this);
@@ -221,10 +227,12 @@ public class RecordActivity extends BaseActivity {
 			mBtnPies.setVisibility(View.GONE);
 			mBtnSwitchCamera.setVisibility(View.GONE);
 			mBtnTakePicture.setVisibility(View.GONE);
+			mBtnSend.setVisibility(View.GONE);
 			break;
 		case UI_MODE_TAKING_VIDEO:
 			mBtnFlash.setVisibility(View.GONE);
-			mBtnSwitchCamera.setVisibility(View.GONE);			
+			mBtnSwitchCamera.setVisibility(View.GONE);	
+			mBtnSend.setVisibility(View.GONE);
 			break;
 		}
 	}
@@ -324,10 +332,15 @@ public class RecordActivity extends BaseActivity {
 	        			PieTalkLogger.i(TAG, "Finished video");
 	        			mTakingVideo = false;
 	        			mReviewingVideo = true;
-	        			mMediaRecorder.stop();
-	        			releaseMediaRecorder();
-	        			
-	        			setUIMode(Constants.CameraUIMode.UI_MODE_REVIEW_VIDEO);
+	        			try {
+		        			mMediaRecorder.stop();
+		        			releaseMediaRecorder();	        			
+		        			setUIMode(Constants.CameraUIMode.UI_MODE_REVIEW_VIDEO);
+	        			} catch (RuntimeException ex) {
+	        				PieTalkLogger.e(TAG, "Error stopping media recorder");
+	        				Toast.makeText(mActivity, mActivity.getResources().getString(R.string.video_recording_failed), Toast.LENGTH_SHORT).show();
+	        				setUIMode(Constants.CameraUIMode.UI_MODE_PRE_PICTURE);
+	        			}
 	        		}
 	        }
 			return false;
@@ -428,6 +441,8 @@ public class RecordActivity extends BaseActivity {
 			mVideoView.setVisibility(View.VISIBLE);
 			mCameraPreview.setVisibility(View.GONE);
 			setUIMode(Constants.CameraUIMode.UI_MODE_REVIEW_VIDEO);
+		} else {
+			setUIMode(Constants.CameraUIMode.UI_MODE_PRE_PICTURE);
 		}
 	}
 	
@@ -517,6 +532,10 @@ public class RecordActivity extends BaseActivity {
         overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
 	}
 	
+	public void tappedSend(View view) {
+		Toast.makeText(this, "You tapped send", Toast.LENGTH_SHORT).show();
+	}
+	
 	@Override
 	public void onBackPressed() {
 		if (mReviewingPicture || mReviewingVideo) {
@@ -532,7 +551,9 @@ public class RecordActivity extends BaseActivity {
 				PieTalkLogger.e(TAG, "Unable to delete file");
 			}
 			
-			mCamera.startPreview();
+			
+			//TODO: Make sure commenting this doesn't break anything
+			//mCamera.startPreview();
 			mReviewingPicture = false;
 			mReviewingVideo = false;
 			setUIMode(Constants.CameraUIMode.UI_MODE_PRE_PICTURE);

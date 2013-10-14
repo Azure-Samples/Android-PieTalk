@@ -54,6 +54,7 @@
     <string name="privacy_policy">Privacy policy</string>
     <string name="terms_of_use">Terms of use</string>
     <string name="everyone">Everyone</string>
+    <string name="video_recording_failed">Video recording failed.</string>
     
     <string-array name="pref_list_privacy">
         <item>Everyone</item>
