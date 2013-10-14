@@ -36,6 +36,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnFocusChangeListener;
+import android.view.View.OnHoverListener;
 import android.view.View.OnLongClickListener;
 import android.view.View.OnTouchListener;
 import android.view.Window;
@@ -46,6 +47,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.NumberPicker;
 import android.widget.NumberPicker.OnScrollListener;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
@@ -75,6 +77,7 @@ public class RecordActivity extends BaseActivity implements NumberPicker.OnValue
 	private ImageButton mBtnDelete;
 	private ImageButton mBtnTime;
 	private TextView mLblTime;
+	private RelativeLayout mLayoutTime;
 	private int mCameraNumber;
 	private boolean mFlashOn;
 	private boolean mTakingVideo;
@@ -86,6 +89,7 @@ public class RecordActivity extends BaseActivity implements NumberPicker.OnValue
 	private FrameLayout mFrameLayout;
 	private byte[] mPictureData;
 	private boolean mIsScrolling;
+	private int     mSecondsSelected;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -106,8 +110,10 @@ public class RecordActivity extends BaseActivity implements NumberPicker.OnValue
 		mBtnSend = (ImageButton) findViewById(R.id.btnSend);
 		mBtnDelete = (ImageButton) findViewById(R.id.btnDelete);
 		mBtnTime = (ImageButton) findViewById(R.id.btnTime);
+		mLayoutTime = (RelativeLayout) findViewById(R.id.layoutTime);
 		
 		mLblTime = (TextView) findViewById(R.id.lblTime);
+		
 		
 		mBtnTakePicture.setOnClickListener(takePictureListener);
 		mBtnTakePicture.setOnLongClickListener(takeVideoListener);
@@ -120,6 +126,9 @@ public class RecordActivity extends BaseActivity implements NumberPicker.OnValue
 		mReviewingPicture = false;
 		mReviewingVideo = false;
 		mIsScrolling = false;
+		mSecondsSelected = 3;
+		
+		mLblTime.setText(mSecondsSelected + "");
 	}
 	
 	private OnClickListener takePictureListener = new OnClickListener() {
@@ -146,6 +155,7 @@ public class RecordActivity extends BaseActivity implements NumberPicker.OnValue
 			mBtnTakePicture.setVisibility(View.VISIBLE);
 			mBtnSend.setVisibility(View.GONE);
 			mBtnDelete.setVisibility(View.GONE);
+			mLayoutTime.setVisibility(View.GONE);
 			
 			mCameraPreview.setVisibility(View.VISIBLE);
 			mVideoView.setVisibility(View.GONE);
@@ -159,6 +169,7 @@ public class RecordActivity extends BaseActivity implements NumberPicker.OnValue
 			mBtnTakePicture.setVisibility(View.GONE);
 			mBtnSend.setVisibility(View.VISIBLE);
 			mBtnDelete.setVisibility(View.VISIBLE);
+			mLayoutTime.setVisibility(View.VISIBLE);
 			
 			Bitmap myBitmap = BitmapFactory.decodeByteArray(mPictureData, 0, mPictureData.length);
 			mImageView.setImageBitmap(myBitmap);
@@ -177,6 +188,7 @@ public class RecordActivity extends BaseActivity implements NumberPicker.OnValue
 			mBtnTakePicture.setVisibility(View.GONE);
 			mBtnSend.setVisibility(View.VISIBLE);
 			mBtnDelete.setVisibility(View.VISIBLE);
+			mLayoutTime.setVisibility(View.VISIBLE);
 			
 			if (mVideoView == null)
 				mVideoView = new VideoView(this);
@@ -577,6 +589,8 @@ public class RecordActivity extends BaseActivity implements NumberPicker.OnValue
 		return mIsScrolling;
 	}
 	
+	
+	
 	public static class NumberPickerFragment extends DialogFragment {
 		
 		@Override
@@ -586,18 +600,20 @@ public class RecordActivity extends BaseActivity implements NumberPicker.OnValue
 		}
 		@Override
 		public Dialog onCreateDialog(Bundle savedInstanceState) {
-			NumberPicker picker = new NumberPicker(getActivity());
+			RecordActivity activity = (RecordActivity) getActivity();
+			NumberPicker picker = new NumberPicker(activity);
 			picker.setMinValue(1);
 			picker.setMaxValue(10);
 			picker.setWrapSelectorWheel(false);
+			picker.setValue(activity.getSelectedSeconds());
 			//Dialog dialog = new Dialog(getActivity());
 			AlertDialog.Builder builder;
-			builder = new AlertDialog.Builder(getActivity());
+			builder = new AlertDialog.Builder(activity);
 			builder.setView(picker);
 			//AlertDialog dialog = new AlertDialog(
 			//dialog.setContentView(picker);
 			//dialog.setTitle("How long to share?");
-			AlertDialog dialog = builder.create();
+			final AlertDialog dialog = builder.create();
 			Window window = dialog.getWindow();
 			WindowManager.LayoutParams wlp = window.getAttributes();
 			wlp.gravity = Gravity.BOTTOM;
@@ -654,13 +670,53 @@ public class RecordActivity extends BaseActivity implements NumberPicker.OnValue
 					PieTalkLogger.i("Test", "test");
 				}
 			});
+			
 			picker.setOnTouchListener(new OnTouchListener() {				
 				@Override
 				public boolean onTouch(View v, MotionEvent event) {
 					RecordActivity activity = (RecordActivity) getActivity();
-					if (event.getAction() == MotionEvent.ACTION_UP)
-						if (!activity.getIsScrolling())
+					if (event.getAction() == MotionEvent.ACTION_UP) {
+						if (!activity.getIsScrolling()) {
 							PieTalkLogger.i("Test", "Get Seconds Value");
+							//dialog.dismiss();
+							NumberPicker pick = (NumberPicker) v;
+							PieTalkLogger.i("test", "Pick value: " + pick.getValue());
+//							View child = pick.getChildAt(pick.getValue());
+//							int[] location = new int[2];
+//							child.getLocationOnScreen(location);
+//							int x = location[0];
+//							int y = location[1];
+//							int w = child.getWidth();
+//							int h = child.getHeight();
+							
+							//This seems to work.
+							float rx = event.getX();
+							float ry = event.getY();
+							if (ry > 128 && ry < 256) {
+								dialog.dismiss();
+//								activity.updateTime();
+							}
+							
+							//PieTalkLogger.i("Location", "x: " + rx + "   y: " + ry);
+//							if (rx < x || rx > x + w || ry < y || ry > y + h) {
+//								PieTalkLogger.i("TEST", "No touch");
+//							} else {
+//								PieTalkLogger.d("TEST", "BAM!");
+//							}
+						}
+					} else if (event.getAction() == MotionEvent.ACTION_DOWN) {
+						PieTalkLogger.i("TEST", "down");
+					}
+						
+					return false;
+				}
+			});
+			
+			picker.setOnHoverListener(new OnHoverListener() {
+				
+				@Override
+				public boolean onHover(View v, MotionEvent event) {
+					PieTalkLogger.i("Test", "OHL");
 					return false;
 				}
 			});
@@ -668,6 +724,8 @@ public class RecordActivity extends BaseActivity implements NumberPicker.OnValue
 			for (int i = 0; i < picker.getChildCount(); i++) {
 				View view = picker.getChildAt(i);
 				view.setClickable(true);
+				//LinearLayout layout = (LinearLayout) view;
+				
 				EditText et = (EditText) view;
 				et.setOnTouchListener(new OnTouchListener() {
 					
@@ -780,6 +838,13 @@ public class RecordActivity extends BaseActivity implements NumberPicker.OnValue
 	public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
 		//Toast.makeText(mActivity, "Value change", Toast.LENGTH_SHORT).show();
 		PieTalkLogger.i(TAG, "New value: " + newVal);
+		mSecondsSelected = newVal;
+		mLblTime.setText(newVal + "");
+	}
+	
+	
+	public int getSelectedSeconds() {
+		return mSecondsSelected;
 	}
 
 }
