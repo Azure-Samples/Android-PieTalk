@@ -137,11 +137,11 @@ public class FriendsListActivity extends BaseActivity {
 			}
 			
 			@Override
-			public boolean onQueryTextChange(String newText) {
+			public boolean onQueryTextChange(final String newText) {
 				PieTalkLogger.i(TAG, "Text: " + newText);
 				mCurrentName = newText;
 				mBtnAddFriend.setEnabled(true);
-				mBtnAddFriend.setVisibility(View.VISIBLE);
+				mBtnAddFriend.setVisibility(View.VISIBLE);				
 				mAdapter.getFilter().filter(newText, new FilterListener() {					
 					@Override
 					public void onFilterComplete(int count) {
@@ -155,6 +155,9 @@ public class FriendsListActivity extends BaseActivity {
 						} else {
 							mLayoutAddFriend.setVisibility(View.GONE);
 						}
+						
+						if (mPieTalkService.getLocalFriendNames().contains(newText))
+							mLayoutAddFriend.setVisibility(View.GONE);
 					}
 				});
 				mLblNewFriendName.setText(mCurrentName);
