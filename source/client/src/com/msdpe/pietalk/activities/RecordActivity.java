@@ -8,12 +8,13 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnKeyListener;
-import android.content.res.Configuration;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.hardware.Camera;
@@ -28,6 +29,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.DisplayMetrics;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MotionEvent;
@@ -43,6 +45,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.NumberPicker;
+import android.widget.NumberPicker.OnScrollListener;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
@@ -82,6 +85,7 @@ public class RecordActivity extends BaseActivity implements NumberPicker.OnValue
 	private File mMediaStorageDir;
 	private FrameLayout mFrameLayout;
 	private byte[] mPictureData;
+	private boolean mIsScrolling;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -115,6 +119,7 @@ public class RecordActivity extends BaseActivity implements NumberPicker.OnValue
 		mTakingVideo = false;
 		mReviewingPicture = false;
 		mReviewingVideo = false;
+		mIsScrolling = false;
 	}
 	
 	private OnClickListener takePictureListener = new OnClickListener() {
@@ -564,6 +569,14 @@ public class RecordActivity extends BaseActivity implements NumberPicker.OnValue
 		newFragment.show(getFragmentManager(), "timePicker");
 	}
 	
+	public void setIsScrolling(boolean isScrolling) {
+		mIsScrolling = isScrolling;
+	}
+	
+	public boolean getIsScrolling() {
+		return mIsScrolling;
+	}
+	
 	public static class NumberPickerFragment extends DialogFragment {
 		
 		@Override
@@ -577,9 +590,19 @@ public class RecordActivity extends BaseActivity implements NumberPicker.OnValue
 			picker.setMinValue(1);
 			picker.setMaxValue(10);
 			picker.setWrapSelectorWheel(false);
-			Dialog dialog = new Dialog(getActivity());
-			dialog.setContentView(picker);
-			dialog.setTitle("How long to share?");
+			//Dialog dialog = new Dialog(getActivity());
+			AlertDialog.Builder builder;
+			builder = new AlertDialog.Builder(getActivity());
+			builder.setView(picker);
+			//AlertDialog dialog = new AlertDialog(
+			//dialog.setContentView(picker);
+			//dialog.setTitle("How long to share?");
+			AlertDialog dialog = builder.create();
+			Window window = dialog.getWindow();
+			WindowManager.LayoutParams wlp = window.getAttributes();
+			wlp.gravity = Gravity.BOTTOM;
+			wlp.flags &= ~WindowManager.LayoutParams.FLAG_DIM_BEHIND;
+			window.setAttributes(wlp);
 			
 			dialog.setOnKeyListener(new OnKeyListener() {
 				
@@ -590,8 +613,29 @@ public class RecordActivity extends BaseActivity implements NumberPicker.OnValue
 				}
 			});
 			
+			picker.setOnScrollListener(new OnScrollListener() {
+				
+				@Override
+				public void onScrollStateChange(NumberPicker view, int scrollState) {
+					RecordActivity activity = (RecordActivity) getActivity();
+					switch (scrollState) {
+					case OnScrollListener.SCROLL_STATE_FLING:
+						activity.setIsScrolling(true);
+						PieTalkLogger.i("TEST", "Fling");
+						break;
+					case OnScrollListener.SCROLL_STATE_IDLE:
+						activity.setIsScrolling(false);
+						PieTalkLogger.i("TEST", "Idle");
+						break;
+					case OnScrollListener.SCROLL_STATE_TOUCH_SCROLL:
+						activity.setIsScrolling(true);
+						PieTalkLogger.i("TEST", "TouchScroll");
+						break;
+					}					
+				}
+			});
 			picker.setOnValueChangedListener((RecordActivity) getActivity());
-			//picker.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
+			picker.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
 			picker.setClickable(true);
 			
 			picker.setOnFocusChangeListener(new OnFocusChangeListener() {
@@ -610,13 +654,16 @@ public class RecordActivity extends BaseActivity implements NumberPicker.OnValue
 					PieTalkLogger.i("Test", "test");
 				}
 			});
-//			picker.setOnTouchListener(new OnTouchListener() {				
-//				@Override
-//				public boolean onTouch(View v, MotionEvent event) {
-//					PieTalkLogger.i("Test", "ONTOUCH");
-//					return false;
-//				}
-//			});
+			picker.setOnTouchListener(new OnTouchListener() {				
+				@Override
+				public boolean onTouch(View v, MotionEvent event) {
+					RecordActivity activity = (RecordActivity) getActivity();
+					if (event.getAction() == MotionEvent.ACTION_UP)
+						if (!activity.getIsScrolling())
+							PieTalkLogger.i("Test", "Get Seconds Value");
+					return false;
+				}
+			});
 			
 			for (int i = 0; i < picker.getChildCount(); i++) {
 				View view = picker.getChildAt(i);
