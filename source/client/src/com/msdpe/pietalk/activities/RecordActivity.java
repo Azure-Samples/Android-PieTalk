@@ -606,70 +606,41 @@ public class RecordActivity extends BaseActivity implements NumberPicker.OnValue
 			picker.setMaxValue(10);
 			picker.setWrapSelectorWheel(false);
 			picker.setValue(activity.getSelectedSeconds());
-			//Dialog dialog = new Dialog(getActivity());
 			AlertDialog.Builder builder;
 			builder = new AlertDialog.Builder(activity);
 			builder.setView(picker);
-			//AlertDialog dialog = new AlertDialog(
-			//dialog.setContentView(picker);
-			//dialog.setTitle("How long to share?");
+
 			final AlertDialog dialog = builder.create();
-			Window window = dialog.getWindow();
+			//Place the dialog at the bottom of the screen
+			Window window = dialog.getWindow();			
 			WindowManager.LayoutParams wlp = window.getAttributes();
 			wlp.gravity = Gravity.BOTTOM;
-			wlp.flags &= ~WindowManager.LayoutParams.FLAG_DIM_BEHIND;
 			window.setAttributes(wlp);
 			
-			dialog.setOnKeyListener(new OnKeyListener() {
-				
-				@Override
-				public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
-					PieTalkLogger.i("Test", "onKey");
-					return false;
-				}
-			});
 			
-			picker.setOnScrollListener(new OnScrollListener() {
-				
+			//Record if we're scrolling for key down detection logic
+			picker.setOnScrollListener(new OnScrollListener() {				
 				@Override
 				public void onScrollStateChange(NumberPicker view, int scrollState) {
 					RecordActivity activity = (RecordActivity) getActivity();
 					switch (scrollState) {
 					case OnScrollListener.SCROLL_STATE_FLING:
 						activity.setIsScrolling(true);
-						PieTalkLogger.i("TEST", "Fling");
 						break;
 					case OnScrollListener.SCROLL_STATE_IDLE:
 						activity.setIsScrolling(false);
-						PieTalkLogger.i("TEST", "Idle");
 						break;
 					case OnScrollListener.SCROLL_STATE_TOUCH_SCROLL:
 						activity.setIsScrolling(true);
-						PieTalkLogger.i("TEST", "TouchScroll");
 						break;
 					}					
 				}
 			});
 			picker.setOnValueChangedListener((RecordActivity) getActivity());
 			picker.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
-			picker.setClickable(true);
+
+			picker.setDisplayedValues(getResources().getStringArray(R.array.share_seconds_list));
 			
-			picker.setOnFocusChangeListener(new OnFocusChangeListener() {
-				
-				@Override
-				public void onFocusChange(View v, boolean hasFocus) {
-					PieTalkLogger.i("TEST", "onFCL");
-				}
-			});
-			
-			String[] numbers = new String[] {"1 second", "2 seconds", "3 seconds", "4 seconds", "5 seconds", "6 seconds", "7 seconds", "8 seconds", "9 seconds", "10 seconds" };
-			picker.setDisplayedValues(numbers);
-			picker.setOnClickListener(new OnClickListener() {				
-				@Override
-				public void onClick(View v) {
-					PieTalkLogger.i("Test", "test");
-				}
-			});
 			
 			picker.setOnTouchListener(new OnTouchListener() {				
 				@Override
@@ -677,32 +648,15 @@ public class RecordActivity extends BaseActivity implements NumberPicker.OnValue
 					RecordActivity activity = (RecordActivity) getActivity();
 					if (event.getAction() == MotionEvent.ACTION_UP) {
 						if (!activity.getIsScrolling()) {
-							PieTalkLogger.i("Test", "Get Seconds Value");
-							//dialog.dismiss();
-							NumberPicker pick = (NumberPicker) v;
-							PieTalkLogger.i("test", "Pick value: " + pick.getValue());
-//							View child = pick.getChildAt(pick.getValue());
-//							int[] location = new int[2];
-//							child.getLocationOnScreen(location);
-//							int x = location[0];
-//							int y = location[1];
-//							int w = child.getWidth();
-//							int h = child.getHeight();
-							
-							//This seems to work.
+							//Check to see if they have clicked into the 
+							//area specific to the middle row
+							//This is a little hacky but NumberPicker's
+							//onClickListener doesn't fire as expected
 							float rx = event.getX();
 							float ry = event.getY();
 							if (ry > 128 && ry < 256) {
 								dialog.dismiss();
-//								activity.updateTime();
-							}
-							
-							//PieTalkLogger.i("Location", "x: " + rx + "   y: " + ry);
-//							if (rx < x || rx > x + w || ry < y || ry > y + h) {
-//								PieTalkLogger.i("TEST", "No touch");
-//							} else {
-//								PieTalkLogger.d("TEST", "BAM!");
-//							}
+							}							
 						}
 					} else if (event.getAction() == MotionEvent.ACTION_DOWN) {
 						PieTalkLogger.i("TEST", "down");
@@ -711,47 +665,6 @@ public class RecordActivity extends BaseActivity implements NumberPicker.OnValue
 					return false;
 				}
 			});
-			
-			picker.setOnHoverListener(new OnHoverListener() {
-				
-				@Override
-				public boolean onHover(View v, MotionEvent event) {
-					PieTalkLogger.i("Test", "OHL");
-					return false;
-				}
-			});
-			
-			for (int i = 0; i < picker.getChildCount(); i++) {
-				View view = picker.getChildAt(i);
-				view.setClickable(true);
-				//LinearLayout layout = (LinearLayout) view;
-				
-				EditText et = (EditText) view;
-				et.setOnTouchListener(new OnTouchListener() {
-					
-					@Override
-					public boolean onTouch(View v, MotionEvent event) {
-						PieTalkLogger.i("TEST", "ont2");
-						return false;
-					}
-				});
-				et.setOnEditorActionListener(new OnEditorActionListener() {					
-					@Override
-					public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-						PieTalkLogger.i("Test", "OEAL");
-						return false;
-					}
-				});
-				//CustomEditText cet = (CustomEditText) view;
-				
-				view.setOnClickListener(new OnClickListener() {
-					
-					@Override
-					public void onClick(View v) {
-						PieTalkLogger.i("Test", "viewoncl");						
-					}
-				});
-			}
 			return dialog;			
 		}
 	}
