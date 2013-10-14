@@ -58,6 +58,7 @@ public class RecordActivity extends BaseActivity {
 	private ImageButton mBtnPies;
 	private ImageButton mBtnFriends;
 	private ImageButton mBtnSend;
+	private ImageButton mBtnDelete;
 	private int mCameraNumber;
 	private boolean mFlashOn;
 	private boolean mTakingVideo;
@@ -86,6 +87,7 @@ public class RecordActivity extends BaseActivity {
 		mVideoView = (VideoView) findViewById(R.id.videoView);
 		mImageView = (ImageView) findViewById(R.id.pictureView2);
 		mBtnSend = (ImageButton) findViewById(R.id.btnSend);
+		mBtnDelete = (ImageButton) findViewById(R.id.btnDelete);
 		
 		mBtnTakePicture.setOnClickListener(takePictureListener);
 		mBtnTakePicture.setOnLongClickListener(takeVideoListener);
@@ -122,7 +124,7 @@ public class RecordActivity extends BaseActivity {
 			mBtnSwitchCamera.setVisibility(View.VISIBLE);
 			mBtnTakePicture.setVisibility(View.VISIBLE);
 			mBtnSend.setVisibility(View.GONE);
-			
+			mBtnDelete.setVisibility(View.GONE);
 			
 			mCameraPreview.setVisibility(View.VISIBLE);
 			mVideoView.setVisibility(View.GONE);
@@ -135,7 +137,7 @@ public class RecordActivity extends BaseActivity {
 			mBtnSwitchCamera.setVisibility(View.GONE);
 			mBtnTakePicture.setVisibility(View.GONE);
 			mBtnSend.setVisibility(View.VISIBLE);
-			
+			mBtnDelete.setVisibility(View.VISIBLE);
 			
 			Bitmap myBitmap = BitmapFactory.decodeByteArray(mPictureData, 0, mPictureData.length);
 			mImageView.setImageBitmap(myBitmap);
@@ -153,6 +155,7 @@ public class RecordActivity extends BaseActivity {
 			mBtnSwitchCamera.setVisibility(View.GONE);
 			mBtnTakePicture.setVisibility(View.GONE);
 			mBtnSend.setVisibility(View.VISIBLE);
+			mBtnDelete.setVisibility(View.VISIBLE);
 			
 			if (mVideoView == null)
 				mVideoView = new VideoView(this);
@@ -536,31 +539,39 @@ public class RecordActivity extends BaseActivity {
 		Toast.makeText(this, "You tapped send", Toast.LENGTH_SHORT).show();
 	}
 	
+	public void tappedDelete(View view) {
+		returnToCameraPreview();
+	}
+	
 	@Override
 	public void onBackPressed() {
 		if (mReviewingPicture || mReviewingVideo) {
 			//releaseMediaRecorder();
-			if (mReviewingVideo) {
-				mVideoView.stopPlayback();
-				mCameraPreview.setVisibility(View.VISIBLE);
-				mVideoView.setVisibility(View.GONE);				
-			}
-			File file = new File(mFileFullPath);
-			mFileFullPath = "";
-			if (!file.delete()) {
-				PieTalkLogger.e(TAG, "Unable to delete file");
-			}
-			
-			
-			//TODO: Make sure commenting this doesn't break anything
-			//mCamera.startPreview();
-			mReviewingPicture = false;
-			mReviewingVideo = false;
-			setUIMode(Constants.CameraUIMode.UI_MODE_PRE_PICTURE);
+			returnToCameraPreview();
 			
 		} else {
 			finish();
 		}
+	}
+	
+	private void returnToCameraPreview() {
+		if (mReviewingVideo) {
+			mVideoView.stopPlayback();
+			mCameraPreview.setVisibility(View.VISIBLE);
+			mVideoView.setVisibility(View.GONE);				
+		}
+		File file = new File(mFileFullPath);
+		mFileFullPath = "";
+		if (!file.delete()) {
+			PieTalkLogger.e(TAG, "Unable to delete file");
+		}
+		
+		
+		//TODO: Make sure commenting this doesn't break anything
+		//mCamera.startPreview();
+		mReviewingPicture = false;
+		mReviewingVideo = false;
+		setUIMode(Constants.CameraUIMode.UI_MODE_PRE_PICTURE);
 	}
 	
 	public static final int MEDIA_TYPE_IMAGE = 1;

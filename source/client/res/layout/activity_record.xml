@@ -44,6 +44,15 @@
         android:layout_alignParentLeft="true"
         android:onClick="tappedFlash"/>
     
+    <ImageButton
+        android:id="@+id/btnDelete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/content_remove"
+        android:layout_alignParentTop="true" 
+        android:layout_alignParentLeft="true"
+        android:onClick="tappedDelete"/>
+    
     
 
     <ImageButton
