@@ -56,6 +56,9 @@
     <string name="everyone">Everyone</string>
     <string name="video_recording_failed">Video recording failed.</string>
     <string name="just_friends">Just friends</string>
+    <string name="instructions_friend_request">- Press and hold to accept</string>
+    <string name="instructions_unseen_pie">- Press and hold to view</string>
+    <string name="instructions_seen_pie">- Double tap to reply</string>
     
     <string-array name="pref_list_privacy">
         <item>Everyone</item>

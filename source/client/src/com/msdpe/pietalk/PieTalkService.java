@@ -301,6 +301,11 @@ public class PieTalkService {
 		});
 	}
 	
+	public void acceptFriendRequest(Pie friendRequestPie, 
+			ApiOperationCallback<PieTalkResponse> callback) {		
+		mClient.invokeApi("AcceptFriendRequest", friendRequestPie, PieTalkResponse.class, callback);
+	}
+	
 	private class MyServiceFilter implements ServiceFilter {		
 		@Override
 		public void handleRequest(ServiceFilterRequest request, NextServiceFilterCallback nextServiceFilterCallback,
@@ -317,7 +322,10 @@ public class PieTalkService {
 							//TODO force logout
 						}
 					} else {
-						PieTalkLogger.e(TAG, "Error in handle request: " + ex.getMessage());
+						if (ex.getCause() != null)
+							PieTalkLogger.e(TAG, "Error in handle request: " + ex.getCause().getMessage());
+						else
+							PieTalkLogger.e(TAG, "Error in handle request: " + ex.getMessage());
 					}
 					
 					if (responseCallback != null)  responseCallback.onResponse(response, ex);

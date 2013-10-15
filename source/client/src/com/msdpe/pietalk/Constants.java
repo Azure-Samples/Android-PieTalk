@@ -14,4 +14,11 @@ public final class Constants {
 		UI_MODE_REVIEW_VIDEO,
 		UI_MODE_TAKING_VIDEO
     }
+	
+	public static enum PieType {
+		PIE_TYPE_FRIEND_REQUEST_ACCEPTED,
+		PIE_TYPE_FRIEND_REQUEST_UNACCEPTED,
+		PIE_TYPE_PIE_SEEN,
+		PIE_TYPE_PIE_UNSEEN,
+	}
 }

@@ -13,20 +13,29 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.ArrayAdapter;
+import android.widget.AdapterView;
+import android.widget.Toast;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ListView;
 
+import com.microsoft.windowsazure.mobileservices.ApiOperationCallback;
+import com.microsoft.windowsazure.mobileservices.ServiceFilterResponse;
 import com.msdpe.pietalk.Constants;
 import com.msdpe.pietalk.R;
 import com.msdpe.pietalk.TestSettingsActivity;
+import com.msdpe.pietalk.adapters.PiesArrayAdapter;
 import com.msdpe.pietalk.base.BaseActivity;
+import com.msdpe.pietalk.datamodels.Pie;
+import com.msdpe.pietalk.util.PieTalkAlert;
 import com.msdpe.pietalk.util.PieTalkLogger;
+import com.msdpe.pietalk.util.PieTalkResponse;
 
 public class PiesListActivity extends BaseActivity {
 	
 	private final String TAG = "PiesListActivity";
 	private ListView mLvPies;
-	private ArrayAdapter<String> mAdapter;	
+	private PiesArrayAdapter mAdapter;	
 	private PullToRefreshAttacher mPullToRefreshAttacher;
 	
 
@@ -49,11 +58,67 @@ public class PiesListActivity extends BaseActivity {
 				
 			}
 		});
+	
+//		mAdapter = new ArrayAdapter<String>(this,
+//    	        android.R.layout.simple_list_item_1, mPieTalkService.getLocalPieUsernames());
+//		mAdapter = new ArrayAdapter<String>(this,
+//    	        R.layout.list_row_pie, R.id.text1, mPieTalkService.getLocalPieUsernames());		
 		
-		mAdapter = new ArrayAdapter<String>(this,
-    	        android.R.layout.simple_list_item_1, mPieTalkService.getLocalPieUsernames());
+		//mAdapter = new PiesArrayAdapter(this,  mPieTalkService.getLocalPieUsernames());
+		mAdapter = new PiesArrayAdapter(this,  mPieTalkService.getLocalPies());
 		mLvPies.setAdapter(mAdapter);
+			
+		mLvPies.setOnItemClickListener(pieClickListener);
+		mLvPies.setOnItemLongClickListener(pieLongClickListener);
 	}
+	
+	private OnItemClickListener pieClickListener = new OnItemClickListener() {
+		@Override
+		public void onItemClick(AdapterView<?> parent, View view, int position,
+				long id) {
+			
+		}		
+	};
+	
+	private OnItemLongClickListener pieLongClickListener = new OnItemLongClickListener() {
+
+		@Override
+		public boolean onItemLongClick(AdapterView<?> parent, View view,
+				final int position, long id) {
+			final Pie pie = mPieTalkService.getLocalPies().get(position);
+			if (pie.getType().equals("FriendRequest")) {
+				//Friend and update the pie
+				mPieTalkService.acceptFriendRequest(pie, new ApiOperationCallback<PieTalkResponse>() {					
+					@Override
+					public void onCompleted(PieTalkResponse response, Exception ex,
+							ServiceFilterResponse serviceFilterResponse) {
+						PieTalkLogger.i(TAG, "Response received");
+						if (ex != null || response.Error != null) {
+																	
+							//Display error					
+							if (ex != null)
+								PieTalkAlert.showSimpleErrorDialog(mActivity, ex.getCause().getMessage());
+							else 
+								Toast.makeText(mActivity, response.Error, Toast.LENGTH_SHORT).show();
+						} else {
+							mAdapter.remove(pie);
+							mPieTalkService.getFriends();
+						}
+					}
+				});
+			} else if (pie.getType().equals("Message")) {
+				if (pie.getHasUserSeen()) {
+					//Do nothing, they should double tap to reply
+				} else {
+					//Show them the PIE!
+				}
+			}
+			return false;
+		}
+		
+	};
+	
+
 	
 	@Override
 	protected void onResume() {
@@ -73,8 +138,9 @@ public class PiesListActivity extends BaseActivity {
 	private BroadcastReceiver receiver = new BroadcastReceiver() {
 		public void onReceive(Context context, android.content.Intent intent) {
 			mAdapter.clear();			
-			for (String item : mPieTalkService.getLocalPieUsernames()) {
-				mAdapter.add(item);
+			//for (String item : mPieTalkService.getLocalPieUsernames()) {
+			for (Pie pie : mPieTalkService.getLocalPies()) {
+				mAdapter.add(pie);
 			}		
 			PieTalkLogger.i(TAG, "Refresh complete");
 			mPullToRefreshAttacher.setRefreshComplete();
