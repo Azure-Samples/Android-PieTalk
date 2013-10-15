@@ -24,11 +24,12 @@
         <activity
             android:name="com.msdpe.pietalk.activities.SplashScreenActivity"
             android:label="@string/title_activity_splash_screen"
-             android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen"
-            android:screenOrientation="portrait" 
-            android:launchMode="singleTop">
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -60,7 +61,7 @@
         <activity
             android:name="com.msdpe.pietalk.activities.FriendsListActivity"
             android:label="@string/title_activity_friends_list"
-            android:launchMode="singleTop" 
+            android:launchMode="singleTop"
             android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
@@ -80,7 +81,7 @@
             android:name="com.msdpe.pietalk.activities.PiesListActivity"
             android:label="@string/title_activity_pies_list"
             android:parentActivityName="com.msdpe.pietalk.activities.RecordActivity"
-            android:screenOrientation="portrait"  >
+            android:screenOrientation="portrait" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.msdpe.pietalk.activities.RecordActivity" />
@@ -88,7 +89,7 @@
         <activity
             android:name="com.msdpe.pietalk.SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:parentActivityName="com.msdpe.pietalk.activities.RecordActivity" 
+            android:parentActivityName="com.msdpe.pietalk.activities.RecordActivity"
             android:screenOrientation="portrait" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -98,7 +99,15 @@
             android:name="com.msdpe.pietalk.TestSettingsActivity"
             android:label="@string/title_activity_test_settings"
             android:parentActivityName="com.msdpe.pietalk.activities.RecordActivity"
-            android:screenOrientation="portrait"  >
+            android:screenOrientation="portrait" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.msdpe.pietalk.activities.RecordActivity" />
+        </activity>
+        <activity
+            android:name="com.msdpe.pietalk.activities.SendToFriendsActivity"
+            android:label="@string/title_activity_send_to_friends"
+            android:parentActivityName="com.msdpe.pietalk.activities.RecordActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.msdpe.pietalk.activities.RecordActivity" />
