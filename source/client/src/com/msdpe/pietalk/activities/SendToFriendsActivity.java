@@ -43,7 +43,8 @@ public class SendToFriendsActivity extends BaseActivity {
 	private void setupActionBar() {
 
 		getActionBar().setDisplayHomeAsUpEnabled(true);
-
+		//Hide icon
+		getActionBar().setDisplayShowHomeEnabled(false);
 	}
 
 	@Override
@@ -64,7 +65,9 @@ public class SendToFriendsActivity extends BaseActivity {
 			//
 			// http://developer.android.com/design/patterns/navigation.html#up-vs-back
 			//
-			NavUtils.navigateUpFromSameTask(this);
+			//NavUtils.navigateUpFromSameTask(this);
+			//Calling finish here so we go back to the review screen
+			finish();
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
