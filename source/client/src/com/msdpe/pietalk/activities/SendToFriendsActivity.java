@@ -1,20 +1,35 @@
 package com.msdpe.pietalk.activities;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
-import android.support.v4.app.NavUtils;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.CheckBox;
+import android.widget.ListView;
 
+import com.msdpe.pietalk.Constants;
 import com.msdpe.pietalk.R;
+import com.msdpe.pietalk.adapters.FriendsArrayAdapter;
 import com.msdpe.pietalk.base.BaseActivity;
+import com.msdpe.pietalk.datamodels.Friend;
+import com.msdpe.pietalk.util.PieTalkLogger;
 
 public class SendToFriendsActivity extends BaseActivity {
+	private String TAG = "SendToFriendsActivity";
 	private String mFileFullPath;
 	private boolean mReviewingPicture;
 	private boolean mReviewingVideo;
 	private int mSelectedSeconds;
+	
+	private ListView mLvFriends;
+	private FriendsArrayAdapter mAdapter;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -33,9 +48,26 @@ public class SendToFriendsActivity extends BaseActivity {
 			mSelectedSeconds = intent.getIntExtra("timeToLive", 0);
 		}
 		
+		mLvFriends = (ListView) findViewById(R.id.lvFriends);
 
-		
+		mAdapter = new FriendsArrayAdapter(this,  mPieTalkService.getLocalFriends());
+		mLvFriends.setAdapter(mAdapter);
+			
+		mLvFriends.setOnItemClickListener(friendClickListener);	
+		//mLvFriends.setClickable(true);
+		//mLvFriends.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 	}
+	
+	private OnItemClickListener friendClickListener = new OnItemClickListener() {
+		@Override
+		public void onItemClick(AdapterView<?> parent, View view, int position,
+				long id) {
+			PieTalkLogger.i(TAG, "onClick");
+			CheckBox cbSelected = (CheckBox) view.findViewById(R.id.cbSelected);
+			cbSelected.setChecked(!cbSelected.isChecked());
+			mPieTalkService.getLocalFriends().get(position).setChecked(cbSelected.isChecked());			
+		}		
+	};
 
 	/**
 	 * Set up the {@link android.app.ActionBar}.
@@ -43,7 +75,7 @@ public class SendToFriendsActivity extends BaseActivity {
 	private void setupActionBar() {
 
 		getActionBar().setDisplayHomeAsUpEnabled(true);
-		//Hide icon
+		//Hide icon in action bar
 		getActionBar().setDisplayShowHomeEnabled(false);
 	}
 
@@ -72,5 +104,31 @@ public class SendToFriendsActivity extends BaseActivity {
 		}
 		return super.onOptionsItemSelected(item);
 	}
+	
+	@Override
+	protected void onResume() {
+		IntentFilter filter = new IntentFilter();
+		//filter.addAction(Constants.BROADCAST_PIES_UPDATED);
+		filter.addAction(Constants.BROADCAST_FRIENDS_UPDATED);
+		registerReceiver(receiver, filter);
+		super.onResume();	
+	}
+	
+	@Override
+	protected void onPause() {
+		unregisterReceiver(receiver);
+		super.onPause();
+	}
+	
+	private BroadcastReceiver receiver = new BroadcastReceiver() {
+		public void onReceive(Context context, android.content.Intent intent) {
+			mAdapter.clear();			
+			//for (String item : mPieTalkService.getLocalPieUsernames()) {
+			for (Friend friend : mPieTalkService.getLocalFriends()) {
+				mAdapter.add(friend);
+			}		
+			PieTalkLogger.i(TAG, "Refresh complete");			
+		}
+	};
 
 }

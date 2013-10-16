@@ -2,22 +2,38 @@ package com.msdpe.pietalk.datamodels;
 
 import java.util.Date;
 
+import com.google.gson.annotations.Expose;
+
 public class Friend {
 	
+	@Expose
 	@com.google.gson.annotations.SerializedName("fromUserId")
 	private String mFromUserId;
+	@Expose
 	@com.google.gson.annotations.SerializedName("toUserId")
 	private String mToUserId;
+	@Expose
 	@com.google.gson.annotations.SerializedName("toUsername")
 	private String mToUsername;
+	@Expose
 	@com.google.gson.annotations.SerializedName("status")
 	private String mStatus;
-	@com.google.gson.annotations.SerializedName("createDate")
+	@Expose
+	@com.google.gson.annotations.SerializedName("createDate")	
 	private Date mCreateDate;
+	@Expose
 	@com.google.gson.annotations.SerializedName("id")
 	private int mId;
+	
+	//Fields to ignore for serialization (not exposed)
+	private boolean mIsChecked;
+	
+	public void setChecked(boolean checked) { mIsChecked = checked; }
+	public boolean getChecked() { return mIsChecked; }
 
-	public Friend() {}
+	public Friend() {
+		mIsChecked = false;
+	}
 
 	public int getId() { return mId; } 
 	//public final void setId(int id) { mId = id; }

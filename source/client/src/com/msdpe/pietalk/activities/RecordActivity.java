@@ -697,7 +697,8 @@ public class RecordActivity extends BaseActivity implements NumberPicker.OnValue
 			PieTalkLogger.e(TAG, "Unable to delete file");
 		}
 		
-		
+		//Ensure friends won't be checked when we return to them
+		mPieTalkService.uncheckFriends();
 		//TODO: Make sure commenting this doesn't break anything
 		//mCamera.startPreview();
 		mReviewingPicture = false;

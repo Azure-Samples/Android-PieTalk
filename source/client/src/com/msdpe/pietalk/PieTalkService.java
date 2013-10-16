@@ -87,6 +87,12 @@ public class PieTalkService {
 		return mFriends;
 	}
 	
+	public void uncheckFriends() {
+		for (Friend friend : mFriends) {
+			friend.setChecked(false);
+		}
+	}
+	
 	public List<Pie> getLocalPies() {
 		return mPies;
 	}
