@@ -569,7 +569,12 @@ public class RecordActivity extends BaseActivity implements NumberPicker.OnValue
 	}
 	
 	public void tappedSend(View view) {
-		Toast.makeText(this, "You tapped send", Toast.LENGTH_SHORT).show();
+		Intent intent = new Intent(mActivity, SendToFriendsActivity.class);
+		intent.putExtra("filePath", mFileFullPath);
+		intent.putExtra("isPicture", mReviewingPicture);
+		intent.putExtra("isVideo", mReviewingVideo);
+		intent.putExtra("timeToLive", mSecondsSelected);
+		startActivity(intent);
 	}
 	
 	public void tappedDelete(View view) {

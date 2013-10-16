@@ -1,23 +1,40 @@
 package com.msdpe.pietalk.activities;
 
-import com.msdpe.pietalk.R;
-import com.msdpe.pietalk.R.layout;
-import com.msdpe.pietalk.R.menu;
-
+import android.content.Intent;
 import android.os.Bundle;
-import android.app.Activity;
+import android.support.v4.app.NavUtils;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.support.v4.app.NavUtils;
+import android.view.WindowManager;
 
-public class SendToFriendsActivity extends Activity {
+import com.msdpe.pietalk.R;
+import com.msdpe.pietalk.base.BaseActivity;
 
+public class SendToFriendsActivity extends BaseActivity {
+	private String mFileFullPath;
+	private boolean mReviewingPicture;
+	private boolean mReviewingVideo;
+	private int mSelectedSeconds;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+		getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN);
+		getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+		super.onCreate(savedInstanceState, true);
 		setContentView(R.layout.activity_send_to_friends);
 		// Show the Up button in the action bar.
 		setupActionBar();
+		
+		Intent intent = getIntent();
+		if (intent != null) {
+			mFileFullPath = intent.getStringExtra("filePath");
+			mReviewingPicture = intent.getBooleanExtra("isPicture", false);
+			mReviewingVideo = intent.getBooleanExtra("isVideo", false);
+			mSelectedSeconds = intent.getIntExtra("timeToLive", 0);
+		}
+		
+
+		
 	}
 
 	/**
