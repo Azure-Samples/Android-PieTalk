@@ -53,6 +53,7 @@ public class PieTalkService {
 	private String mUsername;
 	private String mEmail;
 	public int     mCheckCount;
+	private String[] mTempRecipientUserIds;
 	
 	//Mobile Services objects
 	private MobileServiceClient mClient;
@@ -342,11 +343,11 @@ public class PieTalkService {
 	
 	public void sendPie(final String fileFullPath, final boolean isPicture, final boolean isVideo, int selectedSeconds) {
 		//Get User IDs
-		final String[] recipientUserIds = new String[mCheckCount];
+		mTempRecipientUserIds = new String[mCheckCount];		
 		int count = 0;
 		for (Friend friend : mFriends) {
 			if (friend.getChecked())
-				recipientUserIds[count++] = friend.getToUserId();
+				mTempRecipientUserIds[count++] = friend.getToUserId();
 		}
 		//add new message to local pies
 		final Pie sentPie = Pie.newSentPie(mClient.getCurrentUser().getUserId(), mUsername, selectedSeconds, isPicture, isVideo);
@@ -374,7 +375,7 @@ public class PieTalkService {
 						//callback:  upload file
 						(new BlobUploaderTask(pieFileReturned.getBlobPath(), 
 								fileFullPath, isPicture, isVideo, 
-								recipientUserIds, pieReturned, pieFileReturned)).execute();
+								mTempRecipientUserIds, pieReturned, pieFileReturned)).execute();
 					}
 				});
 			}
@@ -487,13 +488,20 @@ public class PieTalkService {
  	public void sendPiesToRecipients(Pie sentPie, String[] recipientUserIds,
  			PieFile savedPieFile) {
 		JsonObject sendPiesRequest = new JsonObject();
-		String serializedRecipients = new Gson().toJson(recipientUserIds);        
+		String serializedRecipients = new Gson().toJson(recipientUserIds);
+		PieTalkLogger.d(TAG, "Recipients: " + serializedRecipients);
+		if (recipientUserIds.length == 0) {
+			PieTalkLogger.e(TAG, "There are no recipient user ids.  INVESTIGATE!");
+		}
+		
 		sendPiesRequest.add("recipients", new JsonPrimitive(serializedRecipients));
 		sendPiesRequest.addProperty("timeToLive", sentPie.getTimeToLive());
 		sendPiesRequest.addProperty("fromUserId", sentPie.getFromUserId());
 		sendPiesRequest.addProperty("fromUsername", sentPie.getFromUsername());
 		sendPiesRequest.addProperty("isPicture", sentPie.getIsPicture());
 		sendPiesRequest.addProperty("isVideo", sentPie.getIsVideo());
+		sendPiesRequest.addProperty("originalSentPieId", sentPie.getId());
+		sendPiesRequest.addProperty("pieFileId", savedPieFile.getId());
 		mClient.invokeApi("SendPiesToFriends", sendPiesRequest, PieTalkResponse.class, new ApiOperationCallback<PieTalkResponse>() {
 			@Override
 			public void onCompleted(PieTalkResponse response, Exception ex,

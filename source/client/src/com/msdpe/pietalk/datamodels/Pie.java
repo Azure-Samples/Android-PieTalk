@@ -19,7 +19,7 @@ public class Pie {
 	private int mTimeToLive;
 	@com.google.gson.annotations.SerializedName("userHasSeen")
 	private boolean mUserHasSeen;
-	@com.google.gson.annotations.SerializedName("delievered")
+	@com.google.gson.annotations.SerializedName("delivered")
 	private boolean mDelivered;
 	@com.google.gson.annotations.SerializedName("isVideo")
 	private boolean mIsVideo;
