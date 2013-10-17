@@ -195,7 +195,8 @@ public class PiesListActivity extends BaseActivity {
 	@Override
 	public void onBackPressed() {
 		// TODO Auto-generated method stub
-		super.onBackPressed();
+		//super.onBackPressed();
+		NavUtils.navigateUpFromSameTask(this);
 		overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right);
 	}
 

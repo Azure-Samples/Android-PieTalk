@@ -205,7 +205,12 @@ public class SendToFriendsActivity extends BaseActivity {
 	}
 	
 	public void tappedSendToFriends(View view) {
-		Toast.makeText(mActivity, "Tapped send", Toast.LENGTH_SHORT).show();
+		//Toast.makeText(mActivity, "Tapped send", Toast.LENGTH_SHORT).show();
+//		Intent intent = new Intent();
+//		intent.putExtra("pieSent", true);
+		setResult(Constants.RESULT_CODE_PIE_SENT);
+		//setResult(Constants.REQUEST_CODE_SEND_TO_FRIENDS, null);
+		finish();
 	}
 
 }

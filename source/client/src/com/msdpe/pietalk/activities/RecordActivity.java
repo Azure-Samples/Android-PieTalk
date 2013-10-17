@@ -55,6 +55,7 @@ import android.widget.VideoView;
 
 import com.msdpe.pietalk.CameraPreview;
 import com.msdpe.pietalk.Constants;
+import com.msdpe.pietalk.Constants.CameraUIMode;
 import com.msdpe.pietalk.PreferencesHandler;
 import com.msdpe.pietalk.R;
 import com.msdpe.pietalk.base.BaseActivity;
@@ -574,7 +575,22 @@ public class RecordActivity extends BaseActivity implements NumberPicker.OnValue
 		intent.putExtra("isPicture", mReviewingPicture);
 		intent.putExtra("isVideo", mReviewingVideo);
 		intent.putExtra("timeToLive", mSecondsSelected);
-		startActivity(intent);
+		//startActivity(intent);
+		startActivityForResult(intent, Constants.REQUEST_CODE_SEND_TO_FRIENDS);
+	}
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (requestCode == Constants.REQUEST_CODE_SEND_TO_FRIENDS){
+
+			if (resultCode == Constants.RESULT_CODE_PIE_SENT) {
+				setUIMode(CameraUIMode.UI_MODE_PRE_PICTURE);
+				startActivity(new Intent(getApplicationContext(), PiesListActivity.class));
+				overridePendingTransition(0, 0);
+			}
+		} else {
+			super.onActivityResult(requestCode, resultCode, data);
+		}
 	}
 	
 	public void tappedDelete(View view) {

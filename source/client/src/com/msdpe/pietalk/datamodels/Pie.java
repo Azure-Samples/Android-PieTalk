@@ -19,6 +19,12 @@ public class Pie {
 	private int mTimeToLive;
 	@com.google.gson.annotations.SerializedName("userHasSeen")
 	private boolean mUserHasSeen;
+	@com.google.gson.annotations.SerializedName("delievered")
+	private boolean mDelivered;
+	@com.google.gson.annotations.SerializedName("isVideo")
+	private boolean mIsVideo;
+	@com.google.gson.annotations.SerializedName("isPicture")
+	private boolean mIsPicture;
 	@com.google.gson.annotations.SerializedName("id")
 	private int mId;
 
@@ -33,7 +39,8 @@ public class Pie {
 	public Date getCreateDate() { return mCreateDate; }	
 	public Date getUpdateDate() { return mUpdateDate; }
 	public int getTimeToLive() { return mTimeToLive; }
-	public boolean getHasUserSeen() { return mUserHasSeen; }	
+	public boolean getHasUserSeen() { return mUserHasSeen; }
+	public boolean getDelivered() { return mDelivered; }
 	
 	@Override
 	public boolean equals(Object o) {
