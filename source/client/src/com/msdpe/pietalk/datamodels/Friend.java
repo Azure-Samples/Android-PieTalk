@@ -38,10 +38,24 @@ public class Friend {
 	public int getId() { return mId; } 
 	//public final void setId(int id) { mId = id; }
 	public String getFromUserId() { return mFromUserId; }
+	//private void setFromUserId(String userId) { mFromUserId = userId; }
 	public String getToUserId() { return mToUserId; }
+	//private void setToUserId(String userId) { mToUserId = userId; }
 	public String getToUsername() { return mToUsername; }
+	//private void setUsername(String username) { mToUsername = username; }
 	public String getStatus() { return mStatus; }
 	public Date getCreateDate() { return mCreateDate; }	
+	
+	public static Friend getSelfFriend(String username, String userId) {
+		Friend self = new Friend();
+		self.mToUsername = username + " (me)";
+		self.mToUserId = userId;
+		self.mFromUserId = userId;
+		self.mStatus = "SELF";
+		return self;
+	}
+	
+	
 	
 	@Override
 	public boolean equals(Object o) {

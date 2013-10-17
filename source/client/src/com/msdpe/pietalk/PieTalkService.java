@@ -38,6 +38,7 @@ public class PieTalkService {
 	private final String TAG = "PieTalkService";
 	private String mUsername;
 	private String mEmail;
+	public int     mCheckCount;
 	
 	//Mobile Services objects
 	private MobileServiceClient mClient;
@@ -62,6 +63,8 @@ public class PieTalkService {
 			mFriends = new ArrayList<Friend>();
 			mFriendNames = new ArrayList<String>();
 			mPies = new ArrayList<Pie>();
+			
+			mCheckCount = 0;
 		} catch (MalformedURLException e) {
 			Log.e(TAG, "There was an error creating the Mobile Service.  Verify the URL");
 		}
@@ -87,7 +90,12 @@ public class PieTalkService {
 		return mFriends;
 	}
 	
+	public void increaseCheckCount() { mCheckCount++; }
+	public void decreaseCheckCount() { mCheckCount--; }
+	public int  getCheckCount() { return mCheckCount; }
+	
 	public void uncheckFriends() {
+		mCheckCount = 0;
 		for (Friend friend : mFriends) {
 			friend.setChecked(false);
 		}
@@ -276,6 +284,10 @@ public class PieTalkService {
 //						mFriendNames.add(results.get(i).getToUsername());
 //					}
 					PieTalkLogger.i(TAG, "Sending broadcast");
+					//Insert self as friend
+					Friend self = Friend.getSelfFriend(mUsername, mClient.getCurrentUser().getUserId());
+					mFriends.add(0, self);
+					
 					//Broadcast that we've updated our friends list
 					Intent broadcast = new Intent();
 					broadcast.setAction(Constants.BROADCAST_FRIENDS_UPDATED);

@@ -107,7 +107,8 @@
         <activity
             android:name="com.msdpe.pietalk.activities.SendToFriendsActivity"
             android:label="@string/title_activity_send_to_friends"
-            android:parentActivityName="com.msdpe.pietalk.activities.RecordActivity" >
+            android:parentActivityName="com.msdpe.pietalk.activities.RecordActivity"
+            android:screenOrientation="portrait" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.msdpe.pietalk.activities.RecordActivity" />

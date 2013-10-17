@@ -9,10 +9,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.CheckBox;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.msdpe.pietalk.Constants;
 import com.msdpe.pietalk.R;
@@ -27,6 +31,8 @@ public class SendToFriendsActivity extends BaseActivity {
 	private boolean mReviewingPicture;
 	private boolean mReviewingVideo;
 	private int mSelectedSeconds;
+	private RelativeLayout mLayoutShareNames;
+	private TextView mLblShareNames;
 	
 	private ListView mLvFriends;
 	private FriendsArrayAdapter mAdapter;
@@ -39,6 +45,9 @@ public class SendToFriendsActivity extends BaseActivity {
 		setContentView(R.layout.activity_send_to_friends);
 		// Show the Up button in the action bar.
 		setupActionBar();
+		
+		mLayoutShareNames = (RelativeLayout) findViewById(R.id.layoutShareNames);
+		mLblShareNames = (TextView) findViewById(R.id.lblShareNames);
 		
 		Intent intent = getIntent();
 		if (intent != null) {
@@ -56,6 +65,11 @@ public class SendToFriendsActivity extends BaseActivity {
 		mLvFriends.setOnItemClickListener(friendClickListener);	
 		//mLvFriends.setClickable(true);
 		//mLvFriends.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+		
+		
+		if (mPieTalkService.getCheckCount() > 0) {
+			animateSendPanel(true);
+		}
 	}
 	
 	private OnItemClickListener friendClickListener = new OnItemClickListener() {
@@ -65,9 +79,40 @@ public class SendToFriendsActivity extends BaseActivity {
 			PieTalkLogger.i(TAG, "onClick");
 			CheckBox cbSelected = (CheckBox) view.findViewById(R.id.cbSelected);
 			cbSelected.setChecked(!cbSelected.isChecked());
-			mPieTalkService.getLocalFriends().get(position).setChecked(cbSelected.isChecked());			
+			
+			((SendToFriendsActivity) mActivity).updateRowCheck(position, cbSelected.isChecked());
+					
 		}		
 	};
+	
+	public void updateRowCheck(int position, boolean isChecked) {
+		mPieTalkService.getLocalFriends().get(position).setChecked(isChecked);
+		if (isChecked) {
+			mPieTalkService.increaseCheckCount();
+			if (mPieTalkService.getCheckCount() == 1) {
+				PieTalkLogger.i(TAG, "up");
+				animateSendPanel(true);
+			}
+		} else {
+			mPieTalkService.decreaseCheckCount();
+			if (mPieTalkService.getCheckCount() == 0) {
+				PieTalkLogger.i(TAG, "down");
+				animateSendPanel(false);
+			}
+		}	
+	}
+	
+	private void animateSendPanel(boolean animateUp) {
+		if (animateUp) {
+			Animation bottomUp = AnimationUtils.loadAnimation(mActivity, R.anim.slide_up_dialog);
+			mLayoutShareNames.startAnimation(bottomUp);
+			mLayoutShareNames.setVisibility(View.VISIBLE);
+		} else {
+			Animation bottomUp = AnimationUtils.loadAnimation(mActivity, R.anim.slide_down_dialog);
+			mLayoutShareNames.startAnimation(bottomUp);
+			mLayoutShareNames.setVisibility(View.GONE);
+		}
+	}
 
 	/**
 	 * Set up the {@link android.app.ActionBar}.
