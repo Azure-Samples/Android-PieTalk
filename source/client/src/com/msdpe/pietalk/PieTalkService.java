@@ -324,6 +324,19 @@ public class PieTalkService {
 		mClient.invokeApi("AcceptFriendRequest", friendRequestPie, PieTalkResponse.class, callback);
 	}
 	
+	public void sendPie(String fileFullPath, boolean isPicture, boolean isVideo, int selectedSeconds) {
+		//Get User IDs
+		//add new message to local pies
+		//save new pie as from
+		//this should trigger response to caller as everything else is callbacks
+		
+		//Callback from saving new pie
+			//save file and get sass
+				//callback:  upload file
+					//callback: send messages to each recipient user id
+						//callback: broadcast to receiver that messages sent
+	}
+	
 	private class MyServiceFilter implements ServiceFilter {		
 		@Override
 		public void handleRequest(ServiceFilterRequest request, NextServiceFilterCallback nextServiceFilterCallback,

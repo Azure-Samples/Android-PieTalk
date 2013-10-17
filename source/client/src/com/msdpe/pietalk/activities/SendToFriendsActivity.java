@@ -79,8 +79,9 @@ public class SendToFriendsActivity extends BaseActivity {
 		if (mPieTalkService.getCheckCount() > 0) {
 			animateSendPanel(true);
 			for (Friend friend : mPieTalkService.getLocalFriends())
-				if (friend.getChecked())
+				if (friend.getChecked()) {
 					mSelectedUsernames.add(friend.getToUsername());
+				}
 			updateShareLabel();
 		}
 	}
@@ -205,11 +206,9 @@ public class SendToFriendsActivity extends BaseActivity {
 	}
 	
 	public void tappedSendToFriends(View view) {
-		//Toast.makeText(mActivity, "Tapped send", Toast.LENGTH_SHORT).show();
-//		Intent intent = new Intent();
-//		intent.putExtra("pieSent", true);
+		mPieTalkService.sendPie(mFileFullPath, mReviewingPicture, mReviewingVideo,mSelectedSeconds);
+		mPieTalkService.uncheckFriends();
 		setResult(Constants.RESULT_CODE_PIE_SENT);
-		//setResult(Constants.REQUEST_CODE_SEND_TO_FRIENDS, null);
 		finish();
 	}
 
