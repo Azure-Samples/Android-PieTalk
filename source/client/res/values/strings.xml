@@ -82,5 +82,6 @@
     <string name="empty_string"></string>
     
     <string name="sending">- Sending</string>
+    <string name="opened">- Opened</string>
 
 </resources>

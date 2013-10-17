@@ -365,7 +365,11 @@ public class PieTalkService {
 				} else
 					PieTalkLogger.i(TAG, "PIe returned ID: " + pieReturned.getId());
 				//update local pie
-				mPies.set(mPies.indexOf(sentPie), pieReturned);
+				//mPies.set(mPies.indexOf(sentPie), pieReturned);
+				//Todo: check to make sure this works right.  was looking (using indexOf) for the
+				//sentPie object but that occasionally returned a -1 for index
+				//Now just assuming we're still dealing with entry 0
+				mPies.set(0, pieReturned);
 				//Callback from saving new pie
 				//save file and get sas
 				PieFile pieFile = new PieFile(isPicture, isVideo, mUsername, pieReturned.getId(), fileFullPath);

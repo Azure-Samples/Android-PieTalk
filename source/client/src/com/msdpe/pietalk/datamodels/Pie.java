@@ -27,6 +27,8 @@ public class Pie {
 	private boolean mIsPicture;
 	@com.google.gson.annotations.SerializedName("pieFileId")
 	private int mPieFileId;	
+	@com.google.gson.annotations.SerializedName("allUsersHaveSeen")
+	private boolean mAllUsersHaveSeen;
 	@com.google.gson.annotations.SerializedName("id")
 	private int mId;
 
@@ -46,6 +48,7 @@ public class Pie {
 	public boolean getIsPicture() { return mIsPicture; }
 	public boolean getIsVideo() { return mIsVideo; }
 	public int getPieFileId() { return mPieFileId; }
+	public boolean getAllUsersHaveSEen() { return mAllUsersHaveSeen; }
 	public void setHasUserSeen(boolean hasUserSeen) { mUserHasSeen = hasUserSeen; }
 	
 	public static Pie newSentPie(String userId, String username, int timeToLive, boolean isPicture, boolean isVideo) {
@@ -58,6 +61,7 @@ public class Pie {
 		sentPie.mDelivered = false;
 		sentPie.mIsPicture = isPicture;
 		sentPie.mIsVideo = isVideo;
+		sentPie.mAllUsersHaveSeen = false;
 		sentPie.mCreateDate = new Date();
 		sentPie.mUpdateDate = sentPie.mCreateDate;
 		return sentPie;
