@@ -12,6 +12,9 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnPreparedListener;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
@@ -20,12 +23,14 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
+import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 import android.widget.VideoView;
 
@@ -113,6 +118,8 @@ public class PiesListActivity extends BaseActivity {
 						
 					}
 				}
+				//Ensures we can still pull to refresh on this page
+				mPullToRefreshAttacher.onTouch(v, event);
 				return false;
 			}
 		});
@@ -188,6 +195,34 @@ public class PiesListActivity extends BaseActivity {
 									
 								} else if (pie.getIsVideo()) {
 									mIsViewingVideo = true;
+									if (mVideoView == null) {
+										mVideoView = new VideoView(mActivity);
+									}
+									RelativeLayout newLayout = new RelativeLayout(mActivity);
+//									RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) newLayout.getLayoutParams();
+//									layoutParams.width = LayoutParams.MATCH_PARENT;
+//									layoutParams.height = LayoutParams.MATCH_PARENT;
+									RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+//									newLayout.setLayoutParams(layoutParams);
+									
+									layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+									layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+									layoutParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+									layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+									mVideoView.setLayoutParams(layoutParams);
+									
+									mVideoView.setOnPreparedListener(new OnPreparedListener() {				
+											@Override
+											public void onPrepared(MediaPlayer mp) {
+												mp.setLooping(true);											
+											}
+										});
+									
+									Uri uri = Uri.parse(response.PieUrl);
+									mVideoView.setVideoURI(uri);
+									mVideoView.start();
+									newLayout.addView(mVideoView);
+									mViewingDialog.setContentView(newLayout);
 								}
 								mViewingDialog.show();
 							}
