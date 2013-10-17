@@ -1,6 +1,12 @@
 package com.msdpe.pietalk;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,13 +15,18 @@ import org.apache.http.StatusLine;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.os.AsyncTask;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.microsoft.windowsazure.mobileservices.ApiOperationCallback;
 import com.microsoft.windowsazure.mobileservices.MobileServiceClient;
 import com.microsoft.windowsazure.mobileservices.MobileServiceTable;
@@ -31,6 +42,7 @@ import com.msdpe.pietalk.activities.SplashScreenActivity;
 import com.msdpe.pietalk.datamodels.Friend;
 import com.msdpe.pietalk.datamodels.Pie;
 import com.msdpe.pietalk.datamodels.PieFile;
+import com.msdpe.pietalk.util.PieTalkAlert;
 import com.msdpe.pietalk.util.PieTalkLogger;
 import com.msdpe.pietalk.util.PieTalkRegisterResponse;
 import com.msdpe.pietalk.util.PieTalkResponse;
@@ -342,7 +354,7 @@ public class PieTalkService {
 		//save new pie as from
 		mPieTable.insert(sentPie, new TableOperationCallback<Pie>() {			
 			@Override
-			public void onCompleted(Pie pieReturned, Exception ex, ServiceFilterResponse serviceFilterResponse) {
+			public void onCompleted(final Pie pieReturned, Exception ex, ServiceFilterResponse serviceFilterResponse) {
 				//update local pie
 				mPies.set(mPies.indexOf(sentPie), pieReturned);
 				//Callback from saving new pie
@@ -353,12 +365,11 @@ public class PieTalkService {
 					public void onCompleted(PieFile pieFileReturned, Exception ex,
 							ServiceFilterResponse serviceFilterResponse) {
 						//callback:  upload file
+						(new BlobUploaderTask(pieFileReturned.getBlobPath(), 
+								fileFullPath, isPicture, isVideo, 
+								recipientUserIds, pieReturned, pieFileReturned)).execute();
 					}
 				});
-				
-					
-						//callback: send messages to each recipient user id
-							//callback: broadcast to receiver that messages sent
 			}
 		});	
 	}
@@ -389,5 +400,114 @@ public class PieTalkService {
 				}
 			});
 		}
+	}
+
+	/***
+ 	 * Handles uploading a blob to a specified url
+ 	 */
+ 	class BlobUploaderTask extends AsyncTask<Void, Void, Boolean> {
+	    private String mBlobUrl;
+	    private String mFilePath;
+	    private boolean mIsPicture, mIsVideo;
+	    private String[] mRecipientUserIds;
+	    private Pie mPie;
+	    private PieFile mPieFile;
+	    public BlobUploaderTask(String blobUrl, String filePath, boolean isPicture, boolean isVideo,
+	    							String[] recipientUserIds, Pie pieReturned, PieFile pieFileReturned) {
+	    		mBlobUrl = blobUrl;
+	    		mFilePath = filePath;
+	    		mIsPicture = isPicture;
+	    		mIsVideo = isVideo;
+	    		mRecipientUserIds = recipientUserIds;
+	    		mPie = pieReturned;
+	    		mPieFile = pieFileReturned;
+	    }
+
+	    @Override
+	    protected Boolean doInBackground(Void... params) {	         
+		    	try {
+		    		//Get the image data
+				FileInputStream fis = new FileInputStream(mFilePath);
+				int bytesRead = 0;
+				ByteArrayOutputStream bos = new ByteArrayOutputStream();
+				byte[] b = new byte[1024];
+				while ((bytesRead = fis.read(b)) != -1) {
+					bos.write(b, 0, bytesRead);
+				}
+				byte[] bytes = bos.toByteArray();
+				// Post our image data (byte array) to the server
+				URL url = new URL(mBlobUrl.replace("\"", ""));
+				HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+				urlConnection.setDoOutput(true);
+				urlConnection.setRequestMethod("PUT");
+				if (mIsPicture)
+					urlConnection.addRequestProperty("Content-Type", "image/jpeg");
+				else if (mIsVideo)
+					urlConnection.addRequestProperty("Content-Type", "video/mp4");
+				urlConnection.setRequestProperty("Content-Length", ""+ bytes.length);
+				// Write image data to server
+				DataOutputStream wr = new DataOutputStream(urlConnection.getOutputStream());
+				wr.write(bytes);
+				wr.flush();
+				wr.close();
+				int response = urlConnection.getResponseCode();
+				//If we successfully uploaded, return true
+				if (response == 201
+						&& urlConnection.getResponseMessage().equals("Created")) {
+					return true;
+				}
+		    	} catch (Exception ex) {
+		    		Log.e(TAG, ex.getMessage());
+		    	}
+	        return false;	    	
+	    }
+
+	    @Override
+	    protected void onPostExecute(Boolean uploaded) {
+	        if (uploaded) {
+	        		PieTalkLogger.i(TAG, "Upload successful");	   									
+        			//delete local file
+	        		File file = new File(mFilePath);
+	        		if (!file.delete()) {
+	        			PieTalkLogger.e(TAG, "Unable to delete file");
+	        		}
+				//callback: send messages to each recipient user id
+	        		sendPiesToRecipients(mPie, mRecipientUserIds, mPieFile);
+	        }
+	    }
+ 	}
+ 	
+ 	public void sendPiesToRecipients(Pie sentPie, String[] recipientUserIds,
+ 			PieFile savedPieFile) {
+		JsonObject sendPiesRequest = new JsonObject();
+		String serializedRecipients = new Gson().toJson(recipientUserIds);        
+		sendPiesRequest.add("recipients", new JsonPrimitive(serializedRecipients));
+		sendPiesRequest.addProperty("timeToLive", sentPie.getTimeToLive());
+		sendPiesRequest.addProperty("fromUserId", sentPie.getFromUserId());
+		sendPiesRequest.addProperty("fromUsername", sentPie.getFromUsername());
+		sendPiesRequest.addProperty("isPicture", sentPie.getIsPicture());
+		sendPiesRequest.addProperty("isVideo", sentPie.getIsVideo());
+		mClient.invokeApi("SendPiesToFriends", sendPiesRequest, PieTalkResponse.class, new ApiOperationCallback<PieTalkResponse>() {
+			@Override
+			public void onCompleted(PieTalkResponse response, Exception ex,
+					ServiceFilterResponse serviceFilterResponse) {
+				//callback: broadcast to receiver that messages sent
+				Intent broadcast = new Intent();
+				broadcast.setAction(Constants.BROADCAST_PIE_SENT);
+				
+				if (ex != null || response.Error != null) {										
+					//Display error					
+					if (ex != null)
+						PieTalkLogger.e(TAG, "Unexpected error sending pies: " + ex.getCause().getMessage());
+					else 
+						PieTalkLogger.e(TAG,  "Error sending pies: " + response.Error);
+					broadcast.putExtra("Success", false);
+				} else {
+					broadcast.putExtra("Success", true);
+				}
+				mContext.sendBroadcast(broadcast);		
+			}
+		});
+
 	}
 }

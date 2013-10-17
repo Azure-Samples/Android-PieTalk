@@ -125,6 +125,7 @@ public class PiesListActivity extends BaseActivity {
 		IntentFilter filter = new IntentFilter();
 		//filter.addAction(Constants.BROADCAST_PIES_UPDATED);
 		filter.addAction(Constants.BROADCAST_PIES_UPDATED);
+		filter.addAction(Constants.BROADCAST_PIE_SENT);
 		registerReceiver(receiver, filter);
 		super.onResume();	
 	}
@@ -137,15 +138,18 @@ public class PiesListActivity extends BaseActivity {
 	
 	private BroadcastReceiver receiver = new BroadcastReceiver() {
 		public void onReceive(Context context, android.content.Intent intent) {
-			mAdapter.clear();			
-			//for (String item : mPieTalkService.getLocalPieUsernames()) {
-			for (Pie pie : mPieTalkService.getLocalPies()) {
-				mAdapter.add(pie);
-			}		
-			PieTalkLogger.i(TAG, "Refresh complete");
-			mPullToRefreshAttacher.setRefreshComplete();
-			mPullToRefreshAttacher.setRefreshing(false);
-			
+			if (intent.getAction().equals(Constants.BROADCAST_PIES_UPDATED)) {
+				mAdapter.clear();			
+				//for (String item : mPieTalkService.getLocalPieUsernames()) {
+				for (Pie pie : mPieTalkService.getLocalPies()) {
+					mAdapter.add(pie);
+				}		
+				PieTalkLogger.i(TAG, "Refresh complete");
+				mPullToRefreshAttacher.setRefreshComplete();
+				mPullToRefreshAttacher.setRefreshing(false);
+			} else if (intent.getAction().equals(Constants.BROADCAST_PIE_SENT)) {
+				mPieTalkService.getPies();
+			}
 		}
 	};
 

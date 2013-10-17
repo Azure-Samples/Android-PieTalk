@@ -14,6 +14,8 @@ public class PieFile {
 	private int mSentMessageId;
 	@com.google.gson.annotations.SerializedName("fileName")
 	private String mFileName;
+	@com.google.gson.annotations.SerializedName("blobPath")
+	private String mBlobPath;
 	@com.google.gson.annotations.SerializedName("id")
 	private int mId;
 	
@@ -34,6 +36,7 @@ public class PieFile {
 	}
 	
 	public int getId() { return mId; } 
+	public String getBlobPath() { return mBlobPath; }
 	
 	@Override
 	public boolean equals(Object o) {
