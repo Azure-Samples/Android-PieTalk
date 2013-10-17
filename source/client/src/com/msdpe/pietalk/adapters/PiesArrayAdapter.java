@@ -53,6 +53,10 @@ public class PiesArrayAdapter extends ArrayAdapter<Pie> {
 	    			imgIndicator.setImageResource(R.drawable.pie_not_seen);
 	    			lblInstructions.setText(mContext.getResources().getString(R.string.instructions_unseen_pie));
 	    		}
+	    } else if (pie.getType().equals("SENT")) {
+	    		imgIndicator.setImageResource(R.drawable.pie_sent_message);
+	    		lblInstructions.setText(mContext.getResources().getString(R.string.delivered));
+	    		
 	    }
 	    return view;
 	}

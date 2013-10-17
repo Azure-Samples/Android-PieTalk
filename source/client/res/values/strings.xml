@@ -79,5 +79,6 @@
 
     <string name="title_activity_send_to_friends">Send To...</string>
     <string name="empty_string"></string>
+    <string name="delivered">Delivered</string>
 
 </resources>
