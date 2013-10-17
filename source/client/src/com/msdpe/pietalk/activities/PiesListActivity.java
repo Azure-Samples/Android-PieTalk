@@ -233,23 +233,28 @@ public class PiesListActivity extends BaseActivity {
 								View view = mLvPies.getChildAt(position);
 								
 								final TextView lblTime = (TextView) view.findViewById(R.id.lblTime);
-								final ImageView imgIndicator = (ImageView) view.findViewById(R.id.imgIndicator);
-								final TextView lblInstructions = (TextView) view.findViewById(R.id.lblInstructions);
-								int timeToLive = pie.getTimeToLive();
-								lblTime.setText(timeToLive + "");
-								
-								new CountDownTimer(timeToLive * 1000, 1000) {
-									public void onTick(long millisUntilFinished) {
-										lblTime.setText(millisUntilFinished / 1000 + "");
-									}
+								//Only start a countdown if we haven't already
+								if (lblTime.getText().equals("")) {
+									final ImageView imgIndicator = (ImageView) view.findViewById(R.id.imgIndicator);
+									final TextView lblInstructions = (TextView) view.findViewById(R.id.lblInstructions);
+									int timeToLive = pie.getTimeToLive();
+									lblTime.setText(timeToLive + "");
 									
-									public void onFinish() {
-										imgIndicator.setImageResource(R.drawable.pie_seen);
-										lblTime.setText(R.string.empty_string);
-										lblInstructions.setText(R.string.instructions_seen_pie);
-										pie.setHasUserSeen(true);
-									}
-								}.start();
+									new CountDownTimer(timeToLive * 1000, 1000) {
+										public void onTick(long millisUntilFinished) {
+											lblTime.setText(millisUntilFinished / 1000 + "");
+										}
+										
+										public void onFinish() {
+											imgIndicator.setImageResource(R.drawable.pie_seen);
+											lblTime.setText(R.string.empty_string);
+											lblInstructions.setText(R.string.instructions_seen_pie);
+											pie.setHasUserSeen(true);
+											if (mViewingDialog.isShowing())
+												mViewingDialog.dismiss();
+										}
+									}.start();
+								}
 							}
 						}						
 					});
