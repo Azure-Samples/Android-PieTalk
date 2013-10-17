@@ -30,6 +30,7 @@ import com.microsoft.windowsazure.mobileservices.TableQueryCallback;
 import com.msdpe.pietalk.activities.SplashScreenActivity;
 import com.msdpe.pietalk.datamodels.Friend;
 import com.msdpe.pietalk.datamodels.Pie;
+import com.msdpe.pietalk.datamodels.PieFile;
 import com.msdpe.pietalk.util.PieTalkLogger;
 import com.msdpe.pietalk.util.PieTalkRegisterResponse;
 import com.msdpe.pietalk.util.PieTalkResponse;
@@ -45,6 +46,7 @@ public class PieTalkService {
 	private MobileServiceClient mClient;
 	private MobileServiceTable<Friend> mFriendTable;	
 	private MobileServiceTable<Pie> mPieTable;
+	private MobileServiceTable<PieFile> mPieFileTable;
 	
 	//Local data
 	private List<Friend> mFriends;
@@ -60,6 +62,7 @@ public class PieTalkService {
 			
 			mFriendTable = mClient.getTable("Friends", Friend.class);
 			mPieTable = mClient.getTable("Messages", Pie.class);
+			mPieFileTable = mClient.getTable("PieFile", PieFile.class);
 			
 			mFriends = new ArrayList<Friend>();
 			mFriendNames = new ArrayList<String>();
@@ -325,7 +328,7 @@ public class PieTalkService {
 		mClient.invokeApi("AcceptFriendRequest", friendRequestPie, PieTalkResponse.class, callback);
 	}
 	
-	public void sendPie(String fileFullPath, boolean isPicture, boolean isVideo, int selectedSeconds) {
+	public void sendPie(final String fileFullPath, final boolean isPicture, final boolean isVideo, int selectedSeconds) {
 		//Get User IDs
 		final String[] recipientUserIds = new String[mCheckCount];
 		int count = 0;
@@ -334,7 +337,7 @@ public class PieTalkService {
 				recipientUserIds[count++] = friend.getToUserId();
 		}
 		//add new message to local pies
-		final Pie sentPie = Pie.newSentPie(mClient.getCurrentUser().getUserId(), mUsername, selectedSeconds);
+		final Pie sentPie = Pie.newSentPie(mClient.getCurrentUser().getUserId(), mUsername, selectedSeconds, isPicture, isVideo);
 		mPies.add(0, sentPie);
 		//save new pie as from
 		mPieTable.insert(sentPie, new TableOperationCallback<Pie>() {			
@@ -343,8 +346,17 @@ public class PieTalkService {
 				//update local pie
 				mPies.set(mPies.indexOf(sentPie), pieReturned);
 				//Callback from saving new pie
-				//save file and get sass
-					//callback:  upload file
+				//save file and get sas
+				PieFile pieFile = new PieFile(isPicture, isVideo, mUsername, pieReturned.getId(), fileFullPath);
+				mPieFileTable.insert(pieFile, new TableOperationCallback<PieFile>() {					
+					@Override
+					public void onCompleted(PieFile pieFileReturned, Exception ex,
+							ServiceFilterResponse serviceFilterResponse) {
+						//callback:  upload file
+					}
+				});
+				
+					
 						//callback: send messages to each recipient user id
 							//callback: broadcast to receiver that messages sent
 			}

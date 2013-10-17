@@ -42,7 +42,7 @@ public class Pie {
 	public boolean getHasUserSeen() { return mUserHasSeen; }
 	public boolean getDelivered() { return mDelivered; }
 	
-	public static Pie newSentPie(String userId, String username, int timeToLive) {
+	public static Pie newSentPie(String userId, String username, int timeToLive, boolean isPicture, boolean isVideo) {
 		Pie sentPie = new Pie();
 		sentPie.mFromUserId = userId;
 		sentPie.mToUserId = userId;
@@ -50,6 +50,8 @@ public class Pie {
 		sentPie.mType = "SENT";
 		sentPie.mTimeToLive = timeToLive;
 		sentPie.mDelivered = false;
+		sentPie.mIsPicture = isPicture;
+		sentPie.mIsVideo = isVideo;
 		sentPie.mCreateDate = new Date();
 		sentPie.mUpdateDate = sentPie.mCreateDate;
 		return sentPie;
