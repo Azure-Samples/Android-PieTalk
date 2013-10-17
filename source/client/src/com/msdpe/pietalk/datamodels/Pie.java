@@ -42,6 +42,19 @@ public class Pie {
 	public boolean getHasUserSeen() { return mUserHasSeen; }
 	public boolean getDelivered() { return mDelivered; }
 	
+	public static Pie newSentPie(String userId, String username, int timeToLive) {
+		Pie sentPie = new Pie();
+		sentPie.mFromUserId = userId;
+		sentPie.mToUserId = userId;
+		sentPie.mFromUsername = username;
+		sentPie.mType = "SENT";
+		sentPie.mTimeToLive = timeToLive;
+		sentPie.mDelivered = false;
+		sentPie.mCreateDate = new Date();
+		sentPie.mUpdateDate = sentPie.mCreateDate;
+		return sentPie;
+	}
+	
 	@Override
 	public boolean equals(Object o) {
 		return o instanceof Pie && ((Pie) o).mId == mId;

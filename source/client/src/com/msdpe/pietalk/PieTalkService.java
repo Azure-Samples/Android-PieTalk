@@ -25,6 +25,7 @@ import com.microsoft.windowsazure.mobileservices.ServiceFilter;
 import com.microsoft.windowsazure.mobileservices.ServiceFilterRequest;
 import com.microsoft.windowsazure.mobileservices.ServiceFilterResponse;
 import com.microsoft.windowsazure.mobileservices.ServiceFilterResponseCallback;
+import com.microsoft.windowsazure.mobileservices.TableOperationCallback;
 import com.microsoft.windowsazure.mobileservices.TableQueryCallback;
 import com.msdpe.pietalk.activities.SplashScreenActivity;
 import com.msdpe.pietalk.datamodels.Friend;
@@ -326,15 +327,28 @@ public class PieTalkService {
 	
 	public void sendPie(String fileFullPath, boolean isPicture, boolean isVideo, int selectedSeconds) {
 		//Get User IDs
+		final String[] recipientUserIds = new String[mCheckCount];
+		int count = 0;
+		for (Friend friend : mFriends) {
+			if (friend.getChecked())
+				recipientUserIds[count++] = friend.getToUserId();
+		}
 		//add new message to local pies
+		final Pie sentPie = Pie.newSentPie(mClient.getCurrentUser().getUserId(), mUsername, selectedSeconds);
+		mPies.add(0, sentPie);
 		//save new pie as from
-		//this should trigger response to caller as everything else is callbacks
-		
-		//Callback from saving new pie
-			//save file and get sass
-				//callback:  upload file
-					//callback: send messages to each recipient user id
-						//callback: broadcast to receiver that messages sent
+		mPieTable.insert(sentPie, new TableOperationCallback<Pie>() {			
+			@Override
+			public void onCompleted(Pie pieReturned, Exception ex, ServiceFilterResponse serviceFilterResponse) {
+				//update local pie
+				mPies.set(mPies.indexOf(sentPie), pieReturned);
+				//Callback from saving new pie
+				//save file and get sass
+					//callback:  upload file
+						//callback: send messages to each recipient user id
+							//callback: broadcast to receiver that messages sent
+			}
+		});	
 	}
 	
 	private class MyServiceFilter implements ServiceFilter {		
