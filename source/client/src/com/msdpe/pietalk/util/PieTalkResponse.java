@@ -5,4 +5,5 @@ public class PieTalkResponse {
 	public String Error;
 	public String Details;
 	public int    UpdatedId;
+	public String PieUrl;
 }

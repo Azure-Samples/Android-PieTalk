@@ -315,6 +315,7 @@ public class PieTalkService {
 	}
 	
 	public void getPies() {
+		PieTalkLogger.i(TAG, "Getting pies from server");
 		mPieTable.where().execute(new TableQueryCallback<Pie>() {			
 			@Override
 			public void onCompleted(List<Pie> results, int count, Exception ex,
@@ -523,6 +524,9 @@ public class PieTalkService {
 				mContext.sendBroadcast(broadcast);		
 			}
 		});
-
 	}
+ 	
+ 	public void getPieForRecipient(Pie pie, ApiOperationCallback<PieTalkResponse> callback) {
+ 		mClient.invokeApi("getPieForRecipient", pie, PieTalkResponse.class, callback);
+ 	}
 }

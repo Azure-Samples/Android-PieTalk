@@ -3,21 +3,27 @@ package com.msdpe.pietalk.activities;
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher;
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher.OnRefreshListener;
 import android.app.ActionBar;
+import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnKeyListener;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnTouchListener;
 import android.view.WindowManager;
 import android.widget.AdapterView;
-import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.microsoft.windowsazure.mobileservices.ApiOperationCallback;
 import com.microsoft.windowsazure.mobileservices.ServiceFilterResponse;
@@ -37,6 +43,9 @@ public class PiesListActivity extends BaseActivity {
 	private ListView mLvPies;
 	private PiesArrayAdapter mAdapter;	
 	private PullToRefreshAttacher mPullToRefreshAttacher;
+	private boolean mIsViewingPicture;
+	private boolean mIsViewingVideo;
+	private Dialog mViewingDialog;
 	
 
 	@Override
@@ -70,12 +79,43 @@ public class PiesListActivity extends BaseActivity {
 			
 		mLvPies.setOnItemClickListener(pieClickListener);
 		mLvPies.setOnItemLongClickListener(pieLongClickListener);
+//		mLvPies.setOnKeyListener(new View.OnKeyListener() {			
+//			@Override
+//			public boolean onKey(View v, int keyCode, KeyEvent event) {
+//				// TODO Auto-generated method stub
+//				PieTalkLogger.i(TAG, "onKey");
+//				return false;
+//			}
+//		});
+		
+		mLvPies.setOnTouchListener(new OnTouchListener() {
+			
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+//				PieTalkLogger.i(TAG, "onTouch");
+				if (event.getAction() == MotionEvent.ACTION_UP) {
+					if (mIsViewingPicture || mIsViewingVideo) {
+						mViewingDialog.dismiss();
+						mIsViewingPicture = false;
+						mIsViewingVideo = false;
+					}
+				}
+				return false;
+			}
+		});
 	}
+//	@Override
+//	public boolean onKeyDown(int keyCode, KeyEvent event) {
+//		// TODO Auto-generated method stub
+//		PieTalkLogger.i(TAG, "onkeydown");
+//		return super.onKeyDown(keyCode, event);
+//	}
 	
 	private OnItemClickListener pieClickListener = new OnItemClickListener() {
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position,
 				long id) {
+			//PieTalkLogger.i(TAG,  "onItemClick");
 			
 		}		
 	};
@@ -106,11 +146,42 @@ public class PiesListActivity extends BaseActivity {
 						}
 					}
 				});
-			} else if (pie.getType().equals("Message")) {
+			} else if (pie.getType().equals("Pie")) {
+				
 				if (pie.getHasUserSeen()) {
 					//Do nothing, they should double tap to reply
 				} else {
-					//Show them the PIE!
+					//Get SAS for pie
+					mPieTalkService.getPieForRecipient(pie, new ApiOperationCallback<PieTalkResponse>() {
+						@Override
+						public void onCompleted(PieTalkResponse response,
+								Exception ex, ServiceFilterResponse serviceFilterResponse) {
+							if (ex != null || response.Error != null) {
+								//Display error								
+								if (ex != null) 
+									PieTalkAlert.showSimpleErrorDialog(mActivity, ex.getCause().getMessage());
+								else
+									PieTalkAlert.showSimpleErrorDialog(mActivity, response.Error);																	
+							} else {
+								PieTalkLogger.d(TAG, response.PieUrl);
+								//dislay the pie depending on the type
+								mViewingDialog = new Dialog(mActivity, android.R.style.Theme_Black_NoTitleBar);
+								if (pie.getIsPicture()) {									
+									mIsViewingPicture = true;
+									
+								} else if (pie.getIsVideo()) {
+									mIsViewingVideo = true;
+								}
+								mViewingDialog.show();
+							}
+						}						
+					});
+					
+					//Update PIE as being seen at time
+					//Show PIE in dialog (require hold down)
+					//Start local countdown					
+					//Change loal pie when countdown is up
+					//Block access on server after time is up
 				}
 			}
 			return false;
@@ -123,6 +194,8 @@ public class PiesListActivity extends BaseActivity {
 	@Override
 	protected void onResume() {
 		IntentFilter filter = new IntentFilter();
+		mIsViewingPicture = false;
+		mIsViewingVideo = false;
 		//filter.addAction(Constants.BROADCAST_PIES_UPDATED);
 		filter.addAction(Constants.BROADCAST_PIES_UPDATED);
 		filter.addAction(Constants.BROADCAST_PIE_SENT);

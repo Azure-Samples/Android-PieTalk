@@ -25,6 +25,8 @@ public class Pie {
 	private boolean mIsVideo;
 	@com.google.gson.annotations.SerializedName("isPicture")
 	private boolean mIsPicture;
+	@com.google.gson.annotations.SerializedName("pieFileId")
+	private int mPieFileId;	
 	@com.google.gson.annotations.SerializedName("id")
 	private int mId;
 
@@ -43,6 +45,7 @@ public class Pie {
 	public boolean getDelivered() { return mDelivered; }
 	public boolean getIsPicture() { return mIsPicture; }
 	public boolean getIsVideo() { return mIsVideo; }
+	public int getPieFileId() { return mPieFileId; }
 	
 	public static Pie newSentPie(String userId, String username, int timeToLive, boolean isPicture, boolean isVideo) {
 		Pie sentPie = new Pie();
