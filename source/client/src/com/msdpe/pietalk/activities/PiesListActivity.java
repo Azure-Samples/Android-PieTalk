@@ -17,6 +17,7 @@ import android.media.MediaPlayer.OnPreparedListener;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.v4.app.NavUtils;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -31,6 +32,7 @@ import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
@@ -225,6 +227,29 @@ public class PiesListActivity extends BaseActivity {
 									mViewingDialog.setContentView(newLayout);
 								}
 								mViewingDialog.show();
+								
+								//Start countdown
+								int position = mPieTalkService.getLocalPies().indexOf(pie);
+								View view = mLvPies.getChildAt(position);
+								
+								final TextView lblTime = (TextView) view.findViewById(R.id.lblTime);
+								final ImageView imgIndicator = (ImageView) view.findViewById(R.id.imgIndicator);
+								final TextView lblInstructions = (TextView) view.findViewById(R.id.lblInstructions);
+								int timeToLive = pie.getTimeToLive();
+								lblTime.setText(timeToLive + "");
+								
+								new CountDownTimer(timeToLive * 1000, 1000) {
+									public void onTick(long millisUntilFinished) {
+										lblTime.setText(millisUntilFinished / 1000 + "");
+									}
+									
+									public void onFinish() {
+										imgIndicator.setImageResource(R.drawable.pie_seen);
+										lblTime.setText(R.string.empty_string);
+										lblInstructions.setText(R.string.instructions_seen_pie);
+										pie.setHasUserSeen(true);
+									}
+								}.start();
 							}
 						}						
 					});

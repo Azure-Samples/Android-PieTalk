@@ -46,6 +46,7 @@ public class Pie {
 	public boolean getIsPicture() { return mIsPicture; }
 	public boolean getIsVideo() { return mIsVideo; }
 	public int getPieFileId() { return mPieFileId; }
+	public void setHasUserSeen(boolean hasUserSeen) { mUserHasSeen = hasUserSeen; }
 	
 	public static Pie newSentPie(String userId, String username, int timeToLive, boolean isPicture, boolean isVideo) {
 		Pie sentPie = new Pie();
