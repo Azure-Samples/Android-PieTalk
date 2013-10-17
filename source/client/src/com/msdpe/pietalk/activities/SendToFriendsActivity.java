@@ -1,10 +1,14 @@
 package com.msdpe.pietalk.activities;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,9 +18,11 @@ import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.CheckBox;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.msdpe.pietalk.Constants;
 import com.msdpe.pietalk.R;
@@ -32,7 +38,9 @@ public class SendToFriendsActivity extends BaseActivity {
 	private boolean mReviewingVideo;
 	private int mSelectedSeconds;
 	private RelativeLayout mLayoutShareNames;
+	private ImageButton mBtnSendToFriends;
 	private TextView mLblShareNames;
+	private List<String> mSelectedUsernames;
 	
 	private ListView mLvFriends;
 	private FriendsArrayAdapter mAdapter;
@@ -48,6 +56,7 @@ public class SendToFriendsActivity extends BaseActivity {
 		
 		mLayoutShareNames = (RelativeLayout) findViewById(R.id.layoutShareNames);
 		mLblShareNames = (TextView) findViewById(R.id.lblShareNames);
+		mBtnSendToFriends = (ImageButton) findViewById(R.id.btnSendToFriends);
 		
 		Intent intent = getIntent();
 		if (intent != null) {
@@ -65,10 +74,14 @@ public class SendToFriendsActivity extends BaseActivity {
 		mLvFriends.setOnItemClickListener(friendClickListener);	
 		//mLvFriends.setClickable(true);
 		//mLvFriends.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-		
+		mSelectedUsernames = new ArrayList<String>();
 		
 		if (mPieTalkService.getCheckCount() > 0) {
 			animateSendPanel(true);
+			for (Friend friend : mPieTalkService.getLocalFriends())
+				if (friend.getChecked())
+					mSelectedUsernames.add(friend.getToUsername());
+			updateShareLabel();
 		}
 	}
 	
@@ -80,34 +93,40 @@ public class SendToFriendsActivity extends BaseActivity {
 			CheckBox cbSelected = (CheckBox) view.findViewById(R.id.cbSelected);
 			cbSelected.setChecked(!cbSelected.isChecked());
 			
-			((SendToFriendsActivity) mActivity).updateRowCheck(position, cbSelected.isChecked());
+			//((SendToFriendsActivity) mActivity).updateRowCheck(position, cbSelected.isChecked());
 					
 		}		
 	};
 	
 	public void updateRowCheck(int position, boolean isChecked) {
-		mPieTalkService.getLocalFriends().get(position).setChecked(isChecked);
+		Friend friend = mPieTalkService.getLocalFriends().get(position); 
+		friend.setChecked(isChecked);
 		if (isChecked) {
 			mPieTalkService.increaseCheckCount();
+			mSelectedUsernames.add(friend.getToUsername());
 			if (mPieTalkService.getCheckCount() == 1) {
 				PieTalkLogger.i(TAG, "up");
-				animateSendPanel(true);
+				animateSendPanel(true);				
 			}
 		} else {
 			mPieTalkService.decreaseCheckCount();
+			mSelectedUsernames.remove(friend.getToUsername());
 			if (mPieTalkService.getCheckCount() == 0) {
 				PieTalkLogger.i(TAG, "down");
-				animateSendPanel(false);
+				animateSendPanel(false);				
 			}
-		}	
+		}
+		updateShareLabel();
 	}
 	
 	private void animateSendPanel(boolean animateUp) {
 		if (animateUp) {
+			mBtnSendToFriends.setEnabled(true);
 			Animation bottomUp = AnimationUtils.loadAnimation(mActivity, R.anim.slide_up_dialog);
 			mLayoutShareNames.startAnimation(bottomUp);
 			mLayoutShareNames.setVisibility(View.VISIBLE);
 		} else {
+			mBtnSendToFriends.setEnabled(false);
 			Animation bottomUp = AnimationUtils.loadAnimation(mActivity, R.anim.slide_down_dialog);
 			mLayoutShareNames.startAnimation(bottomUp);
 			mLayoutShareNames.setVisibility(View.GONE);
@@ -175,5 +194,18 @@ public class SendToFriendsActivity extends BaseActivity {
 			PieTalkLogger.i(TAG, "Refresh complete");			
 		}
 	};
+	
+	private void updateShareLabel() {
+		if (mSelectedUsernames.size() < 3) {
+			String joinedNames = TextUtils.join(", ", mSelectedUsernames);
+			mLblShareNames.setText(joinedNames);
+		} else {
+			mLblShareNames.setText("Friends selected");
+		}	
+	}
+	
+	public void tappedSendToFriends(View view) {
+		Toast.makeText(mActivity, "Tapped send", Toast.LENGTH_SHORT).show();
+	}
 
 }

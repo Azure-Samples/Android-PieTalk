@@ -40,12 +40,13 @@
             android:textColor="@color/white" />
 
         <ImageButton
-            android:id="@+id/imageButton1"
+            android:id="@+id/btnSendToFriends"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:src="@drawable/social_send_now" />
+            android:src="@drawable/social_send_now" 
+            android:onClick="tappedSendToFriends"/>
 
     </RelativeLayout>
 
