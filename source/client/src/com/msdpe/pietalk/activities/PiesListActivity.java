@@ -1,18 +1,20 @@
 package com.msdpe.pietalk.activities;
 
+import java.io.InputStream;
+
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher;
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher.OnRefreshListener;
 import android.app.ActionBar;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnKeyListener;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -22,8 +24,10 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
+import android.widget.VideoView;
 
 import com.microsoft.windowsazure.mobileservices.ApiOperationCallback;
 import com.microsoft.windowsazure.mobileservices.ServiceFilterResponse;
@@ -46,6 +50,8 @@ public class PiesListActivity extends BaseActivity {
 	private boolean mIsViewingPicture;
 	private boolean mIsViewingVideo;
 	private Dialog mViewingDialog;
+	private ImageView mImagePicture;
+	private VideoView mVideoView;
 	
 
 	@Override
@@ -98,6 +104,13 @@ public class PiesListActivity extends BaseActivity {
 						mViewingDialog.dismiss();
 						mIsViewingPicture = false;
 						mIsViewingVideo = false;
+						if (mImagePicture != null) {
+							mImagePicture = null;
+						} else if (mVideoView != null) {
+							mVideoView.stopPlayback();
+							mVideoView = null;
+						}
+						
 					}
 				}
 				return false;
@@ -168,6 +181,10 @@ public class PiesListActivity extends BaseActivity {
 								mViewingDialog = new Dialog(mActivity, android.R.style.Theme_Black_NoTitleBar);
 								if (pie.getIsPicture()) {									
 									mIsViewingPicture = true;
+									if (mImagePicture == null) 
+										mImagePicture = new ImageView(mActivity);
+									new DownloadPiePictureTask().execute(response.PieUrl);
+									mViewingDialog.setContentView(mImagePicture);
 									
 								} else if (pie.getIsVideo()) {
 									mIsViewingVideo = true;
@@ -188,6 +205,26 @@ public class PiesListActivity extends BaseActivity {
 		}
 		
 	};
+	
+	private class DownloadPiePictureTask extends AsyncTask<String, Void, Bitmap> {
+		public DownloadPiePictureTask() { }
+		
+		@Override
+		protected Bitmap doInBackground(String... piePictureUrl) {
+			Bitmap pieImage = null;
+			try {
+				InputStream in = new java.net.URL(piePictureUrl[0]).openStream();
+				pieImage = BitmapFactory.decodeStream(in);			
+			} catch (Exception ex) {
+				PieTalkLogger.e(TAG, "Error pulling down pie for url: " + piePictureUrl[0]);				
+			}
+			return pieImage;
+		}
+		
+		protected void onPostExecute(Bitmap pieImage) {
+			mImagePicture.setImageBitmap(pieImage);
+		}
+	}
 	
 
 	
