@@ -355,6 +355,13 @@ public class PieTalkService {
 		mPieTable.insert(sentPie, new TableOperationCallback<Pie>() {			
 			@Override
 			public void onCompleted(final Pie pieReturned, Exception ex, ServiceFilterResponse serviceFilterResponse) {
+				if (ex != null) {
+					PieTalkLogger.e(TAG, "Error inserting pie: " + ex.getMessage());
+				}
+				if (pieReturned == null) {
+					PieTalkLogger.i(TAG, "Pie returned is null");
+				} else
+					PieTalkLogger.i(TAG, "PIe returned ID: " + pieReturned.getId());
 				//update local pie
 				mPies.set(mPies.indexOf(sentPie), pieReturned);
 				//Callback from saving new pie
