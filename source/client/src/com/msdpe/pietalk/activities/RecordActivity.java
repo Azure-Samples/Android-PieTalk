@@ -619,7 +619,10 @@ public class RecordActivity extends BaseActivity implements NumberPicker.OnValue
 
 			if (resultCode == Constants.RESULT_CODE_PIE_SENT) {
 				setUIMode(CameraUIMode.UI_MODE_PRE_PICTURE);
-				startActivity(new Intent(getApplicationContext(), PiesListActivity.class));
+				//startActivity(new Intent(getApplicationContext(), PiesListActivity.class));
+				Intent intent = new Intent(mActivity, PiesListActivity.class);
+				intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+				startActivity(intent);
 				overridePendingTransition(0, 0);
 			}
 		} else {
