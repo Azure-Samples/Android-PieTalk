@@ -193,6 +193,7 @@ public class PiesListActivity extends BaseActivity {
 									if (mImagePicture == null) 
 										mImagePicture = new ImageView(mActivity);
 									new DownloadPiePictureTask().execute(response.PieUrl);
+									
 									mViewingDialog.setContentView(mImagePicture);
 									
 								} else if (pie.getIsVideo()) {
