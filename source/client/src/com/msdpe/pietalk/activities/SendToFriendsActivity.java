@@ -37,6 +37,8 @@ public class SendToFriendsActivity extends BaseActivity {
 	private boolean mReviewingPicture;
 	private boolean mReviewingVideo;
 	private int mSelectedSeconds;
+	private boolean mIsReply;
+	private String mReplyToUserId;
 	private RelativeLayout mLayoutShareNames;
 	private ImageButton mBtnSendToFriends;
 	private TextView mLblShareNames;
@@ -64,6 +66,8 @@ public class SendToFriendsActivity extends BaseActivity {
 			mReviewingPicture = intent.getBooleanExtra("isPicture", false);
 			mReviewingVideo = intent.getBooleanExtra("isVideo", false);
 			mSelectedSeconds = intent.getIntExtra("timeToLive", 0);
+			mIsReply = intent.getBooleanExtra("isReply", false);
+			mReplyToUserId = intent.getStringExtra("replyToUserId");
 		}
 		
 		mLvFriends = (ListView) findViewById(R.id.lvFriends);
@@ -76,12 +80,20 @@ public class SendToFriendsActivity extends BaseActivity {
 		//mLvFriends.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 		mSelectedUsernames = new ArrayList<String>();
 		
+		if (mIsReply)
+			mPieTalkService.increaseCheckCount();
+		
 		if (mPieTalkService.getCheckCount() > 0) {
 			animateSendPanel(true);
-			for (Friend friend : mPieTalkService.getLocalFriends())
+			for (Friend friend : mPieTalkService.getLocalFriends()) {
+				if (mIsReply) {
+					if (friend.getToUserId().equals(mReplyToUserId))
+						friend.setChecked(true);
+				}
 				if (friend.getChecked()) {
 					mSelectedUsernames.add(friend.getToUsername());
 				}
+			}
 			updateShareLabel();
 		}
 	}

@@ -402,6 +402,7 @@ public class PiesListActivity extends BaseActivity {
 					Intent intent = new Intent(mActivity, RecordActivity.class);
 					intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
 					intent.putExtra("isReply", true);					
+					intent.putExtra("replyToUserId", tappedPie.getFromUserId());
 					startActivity(intent);
 					
 				}

@@ -92,6 +92,7 @@ public class RecordActivity extends BaseActivity implements NumberPicker.OnValue
 	private boolean mIsScrolling;
 	private int     mSecondsSelected;
 	private boolean mIsReply;
+	private String mReplyToUserId;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -437,8 +438,10 @@ public class RecordActivity extends BaseActivity implements NumberPicker.OnValue
 	protected void onNewIntent(Intent intent) {
 		super.onNewIntent(intent);
 		mIsReply = intent.getBooleanExtra("isReply", false);
-		if (mIsReply)
+		if (mIsReply) {
+			mReplyToUserId = intent.getStringExtra("replyToUserId"); 
 			overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right);
+		}
 	};
 	
 	@Override
@@ -604,6 +607,8 @@ public class RecordActivity extends BaseActivity implements NumberPicker.OnValue
 		intent.putExtra("isPicture", mReviewingPicture);
 		intent.putExtra("isVideo", mReviewingVideo);
 		intent.putExtra("timeToLive", mSecondsSelected);
+		intent.putExtra("isReply", mIsReply);
+		intent.putExtra("replyToUserId", mReplyToUserId);
 		//startActivity(intent);
 		startActivityForResult(intent, Constants.REQUEST_CODE_SEND_TO_FRIENDS);
 	}
@@ -758,7 +763,10 @@ public class RecordActivity extends BaseActivity implements NumberPicker.OnValue
 		//mCamera.startPreview();
 		mReviewingPicture = false;
 		mReviewingVideo = false;
-		setUIMode(Constants.CameraUIMode.UI_MODE_PRE_PICTURE);
+		if (mIsReply)
+			setUIMode(Constants.CameraUIMode.UI_MODE_REPLYING);
+		else
+			setUIMode(Constants.CameraUIMode.UI_MODE_PRE_PICTURE);
 	}
 	
 	public static final int MEDIA_TYPE_IMAGE = 1;
