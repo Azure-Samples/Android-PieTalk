@@ -91,6 +91,7 @@ public class RecordActivity extends BaseActivity implements NumberPicker.OnValue
 	private byte[] mPictureData;
 	private boolean mIsScrolling;
 	private int     mSecondsSelected;
+	private boolean mIsReply;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -100,6 +101,8 @@ public class RecordActivity extends BaseActivity implements NumberPicker.OnValue
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
 				WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		setContentView(R.layout.activity_record);
+		
+		
 		
 		mBtnSwitchCamera = (ImageButton) findViewById(R.id.btnSwitchCameras);
 		mBtnFlash = (ImageButton) findViewById(R.id.btnFlash);
@@ -148,6 +151,20 @@ public class RecordActivity extends BaseActivity implements NumberPicker.OnValue
 	
 	private void setUIMode(Constants.CameraUIMode uiMode) {
 		switch (uiMode) {
+		case UI_MODE_REPLYING:
+			mBtnFlash.setVisibility(View.VISIBLE);
+			mBtnFriends.setVisibility(View.GONE);
+			mBtnPies.setVisibility(View.GONE);
+			mBtnSwitchCamera.setVisibility(View.VISIBLE);
+			mBtnTakePicture.setVisibility(View.VISIBLE);
+			mBtnSend.setVisibility(View.GONE);
+			mBtnDelete.setVisibility(View.GONE);
+			mLayoutTime.setVisibility(View.GONE);
+			
+			mCameraPreview.setVisibility(View.VISIBLE);
+			mVideoView.setVisibility(View.GONE);
+			mImageView.setVisibility(View.GONE);
+			break;
 		case UI_MODE_PRE_PICTURE:
 			mBtnFlash.setVisibility(View.VISIBLE);
 			mBtnFriends.setVisibility(View.VISIBLE);
@@ -414,12 +431,19 @@ public class RecordActivity extends BaseActivity implements NumberPicker.OnValue
 		}
 	};
 	
+	//This method will be fired if RecordActivity is opened from an intent
+	//This helps becuase it will be called if it's opened a second time from
+	//intent which is the case when the user double taps a pie to reply
+	protected void onNewIntent(Intent intent) {
+		mIsReply = intent.getBooleanExtra("isReply", false);
+	};
+	
 	@Override
 	protected void onResume() {
 		// TODO Auto-generated method stub
 		super.onResume();
 		PieTalkLogger.i(TAG, "onResume");
-		PieTalkLogger.i(TAG, "Full filepath: " + mFileFullPath);
+		PieTalkLogger.i(TAG, "Full filepath: " + mFileFullPath);				
 		
 		int numberOfCams = Camera.getNumberOfCameras();
 		mCameraNumber = 0;		
@@ -478,6 +502,8 @@ public class RecordActivity extends BaseActivity implements NumberPicker.OnValue
 			mVideoView.setVisibility(View.VISIBLE);
 			mCameraPreview.setVisibility(View.GONE);
 			setUIMode(Constants.CameraUIMode.UI_MODE_REVIEW_VIDEO);
+		} else if (mIsReply){
+			setUIMode(Constants.CameraUIMode.UI_MODE_REPLYING);
 		} else {
 			setUIMode(Constants.CameraUIMode.UI_MODE_PRE_PICTURE);
 		}
@@ -697,7 +723,17 @@ public class RecordActivity extends BaseActivity implements NumberPicker.OnValue
 			returnToCameraPreview();
 			
 		} else {
-			finish();
+			PieTalkLogger.i(TAG, "back");
+			if (mIsReply) {
+				PieTalkLogger.i(TAG, "back-reply");
+				Intent intent = new Intent(mActivity, PiesListActivity.class);
+				intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+				startActivity(intent);				
+		        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right);
+			} else {			
+				PieTalkLogger.i(TAG, "back-finish");
+				finish();
+			}
 		}
 	}
 	

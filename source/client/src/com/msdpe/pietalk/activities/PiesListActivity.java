@@ -393,7 +393,12 @@ public class PiesListActivity extends BaseActivity {
 				
 				Pie tappedPie = mPieTalkService.getLocalPies().get(mTappedRowPosition);
 				if (tappedPie.getType().equalsIgnoreCase("pie") && tappedPie.getHasUserSeen()) {
-					PieTalkLogger.i(TAG, "DoubleTap row: " + mTappedRowPosition);					
+					PieTalkLogger.i(TAG, "DoubleTap row: " + mTappedRowPosition);
+					Intent intent = new Intent(mActivity, RecordActivity.class);
+					intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+					intent.putExtra("isReply", true);					
+					startActivity(intent);
+					overridePendingTransition(0, 0);
 				}
 			}
 			

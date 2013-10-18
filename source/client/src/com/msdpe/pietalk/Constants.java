@@ -17,7 +17,8 @@ public final class Constants {
 		UI_MODE_TAKING_PICTURE,
 		UI_MODE_REVIEW_PICTURE,
 		UI_MODE_REVIEW_VIDEO,
-		UI_MODE_TAKING_VIDEO
+		UI_MODE_TAKING_VIDEO,
+		UI_MODE_REPLYING
     }
 	
 	public static enum PieType {
