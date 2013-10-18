@@ -19,12 +19,12 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.v4.app.NavUtils;
+import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
-import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -32,6 +32,7 @@ import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
@@ -59,6 +60,7 @@ public class PiesListActivity extends BaseActivity {
 	private Dialog mViewingDialog;
 	private ImageView mImagePicture;
 	private VideoView mVideoView;
+	private GestureDetector mGestureDetector;
 	
 
 	@Override
@@ -80,6 +82,8 @@ public class PiesListActivity extends BaseActivity {
 				
 			}
 		});
+		
+		mGestureDetector = new GestureDetector(this, new GestureListener());
 	
 //		mAdapter = new ArrayAdapter<String>(this,
 //    	        android.R.layout.simple_list_item_1, mPieTalkService.getLocalPieUsernames());
@@ -100,12 +104,14 @@ public class PiesListActivity extends BaseActivity {
 //				return false;
 //			}
 //		});
+
 		
 		mLvPies.setOnTouchListener(new OnTouchListener() {
 			
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
 //				PieTalkLogger.i(TAG, "onTouch");
+				mGestureDetector.onTouchEvent(event);
 				if (event.getAction() == MotionEvent.ACTION_UP) {
 					if (mIsViewingPicture || mIsViewingVideo) {
 						mViewingDialog.dismiss();
@@ -378,6 +384,14 @@ public class PiesListActivity extends BaseActivity {
 		//super.onBackPressed();
 		NavUtils.navigateUpFromSameTask(this);
 		overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right);
+	}
+	
+	public class GestureListener extends GestureDetector.SimpleOnGestureListener {
+		@Override
+		public boolean onDoubleTap(MotionEvent e) {
+			PieTalkLogger.i(TAG, "DoubleTap");
+			return super.onDoubleTap(e);
+		}
 	}
 
 }
