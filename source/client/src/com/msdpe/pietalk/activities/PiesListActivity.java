@@ -61,6 +61,7 @@ public class PiesListActivity extends BaseActivity {
 	private ImageView mImagePicture;
 	private VideoView mVideoView;
 	private GestureDetector mGestureDetector;
+	private int mTappedRowPosition = -1;
 	
 
 	@Override
@@ -143,8 +144,7 @@ public class PiesListActivity extends BaseActivity {
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position,
 				long id) {
-			//PieTalkLogger.i(TAG,  "onItemClick");
-			
+			mTappedRowPosition = position;
 		}		
 	};
 	
@@ -389,7 +389,14 @@ public class PiesListActivity extends BaseActivity {
 	public class GestureListener extends GestureDetector.SimpleOnGestureListener {
 		@Override
 		public boolean onDoubleTap(MotionEvent e) {
-			PieTalkLogger.i(TAG, "DoubleTap");
+			if (mTappedRowPosition > -1) {
+				
+				Pie tappedPie = mPieTalkService.getLocalPies().get(mTappedRowPosition);
+				if (tappedPie.getType().equalsIgnoreCase("pie") && tappedPie.getHasUserSeen()) {
+					PieTalkLogger.i(TAG, "DoubleTap row: " + mTappedRowPosition);					
+				}
+			}
+			
 			return super.onDoubleTap(e);
 		}
 	}
