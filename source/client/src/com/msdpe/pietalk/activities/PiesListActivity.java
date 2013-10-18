@@ -386,6 +386,11 @@ public class PiesListActivity extends BaseActivity {
 		overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right);
 	}
 	
+	protected void onNewIntent(Intent intent) {
+		super.onNewIntent(intent);
+		overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right);
+	};
+	
 	public class GestureListener extends GestureDetector.SimpleOnGestureListener {
 		@Override
 		public boolean onDoubleTap(MotionEvent e) {
@@ -398,7 +403,7 @@ public class PiesListActivity extends BaseActivity {
 					intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
 					intent.putExtra("isReply", true);					
 					startActivity(intent);
-					overridePendingTransition(0, 0);
+					
 				}
 			}
 			

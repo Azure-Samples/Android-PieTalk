@@ -435,7 +435,10 @@ public class RecordActivity extends BaseActivity implements NumberPicker.OnValue
 	//This helps becuase it will be called if it's opened a second time from
 	//intent which is the case when the user double taps a pie to reply
 	protected void onNewIntent(Intent intent) {
+		super.onNewIntent(intent);
 		mIsReply = intent.getBooleanExtra("isReply", false);
+		if (mIsReply)
+			overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right);
 	};
 	
 	@Override
