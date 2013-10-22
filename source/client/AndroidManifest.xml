@@ -12,8 +12,14 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
 
     <uses-feature android:name="android.hardware.camera" />
+    
+    <permission android:name="com.msdpe.pietalk.permission.C2D_MESSAGE" android:protectionLevel="signature" />
+	<uses-permission android:name="com.msdpe.pietalk.permission.C2D_MESSAGE"/>
 
     <application
         android:name="com.msdpe.pietalk.PieTalkApplication"
@@ -113,6 +119,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.msdpe.pietalk.activities.RecordActivity" />
         </activity>
+        <receiver
+		    android:name=".PieTalkBroadcastReceiver"
+		    android:permission="com.google.android.c2dm.permission.SEND" >
+		   <intent-filter>
+		      <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+		      <category android:name="com.msdpe.pietalk" />
+		   </intent-filter>
+		</receiver>
     </application>
 
 </manifest>

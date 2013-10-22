@@ -12,6 +12,11 @@ public final class Constants {
 		
 	public static int RESULT_CODE_PIE_SENT = 9009;
 	
+	//Push notifications
+	public static String SENDER_ID = "371430473080";
+	public static String NOTIFICATION_HUB_CONNECTION_STRING = "Endpoint=sb://pietalk-ns.servicebus.windows.net/;SharedAccessKeyName=DefaultListenSharedAccessSignature;SharedAccessKey=YHf05x5idR7oeW3ZV/+kpCjppUxsS5vn1j++pCwsMxc=";
+	public static String NOTIFICATIN_HUB_NAME = "pietalk";
+	
 	public static enum CameraUIMode {
         UI_MODE_PRE_PICTURE,
 		UI_MODE_TAKING_PICTURE,

@@ -134,6 +134,9 @@ public class RecordActivity extends BaseActivity implements NumberPicker.OnValue
 		mSecondsSelected = 3;
 		
 		mLblTime.setText(mSecondsSelected + "");
+		
+		//TODO: Consider moving to background task
+		mPieTalkService.registerForPush();
 	}
 	
 	private OnClickListener takePictureListener = new OnClickListener() {

@@ -12,21 +12,22 @@ import java.util.List;
 
 import org.apache.http.StatusLine;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.os.AsyncTask;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.widget.Toast;
 
+import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.microsoft.windowsazure.messaging.NotificationHub;
 import com.microsoft.windowsazure.mobileservices.ApiOperationCallback;
 import com.microsoft.windowsazure.mobileservices.MobileServiceClient;
 import com.microsoft.windowsazure.mobileservices.MobileServiceTable;
@@ -42,7 +43,6 @@ import com.msdpe.pietalk.activities.SplashScreenActivity;
 import com.msdpe.pietalk.datamodels.Friend;
 import com.msdpe.pietalk.datamodels.Pie;
 import com.msdpe.pietalk.datamodels.PieFile;
-import com.msdpe.pietalk.util.PieTalkAlert;
 import com.msdpe.pietalk.util.PieTalkLogger;
 import com.msdpe.pietalk.util.PieTalkRegisterResponse;
 import com.msdpe.pietalk.util.PieTalkResponse;
@@ -54,6 +54,9 @@ public class PieTalkService {
 	private String mEmail;
 	public int     mCheckCount;
 	private String[] mTempRecipientUserIds;
+	private GoogleCloudMessaging mGcm;
+	private NotificationHub      mHub;
+	private String mRegistrationId;
 	
 	//Mobile Services objects
 	private MobileServiceClient mClient;
@@ -69,7 +72,9 @@ public class PieTalkService {
 	public PieTalkService(Context context) {
 		mContext = context;
 		try {
-			mClient = new MobileServiceClient("https://pietalk.azure-mobile.net/", 
+			mClient = new MobileServiceClient("https://pietalk.azure-mobile.net/",
+					//TODO: change key to constant
+					//TODO: get rid of service filter for keynote demo					
 					"fPcjjyAxIIIGxPSxgzMfIHxOiQIKWA95", mContext)
 					.withFilter(new MyServiceFilter());
 			
@@ -106,6 +111,7 @@ public class PieTalkService {
 	public List<Friend> getLocalFriends() {
 		return mFriends;
 	}
+	
 	
 	public void increaseCheckCount() { mCheckCount++; }
 	public void decreaseCheckCount() { mCheckCount--; }
@@ -151,8 +157,9 @@ public class PieTalkService {
 			String token = settings.getString("token", null);
 			String username = settings.getString("username", null);
 			String email = settings.getString("email", null);
+			String registrationId = settings.getString("registrationId", null);
 			if (userId != null && !userId.equals("")) {
-				setUserData(userId, token, username, email);
+				setUserData(userId, token, username, email, registrationId);
 				return true;
 			}
 		}
@@ -165,12 +172,13 @@ public class PieTalkService {
 	 * @param userId
 	 * @param token
 	 */
-	public void setUserData(String userId, String token, String username, String email) {
+	public void setUserData(String userId, String token, String username, String email, String registrationId) {
 		MobileServiceUser user = new MobileServiceUser(userId);
 		user.setAuthenticationToken(token);
 		mClient.setCurrentUser(user);		
 		mUsername = username;
 		mEmail = email;
+		mRegistrationId = registrationId;
 	}
 	
 	/***
@@ -182,7 +190,7 @@ public class PieTalkService {
 		String userId = userData.get("userId").getAsString();
 		String token = userData.get("token").getAsString();
 		String email = userData.get("email").getAsString();
-		setUserData(userId, token, null, email);	
+		setUserData(userId, token, null, email, null);	
 		saveUserData();
 	}
 	
@@ -192,7 +200,7 @@ public class PieTalkService {
 		String token = registerData.token;		
 		String username = registerData.username;
 		String email = registerData.email;
-		setUserData(userId, token, username, email);	
+		setUserData(userId, token, username, email, null);	
 		saveUserData();
 	}
 	
@@ -255,6 +263,10 @@ public class PieTalkService {
 		//mClient.invokeApi("SaveUsername", user, callback);
 		
 		mClient.invokeApi("SaveUsername", user, PieTalkResponse.class, callback);
+	}
+	
+	public Activity getActivityContext() {
+		return (Activity) mClient.getContext();
 	}
 	
 	public void logout(boolean shouldRedirectToLogin) {
@@ -532,5 +544,35 @@ public class PieTalkService {
  	
  	public void getPieForRecipient(Pie pie, ApiOperationCallback<PieTalkResponse> callback) {
  		mClient.invokeApi("getPieForRecipient", pie, PieTalkResponse.class, callback);
+ 	}
+ 	
+ 	@SuppressWarnings("unchecked")
+ 	public void registerForPush() {
+ 		mGcm = GoogleCloudMessaging.getInstance(mContext);
+ 		mHub = new NotificationHub(Constants.NOTIFICATIN_HUB_NAME, Constants.NOTIFICATION_HUB_CONNECTION_STRING, mContext);
+ 		new AsyncTask() {
+ 		      @Override
+ 		      protected Object doInBackground(Object... params) {
+ 		         try {
+ 		        	 	PieTalkLogger.i(TAG, "Registering for push notifications");
+ 		            String regId = mGcm.register(Constants.SENDER_ID);
+ 		            PieTalkLogger.i(TAG, "Registration ID: " + regId);
+ 		            if (!regId.equals(mRegistrationId)) {
+ 		            		PieTalkLogger.i(TAG, "Registerin with NotHubs");
+ 		            		mRegistrationId = regId;
+ 		            		SharedPreferences settings = mContext.getSharedPreferences("UserData", 0);
+ 		            		SharedPreferences.Editor preferencesEditor = settings.edit();
+ 		            		preferencesEditor.putString("registrationId", mRegistrationId);        
+ 		            		preferencesEditor.commit();
+ 		            	
+ 		            		mHub.registerTemplate(mRegistrationId, "alertTemplate", "{\"data\":{\"message\":\"$(message)\"}}", mClient.getCurrentUser().getUserId(), "AllUsers", "AndroidUser");
+ 		            }
+ 		         } catch (Exception e) {
+ 		        	 	PieTalkLogger.e(TAG, "Unable to register for push notifications: " + e.getMessage());
+ 		            return e;
+ 		         }
+ 		         return null;
+ 		     }
+ 		   }.execute(null, null, null);
  	}
 }

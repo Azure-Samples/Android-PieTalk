@@ -229,8 +229,7 @@ public class FriendsListActivity extends BaseActivity {
 				} else {
 					Toast.makeText(mActivity, response.Status, Toast.LENGTH_SHORT).show();
 					mBtnAddFriend.setVisibility(View.GONE);
-					mPieTalkService.getFriends();
-					
+					mPieTalkService.getFriends();					
 				}
 			}
 		});
