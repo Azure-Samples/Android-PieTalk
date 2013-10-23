@@ -44,7 +44,19 @@ public class PieTalkBroadcastReceiver extends BroadcastReceiver {
 	}
 	
 	private void processPush(String message) {
+		PieTalkLogger.i(TAG, "Process Push");
 		if (message.equals("Friend request received")) {
+			PieTalkLogger.i(TAG, "FRR");
+			if (mPieTalkApplication.getIsApplicationActive()) {
+				PieTalkLogger.i(TAG, "GF");
+				mPieTalkService.getPies();
+				//TODO:  If we show friend requests in the Friends list, we can 
+				//uncomment this to trigger a refresh
+				//mPieTalkService.getFriends();
+			}
+			else
+				sendNotification("Friend request received");
+		} else if (message.equals("Pie received")) {
 			if (mPieTalkApplication.getIsApplicationActive())
 				mPieTalkService.getPies();
 			else

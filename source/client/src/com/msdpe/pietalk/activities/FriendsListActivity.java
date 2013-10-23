@@ -1,10 +1,5 @@
 package com.msdpe.pietalk.activities;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import android.app.ActionBar;
 import android.app.SearchManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -22,6 +17,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SearchView;
+import android.widget.SearchView.OnCloseListener;
 import android.widget.SearchView.OnQueryTextListener;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -44,6 +40,7 @@ public class FriendsListActivity extends BaseActivity {
 	private TextView mLblNewFriendName;
 	private String mCurrentName;
 	private ImageButton mBtnAddFriend;
+	private SearchView mSearchView;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -122,12 +119,13 @@ public class FriendsListActivity extends BaseActivity {
 		// Associate searchable configuration with the SearchView
 	    SearchManager searchManager =
 	           (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-	    SearchView searchView =
+	    mSearchView =
 	            (SearchView) menu.findItem(R.id.menuSearch).getActionView();
-	    searchView.setSearchableInfo(
+	    mSearchView.setSearchableInfo(
 	            searchManager.getSearchableInfo(getComponentName()));
 	    //searchView.setQueryHint("test");
-	    searchView.setOnQueryTextListener(new OnQueryTextListener() {			
+	    
+	    mSearchView.setOnQueryTextListener(new OnQueryTextListener() {			
 	    		@Override
 			public boolean onQueryTextSubmit(String query) {
 				return true;
@@ -192,6 +190,18 @@ public class FriendsListActivity extends BaseActivity {
 	
 	@Override
 	public void onBackPressed() {
+		PieTalkLogger.i(TAG, "backpressed");
+				
+		//temporary fix for issue affecting galaxy nexus where
+		//query filter doesn't empty on back pressed
+		if (!mCurrentName.equals("")) {
+			mCurrentName = "";
+			PieTalkLogger.i(TAG, "Not iconified");
+			mSearchView.setIconified(true);
+			return;
+		}
+		
+		
 		// TODO Auto-generated method stub
 		super.onBackPressed();
 		overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
