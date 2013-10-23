@@ -1,5 +1,7 @@
 package com.msdpe.pietalk.activities;
 
+import java.net.UnknownHostException;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -19,6 +21,7 @@ import com.msdpe.pietalk.R.id;
 import com.msdpe.pietalk.R.layout;
 import com.msdpe.pietalk.base.BaseActivity;
 import com.msdpe.pietalk.util.PieTalkAlert;
+import com.msdpe.pietalk.util.PieTalkLogger;
 import com.msdpe.pietalk.util.PieTalkRegisterResponse;
 import com.msdpe.pietalk.util.TextValidator;
 
@@ -75,13 +78,18 @@ public class LoginActivity extends BaseActivity {
 				@Override
 				public void onCompleted(PieTalkRegisterResponse response, Exception exc,
 						ServiceFilterResponse arg2) {
+					PieTalkLogger.i(TAG, "onCompleted login");
 					if (exc != null || response.Error != null) {
 						mBtnLogin.setVisibility(View.VISIBLE);
 						mProgressLogin.setVisibility(View.GONE);
-						//Display error
+						//Display error						
 						
-						if (exc != null) 
-							PieTalkAlert.showSimpleErrorDialog(mActivity, exc.getCause().getMessage());
+						//if (UnknownHostException.class.isInstance(ex.getCause())) {
+						
+						if (exc != null) {
+							if (!UnknownHostException.class.isInstance(exc.getCause()))
+								PieTalkAlert.showSimpleErrorDialog(mActivity, exc.getCause().getMessage());
+						}
 						else
 							PieTalkAlert.showSimpleErrorDialog(mActivity, response.Error);									
 						

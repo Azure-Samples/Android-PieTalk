@@ -7,6 +7,7 @@ import java.io.FileInputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,10 +18,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.util.Log;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
-import android.widget.Toast;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.gson.Gson;
@@ -43,6 +44,7 @@ import com.msdpe.pietalk.activities.SplashScreenActivity;
 import com.msdpe.pietalk.datamodels.Friend;
 import com.msdpe.pietalk.datamodels.Pie;
 import com.msdpe.pietalk.datamodels.PieFile;
+import com.msdpe.pietalk.util.PieTalkAlert;
 import com.msdpe.pietalk.util.PieTalkLogger;
 import com.msdpe.pietalk.util.PieTalkRegisterResponse;
 import com.msdpe.pietalk.util.PieTalkResponse;
@@ -408,25 +410,34 @@ public class PieTalkService {
 	
 	private class MyServiceFilter implements ServiceFilter {		
 		@Override
-		public void handleRequest(ServiceFilterRequest request, NextServiceFilterCallback nextServiceFilterCallback,
+		public void handleRequest(final ServiceFilterRequest request, final NextServiceFilterCallback nextServiceFilterCallback,
 				final ServiceFilterResponseCallback responseCallback) {				
 			nextServiceFilterCallback.onNext(request, new ServiceFilterResponseCallback() {				
 				@Override
 				public void onResponse(ServiceFilterResponse response, Exception ex) {
 					if (ex == null) { 
 						StatusLine status = response.getStatus();
-						int statusCode = status.getStatusCode();						
+						int statusCode = status.getStatusCode();		
 						if (statusCode == 401) {
 							//Kick user out 
 							PieTalkLogger.i(TAG, "401 received, forcing logout");
 							//TODO force logout
 						}
-					} else {
-						if (ex.getCause() != null)
+					} else if (ex.getCause() != null) {
+						if (UnknownHostException.class.isInstance(ex.getCause())) {
+							PieTalkLogger.e(TAG, "UnknownHost");							
+							getActivityContext().runOnUiThread(new Runnable() {
+								@Override
+								public void run() {
+									PieTalkAlert.showSimpleErrorDialog(getActivityContext(), "You must be connected to the internet for this to work.");									
+								}
+							});														
+
+						} else {
 							PieTalkLogger.e(TAG, "Error in handle request: " + ex.getCause().getMessage());
-						else
-							PieTalkLogger.e(TAG, "Error in handle request: " + ex.getMessage());
-					}
+						}
+					} else
+						PieTalkLogger.e(TAG, "Error in handle request: " + ex.getMessage());
 					
 					if (responseCallback != null)  responseCallback.onResponse(response, ex);
 				}
