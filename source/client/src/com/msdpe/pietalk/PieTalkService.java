@@ -299,11 +299,13 @@ public class PieTalkService {
 			@Override
 			public void onCompleted(List<Friend> results, int count, Exception ex,
 					ServiceFilterResponse response) {
+				boolean wasSuccess = false;
 				if (ex != null) {
-					Toast.makeText(mContext, "Error getting friends", Toast.LENGTH_SHORT).show();
+					//Toast.makeText(mContext, "Error getting friends", Toast.LENGTH_SHORT).show();
 					PieTalkLogger.e(TAG, "Error getting friends: " + ex.getCause().getMessage());
 				} else {
 					PieTalkLogger.i(TAG, "Friends received");
+					wasSuccess = true;
 					mFriends = results;
 					//Loop through and pull out names
 					//TODO: remove this when we switch to custom adapter
@@ -319,6 +321,7 @@ public class PieTalkService {
 					
 					//Broadcast that we've updated our friends list
 					Intent broadcast = new Intent();
+					broadcast.putExtra(Constants.FRIENDS_UPDATE_STATUS, wasSuccess);
 					broadcast.setAction(Constants.BROADCAST_FRIENDS_UPDATED);
 					mContext.sendBroadcast(broadcast);					
 				}				
@@ -332,19 +335,23 @@ public class PieTalkService {
 			@Override
 			public void onCompleted(List<Pie> results, int count, Exception ex,
 					ServiceFilterResponse response) {
+				boolean wasSuccess = false;
 				if (ex != null) {
-					Toast.makeText(mContext, "Error getting pies", Toast.LENGTH_SHORT).show();
+					//Toast.makeText(mContext, "Error getting pies", Toast.LENGTH_SHORT).show();
 					PieTalkLogger.e(TAG, "Error getting pies: " + ex.getCause().getMessage());
 				} else {
 					PieTalkLogger.i(TAG, "Pies received");
+					wasSuccess = true;
 					mPies = results;
 					
-					PieTalkLogger.i(TAG, "Sending broadcast");
-					//Broadcast that we've updated our pies list
-					Intent broadcast = new Intent();
-					broadcast.setAction(Constants.BROADCAST_PIES_UPDATED);
-					mContext.sendBroadcast(broadcast);					
-				}				
+					
+					//Broadcast that we've updated our pies list									
+				}	
+				PieTalkLogger.i(TAG, "Sending broadcast");
+				Intent broadcast = new Intent();
+				broadcast.putExtra(Constants.PIES_UPDATE_STATUS, wasSuccess);
+				broadcast.setAction(Constants.BROADCAST_PIES_UPDATED);
+				mContext.sendBroadcast(broadcast);	
 			}
 		});
 	}

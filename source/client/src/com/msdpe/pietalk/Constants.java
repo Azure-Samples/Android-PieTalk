@@ -8,6 +8,9 @@ public final class Constants {
 	public static String BROADCAST_PIES_UPDATED = "pies.updated";
 	public static String BROADCAST_PIE_SENT = "pie.sent";
 	
+	public static String FRIENDS_UPDATE_STATUS = "friends.update.status";
+	public static String PIES_UPDATE_STATUS = "pies.update.status";
+	
 	public static int REQUEST_CODE_SEND_TO_FRIENDS = 1001;
 		
 	public static int RESULT_CODE_PIE_SENT = 9009;

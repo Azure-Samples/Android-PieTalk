@@ -199,12 +199,17 @@ public class SendToFriendsActivity extends BaseActivity {
 	
 	private BroadcastReceiver receiver = new BroadcastReceiver() {
 		public void onReceive(Context context, android.content.Intent intent) {
-			mAdapter.clear();			
-			//for (String item : mPieTalkService.getLocalPieUsernames()) {
-			for (Friend friend : mPieTalkService.getLocalFriends()) {
-				mAdapter.add(friend);
-			}		
-			PieTalkLogger.i(TAG, "Refresh complete");			
+			boolean wasSuccess = intent.getBooleanExtra(Constants.FRIENDS_UPDATE_STATUS, false);
+			if (wasSuccess) {
+				mAdapter.clear();			
+				//for (String item : mPieTalkService.getLocalPieUsernames()) {
+				for (Friend friend : mPieTalkService.getLocalFriends()) {
+					mAdapter.add(friend);
+				}		
+				PieTalkLogger.i(TAG, "Refresh complete");
+			} else {
+				Toast.makeText(mActivity, getResources().getString(R.string.error_getting_friends), Toast.LENGTH_SHORT).show();
+			}
 		}
 	};
 	

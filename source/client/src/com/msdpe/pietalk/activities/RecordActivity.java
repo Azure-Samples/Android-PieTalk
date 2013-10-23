@@ -11,7 +11,10 @@ import java.util.List;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.IntentFilter;
 import android.content.DialogInterface.OnKeyListener;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -59,6 +62,7 @@ import com.msdpe.pietalk.Constants.CameraUIMode;
 import com.msdpe.pietalk.PreferencesHandler;
 import com.msdpe.pietalk.R;
 import com.msdpe.pietalk.base.BaseActivity;
+import com.msdpe.pietalk.datamodels.Pie;
 import com.msdpe.pietalk.util.PieTalkLogger;
 
 public class RecordActivity extends BaseActivity implements NumberPicker.OnValueChangeListener {
@@ -516,6 +520,11 @@ public class RecordActivity extends BaseActivity implements NumberPicker.OnValue
 		} else {
 			setUIMode(Constants.CameraUIMode.UI_MODE_PRE_PICTURE);
 		}
+		
+		IntentFilter filter = new IntentFilter();
+		//filter.addAction(Constants.BROADCAST_PIES_UPDATED);
+		filter.addAction(Constants.BROADCAST_PIES_UPDATED);
+		registerReceiver(receiver, filter);
 	}
 	
 	@Override
@@ -525,7 +534,22 @@ public class RecordActivity extends BaseActivity implements NumberPicker.OnValue
 		PieTalkLogger.i(TAG, "onPause");
 		mCameraPreview.getHolder().removeCallback(mCameraPreview);
 		mCamera.release();
+		unregisterReceiver(receiver);
 	}
+	
+	private BroadcastReceiver receiver = new BroadcastReceiver() {
+		public void onReceive(Context context, android.content.Intent intent) {
+			if (intent.getAction().equals(Constants.BROADCAST_PIES_UPDATED)) {
+				boolean wasSuccess = intent.getBooleanExtra(Constants.PIES_UPDATE_STATUS, false);
+				if (wasSuccess) {
+					int count = mPieTalkService.getLocalPies().size();
+					
+				} else {
+					Toast.makeText(mActivity, getResources().getString(R.string.error_getting_pies), Toast.LENGTH_SHORT).show();
+				}				
+			}
+		}
+	};
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {

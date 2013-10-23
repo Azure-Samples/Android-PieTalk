@@ -92,11 +92,16 @@ public class FriendsListActivity extends BaseActivity {
 	private BroadcastReceiver receiver = new BroadcastReceiver() {
 		public void onReceive(Context context, android.content.Intent intent) {
 			PieTalkLogger.i(TAG, "Broadcast received");
-			mAdapter.clear();
-
-			for (String item : mPieTalkService.getLocalFriendNames()) {
-				mAdapter.add(item);
-			}		
+			boolean wasSuccess = intent.getBooleanExtra(Constants.FRIENDS_UPDATE_STATUS, false);
+			if (wasSuccess) {						
+				mAdapter.clear();
+	
+				for (String item : mPieTalkService.getLocalFriendNames()) {
+					mAdapter.add(item);
+				}		
+			} else {
+				Toast.makeText(mActivity, getResources().getString(R.string.error_getting_friends), Toast.LENGTH_SHORT).show();
+			}
 		}
 	};
 

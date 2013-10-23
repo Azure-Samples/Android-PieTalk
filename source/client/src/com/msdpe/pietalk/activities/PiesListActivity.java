@@ -302,9 +302,10 @@ public class PiesListActivity extends BaseActivity {
 	
 	@Override
 	protected void onResume() {
-		IntentFilter filter = new IntentFilter();
+		
 		mIsViewingPicture = false;
 		mIsViewingVideo = false;
+		IntentFilter filter = new IntentFilter();
 		//filter.addAction(Constants.BROADCAST_PIES_UPDATED);
 		filter.addAction(Constants.BROADCAST_PIES_UPDATED);
 		filter.addAction(Constants.BROADCAST_PIE_SENT);
@@ -321,12 +322,17 @@ public class PiesListActivity extends BaseActivity {
 	private BroadcastReceiver receiver = new BroadcastReceiver() {
 		public void onReceive(Context context, android.content.Intent intent) {
 			if (intent.getAction().equals(Constants.BROADCAST_PIES_UPDATED)) {
-				mAdapter.clear();			
-				//for (String item : mPieTalkService.getLocalPieUsernames()) {
-				for (Pie pie : mPieTalkService.getLocalPies()) {
-					mAdapter.add(pie);
-				}		
-				PieTalkLogger.i(TAG, "Refresh complete");
+				boolean wasSuccess = intent.getBooleanExtra(Constants.PIES_UPDATE_STATUS, false);
+				if (wasSuccess) {
+					mAdapter.clear();			
+					//for (String item : mPieTalkService.getLocalPieUsernames()) {
+					for (Pie pie : mPieTalkService.getLocalPies()) {
+						mAdapter.add(pie);
+					}		
+					PieTalkLogger.i(TAG, "Refresh complete");
+				} else {
+					Toast.makeText(mActivity, getResources().getString(R.string.error_getting_pies), Toast.LENGTH_SHORT).show();
+				}
 				mPullToRefreshAttacher.setRefreshComplete();
 				mPullToRefreshAttacher.setRefreshing(false);
 			} else if (intent.getAction().equals(Constants.BROADCAST_PIE_SENT)) {
