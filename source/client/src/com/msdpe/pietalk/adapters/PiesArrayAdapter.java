@@ -41,8 +41,13 @@ public class PiesArrayAdapter extends ArrayAdapter<Pie> {
 	    
 	    ImageView imgIndicator = (ImageView) view.findViewById(R.id.imgIndicator);
 	    if (pie.getType().equals("FriendRequest")) {
-	    		imgIndicator.setImageResource(R.drawable.pie_friend_request);
-	    		lblInstructions.setText(mContext.getResources().getString(R.string.instructions_friend_request));
+	    		if (pie.getHasUserSeen()) {
+	    			imgIndicator.setImageResource(R.drawable.pie_accepted_friend_request);
+		    		lblInstructions.setText(mContext.getResources().getString(R.string.instructions_accepted_friend_request));
+	    		} else {
+	    			imgIndicator.setImageResource(R.drawable.pie_friend_request);
+		    		lblInstructions.setText(mContext.getResources().getString(R.string.instructions_friend_request));
+	    		}
 	    }
 	    else if (pie.getType().equals("Pie")) {
 	    		if (pie.getHasUserSeen()) {

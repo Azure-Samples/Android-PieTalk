@@ -133,7 +133,7 @@ public class PiesListActivity extends BaseActivity implements PullToRefreshAttac
 					}
 				}
 				//Ensures we can still pull to refresh on this page
-				mPullToRefreshAttacher.onTouch(v, event);
+				//mPullToRefreshAttacher.onTouch(v, event);
 				return false;
 			}
 		});
@@ -155,7 +155,33 @@ public class PiesListActivity extends BaseActivity implements PullToRefreshAttac
 	
 	@Override
     public void onRefreshStarted(View view) {
-        mPieTalkService.getPies();
+		PieTalkLogger.i(TAG, "onRefreshStarted");
+        //mPieTalkService.getPies();
+		new AsyncTask<Void, Void, Void>() {
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void result) {
+                super.onPostExecute(result);
+
+                //mAdapter.addAll(ITEMS);
+                //mAdapter.notifyDataSetChanged();
+                mPieTalkService.getPies();
+
+                // Notify PullToRefreshAttacher that the refresh has finished
+                mPullToRefreshAttacher.setRefreshComplete();
+            }
+        }.execute();
+		
     }
 	
 	private OnItemLongClickListener pieLongClickListener = new OnItemLongClickListener() {
@@ -179,8 +205,12 @@ public class PiesListActivity extends BaseActivity implements PullToRefreshAttac
 							else 
 								Toast.makeText(mActivity, response.Error, Toast.LENGTH_SHORT).show();
 						} else {
-							mAdapter.remove(pie);
+							//mAdapter.remove(pie);
 							mPieTalkService.getFriends();
+							int position = mPieTalkService.getLocalPies().indexOf(pie);
+							View view = mLvPies.getChildAt(position);
+							ImageView imgIndicator = (ImageView) view.findViewById(R.id.imgIndicator);
+							imgIndicator.setImageResource(R.drawable.pie_accepted_friend_request);
 						}
 					}
 				});
