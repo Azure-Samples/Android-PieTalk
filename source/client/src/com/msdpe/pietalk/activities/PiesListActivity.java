@@ -4,6 +4,7 @@ import java.io.InputStream;
 
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher;
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher.OnRefreshListener;
+import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
 import android.app.ActionBar;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
@@ -49,7 +50,7 @@ import com.msdpe.pietalk.util.PieTalkAlert;
 import com.msdpe.pietalk.util.PieTalkLogger;
 import com.msdpe.pietalk.util.PieTalkResponse;
 
-public class PiesListActivity extends BaseActivity {
+public class PiesListActivity extends BaseActivity implements PullToRefreshAttacher.OnRefreshListener {
 	
 	private final String TAG = "PiesListActivity";
 	private ListView mLvPies;
@@ -62,7 +63,7 @@ public class PiesListActivity extends BaseActivity {
 	private VideoView mVideoView;
 	private GestureDetector mGestureDetector;
 	private int mTappedRowPosition = -1;
-	private RelativeLayout mLayoutPies;
+	private PullToRefreshLayout mLayoutPies;
 	
 
 	@Override
@@ -75,16 +76,18 @@ public class PiesListActivity extends BaseActivity {
 		setupActionBar();
 		
 		mLvPies = (ListView) findViewById(R.id.lvPies);
-		mLayoutPies = (RelativeLayout) findViewById(R.id.layoutPies);
+		mLvPies.setEmptyView(findViewById(android.R.id.empty));
+		mLayoutPies = (PullToRefreshLayout) findViewById(R.id.layoutPies);
 		mPullToRefreshAttacher = PullToRefreshAttacher.get(this);
-		mPullToRefreshAttacher.addRefreshableView(mLvPies, new OnRefreshListener() {			
-			@Override
-			public void onRefreshStarted(View arg0) {
-				// TODO Auto-generated method stub
-				mPieTalkService.getPies();
-				
-			}
-		});
+		mLayoutPies.setPullToRefreshAttacher(mPullToRefreshAttacher, this);
+//		mPullToRefreshAttacher.addRefreshableView(mLayoutPies, new OnRefreshListener() {			
+//			@Override
+//			public void onRefreshStarted(View arg0) {
+//				// TODO Auto-generated method stub
+//				mPieTalkService.getPies();
+//				
+//			}
+//		});
 		
 		mGestureDetector = new GestureDetector(this, new GestureListener());
 	
@@ -149,6 +152,11 @@ public class PiesListActivity extends BaseActivity {
 			mTappedRowPosition = position;
 		}		
 	};
+	
+	@Override
+    public void onRefreshStarted(View view) {
+        mPieTalkService.getPies();
+    }
 	
 	private OnItemLongClickListener pieLongClickListener = new OnItemLongClickListener() {
 

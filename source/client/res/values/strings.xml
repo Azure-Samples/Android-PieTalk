@@ -85,5 +85,6 @@
     
     <string name="sending">- Sending</string>
     <string name="opened">- Opened</string>
+    <string name="no_pies">You don\'t have any Pies :()</string>
 
 </resources>
