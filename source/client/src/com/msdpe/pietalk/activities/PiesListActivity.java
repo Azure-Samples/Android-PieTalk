@@ -62,6 +62,7 @@ public class PiesListActivity extends BaseActivity {
 	private VideoView mVideoView;
 	private GestureDetector mGestureDetector;
 	private int mTappedRowPosition = -1;
+	private RelativeLayout mLayoutPies;
 	
 
 	@Override
@@ -74,6 +75,7 @@ public class PiesListActivity extends BaseActivity {
 		setupActionBar();
 		
 		mLvPies = (ListView) findViewById(R.id.lvPies);
+		mLayoutPies = (RelativeLayout) findViewById(R.id.layoutPies);
 		mPullToRefreshAttacher = PullToRefreshAttacher.get(this);
 		mPullToRefreshAttacher.addRefreshableView(mLvPies, new OnRefreshListener() {			
 			@Override
