@@ -44,14 +44,6 @@ public class FriendsListActivity extends BaseActivity {
 	private TextView mLblNewFriendName;
 	private String mCurrentName;
 	private ImageButton mBtnAddFriend;
-	
-//	String[] values = new String[] { "Android", "iPhone", "WindowsMobile",
-//	        "Blackberry", "WebOS", "Ubuntu", "Windows7", "Max OS X",
-//	        "Linux", "OS/2", "Ubuntu", "Windows7", "Max OS X", "Linux",
-//	        "OS/2", "Ubuntu", "Windows7", "Max OS X", "Linux", "OS/2",
-//	        "Android", "iPhone", "WindowsMobile" };
-	
-//	String[] values = new String[] { "Aaa", "Abc", "Abd", "Bcx", "Bdy", "Cdd" };
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

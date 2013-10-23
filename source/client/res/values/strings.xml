@@ -24,7 +24,7 @@
     <string name="ok">OK</string>
     <string name="email_or_username">Email or Username</string>
     <string name="title_activity_record">RecordActivity</string>
-    <string name="title_activity_access_friends">AccessFriends</string>
+    <string name="title_activity_access_friends">Add Friends</string>
     <string name="add_friends">Add Friends</string>
     <string name="skip">Skip</string>
     <string name="access_friends_request">PieTalk would like to access your contacts</string>
