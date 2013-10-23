@@ -1,7 +1,5 @@
 package com.msdpe.pietalk;
 
-import com.google.android.gms.gcm.GoogleCloudMessaging;
-
 import android.app.Activity;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -10,16 +8,25 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 
+import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.msdpe.pietalk.util.PieTalkLogger;
+
 public class PieTalkBroadcastReceiver extends BroadcastReceiver {
 	public static final int NOTIFICATION_ID = 1;
 	private NotificationManager mNotificationManager;
 	private NotificationCompat.Builder mBuilder;
 	private Context mContext;
+	private final String TAG = "PieTalkBroadcastReceiver";
+	private PieTalkService mPieTalkService;
+	private PieTalkApplication mPieTalkApplication;
 
 	@Override
-	public void onReceive(Context context, Intent intent) {
+	public void onReceive(Context context, Intent intent) {				
 		GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(context);
         mContext = context;
+        mPieTalkApplication = (PieTalkApplication) mContext.getApplicationContext(); 
+		mPieTalkService = mPieTalkApplication.getPieTalkService();
+        
         String messageType = gcm.getMessageType(intent);
         if (GoogleCloudMessaging.MESSAGE_TYPE_SEND_ERROR.equals(messageType)) {
             sendNotification("Send error: " + intent.getExtras().toString());
@@ -27,9 +34,23 @@ public class PieTalkBroadcastReceiver extends BroadcastReceiver {
             sendNotification("Deleted messages on server: " + 
                     intent.getExtras().toString());
         } else {
-            sendNotification("Received: " + intent.getExtras().toString());
+        		PieTalkLogger.i(TAG, "Message: " + intent.getStringExtra("message"));
+        		String message = intent.getStringExtra("message");
+        		processPush(message);
+            //sendNotification("Received: " + intent.getExtras().toString());
+        		//PieTalkLogger.i(TAG, "Message: " + intent.getStringExtra("message"));
         }
         setResultCode(Activity.RESULT_OK);
+	}
+	
+	private void processPush(String message) {
+		if (message.equals("Friend request received")) {
+			if (mPieTalkApplication.getIsApplicationActive())
+				mPieTalkService.getPies();
+			else
+				sendNotification("Pie received");
+		} else
+			sendNotification("Message received: " + message);
 	}
 	
 	private void sendNotification(String msg) {
@@ -37,17 +58,18 @@ public class PieTalkBroadcastReceiver extends BroadcastReceiver {
 		mNotificationManager = (NotificationManager)
 	              mContext.getSystemService(Context.NOTIFICATION_SERVICE);
 	
-		PieTalkApplication app = (PieTalkApplication) mContext.getApplicationContext(); 
-		PieTalkService pieTalkService = app.getPieTalkService();
-		Activity activity = (Activity) pieTalkService.getActivityContext();
+		
+		Activity activity = (Activity) mPieTalkService.getActivityContext();
 
 		PendingIntent contentIntent = PendingIntent.getActivity(mContext, 0,
 				new Intent(activity, Activity.class), 0);
 
+		PieTalkLogger.i(TAG, "Push received: " + msg);
+		
 		NotificationCompat.Builder mBuilder =
 				new NotificationCompat.Builder(mContext)
 				.setSmallIcon(R.drawable.ic_launcher)
-				.setContentTitle("Notification Hub Demo")
+				.setContentTitle("PieTalk Message")
 				.setStyle(new NotificationCompat.BigTextStyle().bigText(msg))
 				.setContentText(msg);
 

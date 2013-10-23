@@ -9,6 +9,7 @@ public class PieTalkApplication extends Application {
 	private PieTalkService mPieTalkService;
 	private Activity mCurrentActivity;
 	private SplashScreenActivity mSplashScreenActivity;
+	private boolean mIsApplicationActive = false;
 	
 	public PieTalkApplication() {}
 	
@@ -34,4 +35,10 @@ public class PieTalkApplication extends Application {
 	public SplashScreenActivity getSplashScreenActivity() {
 		return mSplashScreenActivity;
 	}
+	
+	public void setIsApplicationActive(boolean isApplicationActive) {
+		mIsApplicationActive = isApplicationActive;
+	}
+	
+	public boolean getIsApplicationActive() { return mIsApplicationActive; }
 }

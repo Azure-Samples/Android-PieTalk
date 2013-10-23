@@ -582,8 +582,9 @@ public class PieTalkService {
  		            		SharedPreferences.Editor preferencesEditor = settings.edit();
  		            		preferencesEditor.putString("registrationId", mRegistrationId);        
  		            		preferencesEditor.commit();
- 		            	
- 		            		mHub.registerTemplate(mRegistrationId, "alertTemplate", "{\"data\":{\"message\":\"$(message)\"}}", mClient.getCurrentUser().getUserId(), "AllUsers", "AndroidUser");
+ 		            		
+ 		            		mHub.registerTemplate(mRegistrationId, "messageTemplate", "{\"data\":{\"message\":\"$(message)\"}, \"collapse_key\":\"$(collapse_key)\"}", mClient.getCurrentUser().getUserId(), "AllUsers", "AndroidUser");
+ 		            		//mHub.registerTemplate(mRegistrationId, "friendRequestTemplate", "{\"data\":{\"message\":\"$(message)\"}, \"collapse_key\":\"$(collapse_key)\"}", mClient.getCurrentUser().getUserId(), "AllUsers", "AndroidUser");
  		            }
  		         } catch (Exception e) {
  		        	 	PieTalkLogger.e(TAG, "Unable to register for push notifications: " + e.getMessage());

@@ -30,4 +30,16 @@ public class BaseListActivity extends ListActivity {
 		mPieTalkService = mApplication.getPieTalkService();
 		mPieTalkService.setContext(this);
 	}
+	
+	@Override
+	protected void onResume() {
+		mApplication.setIsApplicationActive(true);
+		super.onResume();
+	}
+	
+	@Override
+	protected void onPause() {
+		mApplication.setIsApplicationActive(false);
+		super.onPause();
+	}
 }
