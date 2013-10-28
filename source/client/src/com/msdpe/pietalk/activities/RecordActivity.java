@@ -63,6 +63,8 @@ import com.msdpe.pietalk.PreferencesHandler;
 import com.msdpe.pietalk.R;
 import com.msdpe.pietalk.base.BaseActivity;
 import com.msdpe.pietalk.datamodels.Pie;
+import com.msdpe.pietalk.util.NetworkUtilities;
+import com.msdpe.pietalk.util.PieTalkAlert;
 import com.msdpe.pietalk.util.PieTalkLogger;
 
 public class RecordActivity extends BaseActivity implements NumberPicker.OnValueChangeListener {
@@ -128,8 +130,12 @@ public class RecordActivity extends BaseActivity implements NumberPicker.OnValue
 		mBtnTakePicture.setOnLongClickListener(takeVideoListener);
 		mBtnTakePicture.setOnTouchListener(touchListener);
 		
-		mPieTalkService.getFriends();
-		mPieTalkService.getPies();
+		if (NetworkUtilities.isNetworkOnline(mActivity)) {
+			mPieTalkService.getFriends();			
+			mPieTalkService.getPies();
+		} else {
+			PieTalkAlert.showSimpleErrorDialog(mActivity, "You should connect to the internet and rerun PieTalk.");
+		}
 		
 		mTakingVideo = false;
 		mReviewingPicture = false;

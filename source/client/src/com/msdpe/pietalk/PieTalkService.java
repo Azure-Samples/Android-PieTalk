@@ -17,10 +17,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
-import android.os.Handler;
 import android.util.Log;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
@@ -46,6 +43,7 @@ import com.msdpe.pietalk.activities.SplashScreenActivity;
 import com.msdpe.pietalk.datamodels.Friend;
 import com.msdpe.pietalk.datamodels.Pie;
 import com.msdpe.pietalk.datamodels.PieFile;
+import com.msdpe.pietalk.util.NetworkUtilities;
 import com.msdpe.pietalk.util.NoNetworkConnectivityException;
 import com.msdpe.pietalk.util.PieTalkAlert;
 import com.msdpe.pietalk.util.PieTalkLogger;
@@ -369,7 +367,7 @@ public class PieTalkService {
 	}
 	
 	public boolean sendPie(final String fileFullPath, final boolean isPicture, final boolean isVideo, int selectedSeconds) {
-		if (!isNetworkOnline()) {
+		if (!NetworkUtilities.isNetworkOnline(mContext)) {
 			PieTalkAlert.showSimpleErrorDialog(getActivityContext(), "You must be connected to the internet for this to work.");
 			return false;
 		}
@@ -419,32 +417,14 @@ public class PieTalkService {
 		return true;
 	}
 	
-	private boolean isNetworkOnline() {
-		boolean status = false;
-		try {
-			ConnectivityManager cm = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
-			NetworkInfo netInfo = cm.getNetworkInfo(0);
-			if (netInfo != null && netInfo.getState() == NetworkInfo.State.CONNECTED) {
-				status = true;
-			} else {
-				netInfo = cm.getNetworkInfo(1);
-				if (netInfo != null && netInfo.getState() == NetworkInfo.State.CONNECTED) {
-					status = true;
-				}
-			}
-		} catch (Exception ex) {
-			PieTalkLogger.e(TAG, "Error checking for network connectivity: " + ex.getMessage());
-			status = false;
-		}
-		return status;
-	}
+	
 	
 	private class MyServiceFilter implements ServiceFilter {		
 		@Override
 		public void handleRequest(final ServiceFilterRequest request, final NextServiceFilterCallback nextServiceFilterCallback,
 				final ServiceFilterResponseCallback responseCallback) {
-			
-			if (!isNetworkOnline()) {
+						
+			if (!NetworkUtilities.isNetworkOnline(mContext)) {	
 				getActivityContext().runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
@@ -522,6 +502,7 @@ public class PieTalkService {
 					bos.write(b, 0, bytesRead);
 				}
 				byte[] bytes = bos.toByteArray();
+				fis.close();
 				// Post our image data (byte array) to the server
 				URL url = new URL(mBlobUrl.replace("\"", ""));
 				HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();

@@ -195,7 +195,7 @@ public class FriendsListActivity extends BaseActivity {
 				
 		//temporary fix for issue affecting galaxy nexus where
 		//query filter doesn't empty on back pressed
-		if (!mCurrentName.equals("")) {
+		if (mCurrentName != null && !mCurrentName.equals("")) {
 			mCurrentName = "";
 			PieTalkLogger.i(TAG, "Not iconified");
 			mSearchView.setIconified(true);

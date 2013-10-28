@@ -3,7 +3,6 @@ package com.msdpe.pietalk.activities;
 import java.io.InputStream;
 
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher;
-import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher.OnRefreshListener;
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
 import android.app.ActionBar;
 import android.app.Dialog;
