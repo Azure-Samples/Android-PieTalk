@@ -84,10 +84,11 @@ public class LoginActivity extends BaseActivity {
 						mBtnLogin.setVisibility(View.VISIBLE);
 						mProgressLogin.setVisibility(View.GONE);
 												
-						if (NoNetworkConnectivityException.class.isInstance(exc))
-							return;
+						
 						//Display error
 						if (exc != null) {
+							if (NoNetworkConnectivityException.class.isInstance(exc))
+								return;
 							PieTalkAlert.showSimpleErrorDialog(mActivity, exc.getCause().getMessage());
 						}
 						else
