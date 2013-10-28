@@ -20,6 +20,7 @@ import com.msdpe.pietalk.R.drawable;
 import com.msdpe.pietalk.R.id;
 import com.msdpe.pietalk.R.layout;
 import com.msdpe.pietalk.base.BaseActivity;
+import com.msdpe.pietalk.util.NoNetworkConnectivityException;
 import com.msdpe.pietalk.util.PieTalkAlert;
 import com.msdpe.pietalk.util.PieTalkLogger;
 import com.msdpe.pietalk.util.PieTalkRegisterResponse;
@@ -82,13 +83,12 @@ public class LoginActivity extends BaseActivity {
 					if (exc != null || response.Error != null) {
 						mBtnLogin.setVisibility(View.VISIBLE);
 						mProgressLogin.setVisibility(View.GONE);
-						//Display error						
-						
-						//if (UnknownHostException.class.isInstance(ex.getCause())) {
-						
+												
+						if (NoNetworkConnectivityException.class.isInstance(exc))
+							return;
+						//Display error
 						if (exc != null) {
-							if (!UnknownHostException.class.isInstance(exc.getCause()))
-								PieTalkAlert.showSimpleErrorDialog(mActivity, exc.getCause().getMessage());
+							PieTalkAlert.showSimpleErrorDialog(mActivity, exc.getCause().getMessage());
 						}
 						else
 							PieTalkAlert.showSimpleErrorDialog(mActivity, response.Error);									

@@ -223,10 +223,11 @@ public class SendToFriendsActivity extends BaseActivity {
 	}
 	
 	public void tappedSendToFriends(View view) {
-		mPieTalkService.sendPie(mFileFullPath, mReviewingPicture, mReviewingVideo,mSelectedSeconds);
-		mPieTalkService.uncheckFriends();
-		setResult(Constants.RESULT_CODE_PIE_SENT);
-		finish();
+		if (mPieTalkService.sendPie(mFileFullPath, mReviewingPicture, mReviewingVideo,mSelectedSeconds)) {
+			mPieTalkService.uncheckFriends();
+			setResult(Constants.RESULT_CODE_PIE_SENT);
+			finish();
+		}
 	}
 
 }

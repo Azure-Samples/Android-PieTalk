@@ -46,6 +46,7 @@ import com.msdpe.pietalk.TestSettingsActivity;
 import com.msdpe.pietalk.adapters.PiesArrayAdapter;
 import com.msdpe.pietalk.base.BaseActivity;
 import com.msdpe.pietalk.datamodels.Pie;
+import com.msdpe.pietalk.util.NoNetworkConnectivityException;
 import com.msdpe.pietalk.util.PieTalkAlert;
 import com.msdpe.pietalk.util.PieTalkLogger;
 import com.msdpe.pietalk.util.PieTalkResponse;
@@ -198,10 +199,13 @@ public class PiesListActivity extends BaseActivity implements PullToRefreshAttac
 							ServiceFilterResponse serviceFilterResponse) {
 						PieTalkLogger.i(TAG, "Response received");
 						if (ex != null || response.Error != null) {
-																	
+																
 							//Display error					
-							if (ex != null)
+							if (ex != null) {
+								if (NoNetworkConnectivityException.class.isInstance(ex))
+									return;	
 								PieTalkAlert.showSimpleErrorDialog(mActivity, ex.getCause().getMessage());
+							}
 							else 
 								Toast.makeText(mActivity, response.Error, Toast.LENGTH_SHORT).show();
 						} else {
@@ -225,9 +229,13 @@ public class PiesListActivity extends BaseActivity implements PullToRefreshAttac
 						public void onCompleted(PieTalkResponse response,
 								Exception ex, ServiceFilterResponse serviceFilterResponse) {
 							if (ex != null || response.Error != null) {
+								
 								//Display error								
-								if (ex != null) 
+								if (ex != null)  {
+									if (NoNetworkConnectivityException.class.isInstance(ex))
+										return;								
 									PieTalkAlert.showSimpleErrorDialog(mActivity, ex.getCause().getMessage());
+								}
 								else
 									PieTalkAlert.showSimpleErrorDialog(mActivity, response.Error);																	
 							} else {

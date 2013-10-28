@@ -18,6 +18,7 @@ import com.msdpe.pietalk.R.drawable;
 import com.msdpe.pietalk.R.id;
 import com.msdpe.pietalk.R.layout;
 import com.msdpe.pietalk.base.BaseActivity;
+import com.msdpe.pietalk.util.NoNetworkConnectivityException;
 import com.msdpe.pietalk.util.PieTalkAlert;
 import com.msdpe.pietalk.util.PieTalkResponse;
 import com.msdpe.pietalk.util.TextValidator;
@@ -79,10 +80,13 @@ public class SelectUsernameActivity extends BaseActivity {
 							//Log.e(TAG, "Error: " + exc.getCause().getMessage());
 							mBtnNext.setVisibility(View.VISIBLE);
 							mProgressSignup.setVisibility(View.GONE);
-							//Display error
 							
-							if (exc != null)
+							//Display error							
+							if (exc != null) {
+								if (NoNetworkConnectivityException.class.isInstance(exc))
+									return;
 								PieTalkAlert.showSimpleErrorDialog(mActivity, exc.getCause().getMessage());
+							}
 							else 
 								PieTalkAlert.showSimpleErrorDialog(mActivity, response.Error);
 							

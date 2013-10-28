@@ -31,6 +31,7 @@ import com.msdpe.pietalk.R.id;
 import com.msdpe.pietalk.R.layout;
 import com.msdpe.pietalk.R.string;
 import com.msdpe.pietalk.base.BaseActivity;
+import com.msdpe.pietalk.util.NoNetworkConnectivityException;
 import com.msdpe.pietalk.util.PieTalkAlert;
 import com.msdpe.pietalk.util.PieTalkRegisterResponse;
 import com.msdpe.pietalk.util.TextValidator;
@@ -96,11 +97,13 @@ public class SignupActivity extends BaseActivity implements DatePickerDialog.OnD
 								//Log.i(TAG, jsonData.toString());
 								if (exc != null || response.Error != null) {
 									mBtnSignup.setVisibility(View.VISIBLE);
-									mProgressSignup.setVisibility(View.GONE);
-									//Display error
-									
-									if (exc != null) 
+									mProgressSignup.setVisibility(View.GONE);									
+									//Display error									
+									if (exc != null) {
+										if (NoNetworkConnectivityException.class.isInstance(exc))
+											return;
 										PieTalkAlert.showSimpleErrorDialog(mActivity, exc.getCause().getMessage());
+									}
 									else
 										PieTalkAlert.showSimpleErrorDialog(mActivity, response.Error);									
 									

@@ -27,6 +27,7 @@ import com.microsoft.windowsazure.mobileservices.ServiceFilterResponse;
 import com.msdpe.pietalk.Constants;
 import com.msdpe.pietalk.R;
 import com.msdpe.pietalk.base.BaseActivity;
+import com.msdpe.pietalk.util.NoNetworkConnectivityException;
 import com.msdpe.pietalk.util.PieTalkAlert;
 import com.msdpe.pietalk.util.PieTalkLogger;
 import com.msdpe.pietalk.util.PieTalkRegisterResponse;
@@ -227,10 +228,13 @@ public class FriendsListActivity extends BaseActivity {
 					ServiceFilterResponse arg2) {
 				PieTalkLogger.i(TAG, "Response received");
 				if (ex != null || response.Error != null) {
-					mBtnAddFriend.setEnabled(true);										
+					mBtnAddFriend.setEnabled(true);					
 					//Display error					
-					if (ex != null)
+					if (ex != null) {
+						if (NoNetworkConnectivityException.class.isInstance(ex))
+							return;
 						PieTalkAlert.showSimpleErrorDialog(mActivity, ex.getCause().getMessage());
+					}
 					else 
 						Toast.makeText(mActivity, response.Error, Toast.LENGTH_SHORT).show();
 				} else {

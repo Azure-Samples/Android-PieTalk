@@ -17,6 +17,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.util.Log;
@@ -44,6 +46,7 @@ import com.msdpe.pietalk.activities.SplashScreenActivity;
 import com.msdpe.pietalk.datamodels.Friend;
 import com.msdpe.pietalk.datamodels.Pie;
 import com.msdpe.pietalk.datamodels.PieFile;
+import com.msdpe.pietalk.util.NoNetworkConnectivityException;
 import com.msdpe.pietalk.util.PieTalkAlert;
 import com.msdpe.pietalk.util.PieTalkLogger;
 import com.msdpe.pietalk.util.PieTalkRegisterResponse;
@@ -303,7 +306,8 @@ public class PieTalkService {
 					ServiceFilterResponse response) {
 				boolean wasSuccess = false;
 				if (ex != null) {
-					//Toast.makeText(mContext, "Error getting friends", Toast.LENGTH_SHORT).show();
+					if (NoNetworkConnectivityException.class.isInstance(ex))
+						return;
 					PieTalkLogger.e(TAG, "Error getting friends: " + ex.getCause().getMessage());
 				} else {
 					PieTalkLogger.i(TAG, "Friends received");
@@ -339,7 +343,8 @@ public class PieTalkService {
 					ServiceFilterResponse response) {
 				boolean wasSuccess = false;
 				if (ex != null) {
-					//Toast.makeText(mContext, "Error getting pies", Toast.LENGTH_SHORT).show();
+					if (NoNetworkConnectivityException.class.isInstance(ex))
+						return;
 					PieTalkLogger.e(TAG, "Error getting pies: " + ex.getCause().getMessage());
 				} else {
 					PieTalkLogger.i(TAG, "Pies received");
@@ -363,7 +368,11 @@ public class PieTalkService {
 		mClient.invokeApi("AcceptFriendRequest", friendRequestPie, PieTalkResponse.class, callback);
 	}
 	
-	public void sendPie(final String fileFullPath, final boolean isPicture, final boolean isVideo, int selectedSeconds) {
+	public boolean sendPie(final String fileFullPath, final boolean isPicture, final boolean isVideo, int selectedSeconds) {
+		if (!isNetworkOnline()) {
+			PieTalkAlert.showSimpleErrorDialog(getActivityContext(), "You must be connected to the internet for this to work.");
+			return false;
+		}
 		//Get User IDs
 		mTempRecipientUserIds = new String[mCheckCount];		
 		int count = 0;
@@ -406,12 +415,47 @@ public class PieTalkService {
 				});
 			}
 		});	
+		
+		return true;
+	}
+	
+	private boolean isNetworkOnline() {
+		boolean status = false;
+		try {
+			ConnectivityManager cm = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+			NetworkInfo netInfo = cm.getNetworkInfo(0);
+			if (netInfo != null && netInfo.getState() == NetworkInfo.State.CONNECTED) {
+				status = true;
+			} else {
+				netInfo = cm.getNetworkInfo(1);
+				if (netInfo != null && netInfo.getState() == NetworkInfo.State.CONNECTED) {
+					status = true;
+				}
+			}
+		} catch (Exception ex) {
+			PieTalkLogger.e(TAG, "Error checking for network connectivity: " + ex.getMessage());
+			status = false;
+		}
+		return status;
 	}
 	
 	private class MyServiceFilter implements ServiceFilter {		
 		@Override
 		public void handleRequest(final ServiceFilterRequest request, final NextServiceFilterCallback nextServiceFilterCallback,
-				final ServiceFilterResponseCallback responseCallback) {				
+				final ServiceFilterResponseCallback responseCallback) {
+			
+			if (!isNetworkOnline()) {
+				getActivityContext().runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						PieTalkAlert.showSimpleErrorDialog(getActivityContext(), "You must be connected to the internet for this to work.");									
+					}
+				});	
+				
+				responseCallback.onResponse(null, new NoNetworkConnectivityException());
+				return;
+			}			
+			
 			nextServiceFilterCallback.onNext(request, new ServiceFilterResponseCallback() {				
 				@Override
 				public void onResponse(ServiceFilterResponse response, Exception ex) {
@@ -546,9 +590,12 @@ public class PieTalkService {
 				broadcast.setAction(Constants.BROADCAST_PIE_SENT);
 				
 				if (ex != null || response.Error != null) {										
-					//Display error					
-					if (ex != null)
+					//Display error						
+					if (ex != null) {
+						if (NoNetworkConnectivityException.class.isInstance(ex))
+							return;
 						PieTalkLogger.e(TAG, "Unexpected error sending pies: " + ex.getCause().getMessage());
+					}
 					else 
 						PieTalkLogger.e(TAG,  "Error sending pies: " + response.Error);
 					broadcast.putExtra("Success", false);
