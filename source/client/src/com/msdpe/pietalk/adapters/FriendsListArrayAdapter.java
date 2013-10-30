@@ -32,8 +32,15 @@ public class FriendsListArrayAdapter extends ArrayAdapter<Friend> {
 	            .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 	    View view = inflater.inflate(R.layout.list_row_friend, parent, false);    
 	    TextView lblUsername = (TextView) view.findViewById(R.id.lblUsername);
-	    lblUsername.setText(friend.getToUsername());
-	    
+	    //lblUsername.setText(friend.getToUsername());
+	    lblUsername.setText(friend.getDisplayName());
+	    TextView lblInfo = (TextView) view.findViewById(R.id.lblInfo);
+	    if (friend.getStatus().equalsIgnoreCase("requested")) {
+	    		lblInfo.setText(mContext.getResources().getString(R.string.pending));
+	    } else {
+	    		//lblInfo.setText(mContext.getResources().getString(R.string.empty_string));
+	    		lblInfo.setText(friend.getToUsername());
+	    }
 	    
 	    
 	    return view;

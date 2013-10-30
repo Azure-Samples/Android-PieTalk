@@ -17,4 +17,13 @@
         android:text="@string/set_in_code"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
+    <TextView
+        android:id="@+id/lblInfo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/lblUsername"
+        android:layout_below="@+id/lblUsername"
+        android:text="@string/set_in_code"
+        android:textColor="@color/sign_up_grey" />
+
 </RelativeLayout>

@@ -16,6 +16,9 @@ public class Friend {
 	@com.google.gson.annotations.SerializedName("toUsername")
 	private String mToUsername;
 	@Expose
+	@com.google.gson.annotations.SerializedName("displayName")
+	private String mDisplayName;
+	@Expose
 	@com.google.gson.annotations.SerializedName("status")
 	private String mStatus;
 	@Expose
@@ -32,7 +35,7 @@ public class Friend {
 	public boolean getChecked() { return mIsChecked; }
 
 	public Friend() {
-		mIsChecked = false;
+		mIsChecked = false;		
 	}
 
 	public int getId() { return mId; } 
@@ -42,6 +45,11 @@ public class Friend {
 	public String getToUserId() { return mToUserId; }
 	//private void setToUserId(String userId) { mToUserId = userId; }
 	public String getToUsername() { return mToUsername; }
+	public String getDisplayName() {
+		if (mDisplayName != null && !mDisplayName.equals(""))
+			return mDisplayName;
+		return mToUsername;
+	}
 	//private void setUsername(String username) { mToUsername = username; }
 	public String getStatus() { return mStatus; }
 	public Date getCreateDate() { return mCreateDate; }	
