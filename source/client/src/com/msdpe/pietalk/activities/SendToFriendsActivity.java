@@ -22,13 +22,13 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.msdpe.pietalk.Constants;
 import com.msdpe.pietalk.R;
 import com.msdpe.pietalk.adapters.FriendsArrayAdapter;
 import com.msdpe.pietalk.base.BaseActivity;
 import com.msdpe.pietalk.datamodels.Friend;
+import com.msdpe.pietalk.util.PieTalkAlert;
 import com.msdpe.pietalk.util.PieTalkLogger;
 
 public class SendToFriendsActivity extends BaseActivity {
@@ -208,7 +208,7 @@ public class SendToFriendsActivity extends BaseActivity {
 				}		
 				PieTalkLogger.i(TAG, "Refresh complete");
 			} else {
-				Toast.makeText(mActivity, getResources().getString(R.string.error_getting_friends), Toast.LENGTH_SHORT).show();
+				PieTalkAlert.showToast(mActivity, R.string.error_getting_friends);
 			}
 		}
 	};

@@ -44,6 +44,6 @@ public class PieTalkAlert {
 	}
 	
 	public static void showToast(Context context, String text) {
-		showToast(context, text, false, false);
+		showToast(context, text, true, false);
 	}
 }

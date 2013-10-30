@@ -34,7 +34,6 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.microsoft.windowsazure.mobileservices.ApiOperationCallback;
@@ -206,7 +205,7 @@ public class PiesListActivity extends BaseActivity implements PullToRefreshAttac
 								PieTalkAlert.showSimpleErrorDialog(mActivity, ex.getCause().getMessage());
 							}
 							else 
-								Toast.makeText(mActivity, response.Error, Toast.LENGTH_SHORT).show();
+								PieTalkAlert.showToast(mActivity, response.Error);
 						} else {
 							//mAdapter.remove(pie);
 							mPieTalkService.getFriends();
@@ -378,8 +377,7 @@ public class PiesListActivity extends BaseActivity implements PullToRefreshAttac
 					}		
 					PieTalkLogger.i(TAG, "Refresh complete");
 				} else {
-					Toast.makeText(mActivity, getResources().getString(R.string.error_getting_pies), Toast.LENGTH_SHORT).show();
-					//PieTalkAlert.showToast(mActivity, R.string.error_getting_pies, true, false);
+					PieTalkAlert.showToast(mActivity, R.string.error_getting_pies);
 				}
 				mPullToRefreshAttacher.setRefreshComplete();
 				mPullToRefreshAttacher.setRefreshing(false);

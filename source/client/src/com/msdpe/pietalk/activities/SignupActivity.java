@@ -10,7 +10,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
-import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -19,17 +18,11 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.gson.JsonElement;
 import com.microsoft.windowsazure.mobileservices.ApiOperationCallback;
 import com.microsoft.windowsazure.mobileservices.ServiceFilterResponse;
 import com.msdpe.pietalk.Constants;
 import com.msdpe.pietalk.R;
-import com.msdpe.pietalk.R.drawable;
-import com.msdpe.pietalk.R.id;
-import com.msdpe.pietalk.R.layout;
-import com.msdpe.pietalk.R.string;
 import com.msdpe.pietalk.base.BaseActivity;
 import com.msdpe.pietalk.util.NoNetworkConnectivityException;
 import com.msdpe.pietalk.util.PieTalkAlert;
@@ -161,7 +154,7 @@ public class SignupActivity extends BaseActivity implements DatePickerDialog.OnD
 		mSelectedDate.set(year, month, day);
 		
 		if (mSelectedDate.after(Calendar.getInstance())) {
-			Toast.makeText(getApplicationContext(), R.string.born_in_future, Toast.LENGTH_LONG).show();
+			PieTalkAlert.showToast(mActivity, R.string.born_in_future);
 			mTxtBirthday.setError("Date must be in the past");
 			mDateIsInFuture = true;
 		} else

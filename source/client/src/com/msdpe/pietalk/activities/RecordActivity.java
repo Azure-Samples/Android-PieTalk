@@ -52,8 +52,6 @@ import android.widget.NumberPicker;
 import android.widget.NumberPicker.OnScrollListener;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.TextView.OnEditorActionListener;
-import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.msdpe.pietalk.CameraPreview;
@@ -62,7 +60,6 @@ import com.msdpe.pietalk.Constants.CameraUIMode;
 import com.msdpe.pietalk.PreferencesHandler;
 import com.msdpe.pietalk.R;
 import com.msdpe.pietalk.base.BaseActivity;
-import com.msdpe.pietalk.datamodels.Pie;
 import com.msdpe.pietalk.util.NetworkUtilities;
 import com.msdpe.pietalk.util.PieTalkAlert;
 import com.msdpe.pietalk.util.PieTalkLogger;
@@ -406,7 +403,7 @@ public class RecordActivity extends BaseActivity implements NumberPicker.OnValue
 		        			setUIMode(Constants.CameraUIMode.UI_MODE_REVIEW_VIDEO);
 	        			} catch (RuntimeException ex) {
 	        				PieTalkLogger.e(TAG, "Error stopping media recorder");
-	        				Toast.makeText(mActivity, mActivity.getResources().getString(R.string.video_recording_failed), Toast.LENGTH_SHORT).show();
+	        				PieTalkAlert.showToast(mActivity, R.string.video_recording_failed, true, true);
 	        				setUIMode(Constants.CameraUIMode.UI_MODE_PRE_PICTURE);
 	        			}
 	        		}
@@ -854,7 +851,6 @@ public class RecordActivity extends BaseActivity implements NumberPicker.OnValue
 
 	@Override
 	public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
-		//Toast.makeText(mActivity, "Value change", Toast.LENGTH_SHORT).show();
 		PieTalkLogger.i(TAG, "New value: " + newVal);
 		mSecondsSelected = newVal;
 		mLblTime.setText(newVal + "");

@@ -17,10 +17,8 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SearchView;
-import android.widget.SearchView.OnCloseListener;
 import android.widget.SearchView.OnQueryTextListener;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.microsoft.windowsazure.mobileservices.ApiOperationCallback;
 import com.microsoft.windowsazure.mobileservices.ServiceFilterResponse;
@@ -98,7 +96,7 @@ public class FriendsListActivity extends BaseActivity {
 					mAdapter.add(item);
 				}		
 			} else {
-				Toast.makeText(mActivity, getResources().getString(R.string.error_getting_friends), Toast.LENGTH_SHORT).show();
+				PieTalkAlert.showToast(mActivity, R.string.error_getting_friends);
 			}
 		}
 	};
@@ -219,7 +217,7 @@ public class FriendsListActivity extends BaseActivity {
 	}
 	
 	public void tappedAddFriend(View view) {
-		Toast.makeText(this, "Adding " + mCurrentName +"...", Toast.LENGTH_SHORT).show();
+		PieTalkAlert.showToast(this, "Adding " + mCurrentName +"...");
 		mBtnAddFriend.setEnabled(false);
 		
 		mPieTalkService.requestFriend(mCurrentName, new ApiOperationCallback<PieTalkRegisterResponse>() {			
@@ -236,9 +234,9 @@ public class FriendsListActivity extends BaseActivity {
 						PieTalkAlert.showSimpleErrorDialog(mActivity, ex.getCause().getMessage());
 					}
 					else 
-						Toast.makeText(mActivity, response.Error, Toast.LENGTH_SHORT).show();
+						PieTalkAlert.showToast(mActivity, response.Error);
 				} else {
-					Toast.makeText(mActivity, response.Status, Toast.LENGTH_SHORT).show();
+					PieTalkAlert.showToast(mActivity, response.Status);
 					mBtnAddFriend.setVisibility(View.GONE);
 					mPieTalkService.getFriends();					
 				}
