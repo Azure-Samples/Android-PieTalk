@@ -379,6 +379,7 @@ public class PiesListActivity extends BaseActivity implements PullToRefreshAttac
 					PieTalkLogger.i(TAG, "Refresh complete");
 				} else {
 					Toast.makeText(mActivity, getResources().getString(R.string.error_getting_pies), Toast.LENGTH_SHORT).show();
+					//PieTalkAlert.showToast(mActivity, R.string.error_getting_pies, true, false);
 				}
 				mPullToRefreshAttacher.setRefreshComplete();
 				mPullToRefreshAttacher.setRefreshing(false);

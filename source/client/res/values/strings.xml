@@ -21,8 +21,8 @@
     <string name="next">Next</string>
     <string name="select_username_instrutions">Please select a unique username.\nYour username identifies you on Pietalk.</string>
     <string name="error">Error</string>
-    <string name="error_getting_friends">Couldn\'t refresh friends.  Please try again</string>
-    <string name="error_getting_pies">Couldn\'t refresh pies.  Please try again.</string>
+    <string name="error_getting_friends">Couldn\'t refresh friends.  Please check your internet connection and try again</string>
+    <string name="error_getting_pies">Couldn\'t refresh pies.  Please check your internet connection and try again.</string>
     <string name="ok">OK</string>
     <string name="email_or_username">Email or Username</string>
     <string name="title_activity_record">RecordActivity</string>

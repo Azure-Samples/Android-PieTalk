@@ -551,7 +551,7 @@ public class RecordActivity extends BaseActivity implements NumberPicker.OnValue
 					int count = mPieTalkService.getLocalPies().size();
 					
 				} else {
-					Toast.makeText(mActivity, getResources().getString(R.string.error_getting_pies), Toast.LENGTH_SHORT).show();
+					PieTalkAlert.showToast(mActivity, R.string.error_getting_pies, true, true);
 				}				
 			}
 		}
