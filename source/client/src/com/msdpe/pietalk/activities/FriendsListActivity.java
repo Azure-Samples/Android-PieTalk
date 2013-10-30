@@ -24,7 +24,9 @@ import com.microsoft.windowsazure.mobileservices.ApiOperationCallback;
 import com.microsoft.windowsazure.mobileservices.ServiceFilterResponse;
 import com.msdpe.pietalk.Constants;
 import com.msdpe.pietalk.R;
+import com.msdpe.pietalk.adapters.FriendsListArrayAdapter;
 import com.msdpe.pietalk.base.BaseActivity;
+import com.msdpe.pietalk.datamodels.Friend;
 import com.msdpe.pietalk.util.NoNetworkConnectivityException;
 import com.msdpe.pietalk.util.PieTalkAlert;
 import com.msdpe.pietalk.util.PieTalkLogger;
@@ -34,7 +36,8 @@ public class FriendsListActivity extends BaseActivity {
 	
 	private final String TAG = "FriendsListActivity";
 	private ListView mLvFriends;
-	private ArrayAdapter<String> mAdapter;
+	//private ArrayAdapter<String> mAdapter;
+	private FriendsListArrayAdapter mAdapter;
 	private LinearLayout mLayoutAddFriend;
 	private TextView mLblNewFriendName;
 	private String mCurrentName;
@@ -66,9 +69,12 @@ public class FriendsListActivity extends BaseActivity {
 	    
 	    //mAdapter = new ArrayAdapter<String>(this,
 	    //    android.R.layout.simple_list_item_1, list);
-	    mAdapter = new ArrayAdapter<String>(this,
-	    	        android.R.layout.simple_list_item_1, mPieTalkService.getLocalFriendNames());
-	    mLvFriends.setAdapter(mAdapter);
+//	    mAdapter = new ArrayAdapter<String>(this,
+//	    	        android.R.layout.simple_list_item_1, mPieTalkService.getLocalFriendNames());
+//	    mLvFriends.setAdapter(mAdapter);
+		
+		mAdapter = new FriendsListArrayAdapter(this,  mPieTalkService.getLocalFriends());
+		mLvFriends.setAdapter(mAdapter);
 	}
 	
 	@Override
@@ -92,8 +98,11 @@ public class FriendsListActivity extends BaseActivity {
 			if (wasSuccess) {						
 				mAdapter.clear();
 	
-				for (String item : mPieTalkService.getLocalFriendNames()) {
-					mAdapter.add(item);
+				//for (String item : mPieTalkService.getLocalFriendNames()) {
+				//	mAdapter.add(item);
+				//}
+				for (Friend friend : mPieTalkService.getLocalFriends()) {
+					mAdapter.add(friend);
 				}		
 			} else {
 				PieTalkAlert.showToast(mActivity, R.string.error_getting_friends);

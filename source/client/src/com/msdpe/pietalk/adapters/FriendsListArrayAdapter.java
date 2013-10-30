@@ -13,15 +13,15 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.TextView;
 
 import com.msdpe.pietalk.R;
-import com.msdpe.pietalk.activities.SendToFriendsActivity;
+import com.msdpe.pietalk.activities.FriendsListActivity;
 import com.msdpe.pietalk.datamodels.Friend;
 
-public class FriendsArrayAdapter extends ArrayAdapter<Friend> {
-	private SendToFriendsActivity mContext;
+public class FriendsListArrayAdapter extends ArrayAdapter<Friend> {
+	private FriendsListActivity mContext;
 	private List<Friend> mFriends;
 	
-	public FriendsArrayAdapter(SendToFriendsActivity context, List<Friend> friends) {		
-		super(context, R.layout.list_row_send_to_friend, friends);
+	public FriendsListArrayAdapter(FriendsListActivity context, List<Friend> friends) {		
+		super(context, R.layout.list_row_friend, friends);
 		mContext = context;
 		mFriends = friends;
 	}
@@ -30,23 +30,12 @@ public class FriendsArrayAdapter extends ArrayAdapter<Friend> {
 		Friend friend = mFriends.get(position);
 		LayoutInflater inflater = (LayoutInflater) mContext
 	            .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-	    View view = inflater.inflate(R.layout.list_row_send_to_friend, parent, false);    
+	    View view = inflater.inflate(R.layout.list_row_friend, parent, false);    
 	    TextView lblUsername = (TextView) view.findViewById(R.id.lblUsername);
 	    lblUsername.setText(friend.getToUsername());
 	    
-	    CheckBox cbSelected = (CheckBox) view.findViewById(R.id.cbSelected);
-	    if (cbSelected != null) {
-	    		cbSelected.setChecked(friend.getChecked());
-	    }
 	    
-	    cbSelected.setOnCheckedChangeListener(new OnCheckedChangeListener() {			
-			@Override
-			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				mContext.updateRowCheck(position, isChecked);
-			}
-		});
 	    
 	    return view;
 	}
-
 }

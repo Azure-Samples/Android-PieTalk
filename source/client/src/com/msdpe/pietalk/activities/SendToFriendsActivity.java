@@ -25,7 +25,7 @@ import android.widget.TextView;
 
 import com.msdpe.pietalk.Constants;
 import com.msdpe.pietalk.R;
-import com.msdpe.pietalk.adapters.FriendsArrayAdapter;
+import com.msdpe.pietalk.adapters.SendToFriendsArrayAdapter;
 import com.msdpe.pietalk.base.BaseActivity;
 import com.msdpe.pietalk.datamodels.Friend;
 import com.msdpe.pietalk.util.PieTalkAlert;
@@ -45,7 +45,7 @@ public class SendToFriendsActivity extends BaseActivity {
 	private List<String> mSelectedUsernames;
 	
 	private ListView mLvFriends;
-	private FriendsArrayAdapter mAdapter;
+	private SendToFriendsArrayAdapter mAdapter;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +72,7 @@ public class SendToFriendsActivity extends BaseActivity {
 		
 		mLvFriends = (ListView) findViewById(R.id.lvFriends);
 
-		mAdapter = new FriendsArrayAdapter(this,  mPieTalkService.getLocalFriends());
+		mAdapter = new SendToFriendsArrayAdapter(this,  mPieTalkService.getLocalFriends());
 		mLvFriends.setAdapter(mAdapter);
 			
 		mLvFriends.setOnItemClickListener(friendClickListener);	
