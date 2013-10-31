@@ -668,4 +668,11 @@ public class PieTalkService {
 			}			
 		});
 	}
+ 	
+ 	public UserPreferences getLocalPreferences() { return mUserPrefs; }
+ 	
+ 	public void updatePreferences(UserPreferences prefs, TableOperationCallback<UserPreferences> callback) {
+ 		mUserPrefs = prefs;
+ 		mUserPreferencesTable.update(mUserPrefs, callback);
+ 	}
 }

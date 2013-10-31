@@ -1,9 +1,9 @@
 package com.msdpe.pietalk;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
@@ -15,6 +15,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.WindowManager;
 
+import com.msdpe.pietalk.datamodels.UserPreferences;
+import com.msdpe.pietalk.util.PieTalkAlert;
 import com.msdpe.pietalk.util.PieTalkLogger;
 
 public class TestSettingsActivity extends Activity {
@@ -91,6 +93,27 @@ public class TestSettingsActivity extends Activity {
 				SharedPreferences sharedPreferences, String key) {
 			PieTalkLogger.d(TAG, "Preference changed for key: " + key);
 			Preference myPref = findPreference(key);
+			
+			
+			Resources resources = getActivity().getResources();
+			UserPreferences preferences = mPieTalkService.getLocalPreferences();
+			
+			if (key == resources.getString(R.string.email_address)) {
+				String oldEmail = preferences.getEmail();
+				String newEmail = sharedPreferences.getString(key, "");
+				if (!android.util.Patterns.EMAIL_ADDRESS.matcher(newEmail).matches()) {
+					SharedPreferences.Editor editor = sharedPreferences.edit();
+					editor.putString(key, oldEmail);
+					PieTalkAlert.showToast(getActivity(), "That email address is invalid!");
+					editor.commit();
+					//myPref.setSummary(oldEmail);
+					//myPref.setTitle(oldEmail);
+					EditTextPreference editPref = (EditTextPreference) myPref;
+					editPref.setText(oldEmail);
+					return;
+				}
+			}
+			
 			myPref.setSummary(sharedPreferences.getString(key, ""));
 		}
 		
