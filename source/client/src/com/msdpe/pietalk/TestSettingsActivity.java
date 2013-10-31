@@ -135,10 +135,10 @@ public class TestSettingsActivity extends Activity {
 						SharedPreferences.Editor editor = sharedPreferences.edit();
 						String oldEmail = localPreferences.getEmail();
 						editor.putString(key, oldEmail);
-						PieTalkAlert.showToast(getActivity(), "That email address is invalid!");
 						editor.commit();
 						EditTextPreference editPref = (EditTextPreference) myPref;
-						editPref.setText(oldEmail);						
+						editPref.setText(oldEmail);	
+						editPref.setSummary(oldEmail);
 					} else {
 						
 					}
