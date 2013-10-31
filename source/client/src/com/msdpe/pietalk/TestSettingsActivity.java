@@ -60,14 +60,9 @@ public class TestSettingsActivity extends Activity {
 			addPreferencesFromResource(R.xml.preferences);
 			PieTalkApplication app = (PieTalkApplication) getActivity().getApplication();
 			mPieTalkService = app.getPieTalkService();
-			Preference usernamePref = (Preference) findPreference(getString(R.string.username));
-			usernamePref.setSummary(mPieTalkService.getUsername());
-			usernamePref.setSelectable(false);
 			
-			EditTextPreference emailPref = (EditTextPreference) findPreference(getString(R.string.email_address));
-			emailPref.setSummary(mPieTalkService.getEmail());
 			//emailPref.setText(mPieTalkService.getEmail());
-			PieTalkLogger.i(TAG, "Setting email in preferences");
+			//PieTalkLogger.i(TAG, "Setting email in preferences");
 			
 			initializeToDefaults();
 //			emailPref.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
@@ -101,6 +96,14 @@ public class TestSettingsActivity extends Activity {
 		
 		private void initializeToDefaults() {
 			SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+			//Set Username
+			Preference usernamePref = (Preference) findPreference(getString(R.string.username));
+			usernamePref.setSummary(mPieTalkService.getUsername());
+			usernamePref.setSelectable(false);
+			//Set Email
+			EditTextPreference emailPref = (EditTextPreference) findPreference(getString(R.string.email_address));
+			emailPref.setSummary(mPieTalkService.getEmail());
+			//Set receive from and share to
 			Preference receiveFromPref = (Preference) findPreference(getString(R.string.receive_pies_from));
 			receiveFromPref.setSummary(sharedPrefs.getString(getActivity().getResources().getString(R.string.receive_pies_from), ""));
 			Preference shareToPref = (Preference) findPreference(getString(R.string.share_stories_to));

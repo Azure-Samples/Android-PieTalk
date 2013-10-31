@@ -263,6 +263,7 @@ public class PieTalkService {
 	public void saveUsername(String username, ApiOperationCallback<PieTalkResponse> callback) {
 		JsonObject user = new JsonObject();
 		user.addProperty("username", username);
+		user.addProperty("email", mEmail);
 		//mClient.invokeApi("SaveUsername", user, callback);
 		
 		mClient.invokeApi("SaveUsername", user, PieTalkResponse.class, callback);
