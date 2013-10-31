@@ -45,7 +45,7 @@ public class TestSettingsActivity extends Activity {
 			mPieTalkService = app.getPieTalkService();
 			Preference usernamePref = (Preference) findPreference(getString(R.string.username));
 			usernamePref.setSummary(mPieTalkService.getUsername());
-			PieTalkLogger.i(TAG, "Summary: " + usernamePref.getSummary());
+			usernamePref.setSelectable(false);
 			
 			EditTextPreference emailPref = (EditTextPreference) findPreference(getString(R.string.email_address));
 			emailPref.setSummary(mPieTalkService.getEmail());
