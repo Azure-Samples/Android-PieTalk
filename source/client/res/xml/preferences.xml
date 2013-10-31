@@ -3,7 +3,10 @@
     <PreferenceCategory android:title="@string/my_account">
         <Preference android:title="@string/username" android:key="@string/username"/>
         <Preference android:title="@string/mobile_number" android:key="@string/mobile_number"/>
-        <EditTextPreference android:title="@string/email_address" android:key="@string/email_address"/>
+        <EditTextPreference android:title="@string/email_address"
+            				android:dialogTitle="@string/enter_your_email" 
+            				android:positiveButtonText="@string/save"
+            				android:key="@string/email_address"/>
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/privacy">
         <ListPreference android:title="@string/receive_pies_from" 

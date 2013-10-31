@@ -392,7 +392,6 @@ public class PiesListActivity extends BaseActivity implements PullToRefreshAttac
 	 */
 	private void setupActionBar() {
 		getActionBar().setDisplayHomeAsUpEnabled(true);	
-		ActionBar bar = getActionBar();
 		
 	}
 

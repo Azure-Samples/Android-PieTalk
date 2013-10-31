@@ -1,11 +1,15 @@
 package com.msdpe.pietalk;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceFragment;
+import android.preference.PreferenceManager;
 import android.support.v4.app.NavUtils;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,7 +19,7 @@ import com.msdpe.pietalk.util.PieTalkLogger;
 
 public class TestSettingsActivity extends Activity {
 	private final String TAG = "TestSettingsActivity";
-	
+	private SettingsFragment mSettingsFragment;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -25,16 +29,29 @@ public class TestSettingsActivity extends Activity {
 		//setContentView(R.layout.activity_test_settings);
 		// Show the Up button in the action bar.
 		setupActionBar();
-		
+		mSettingsFragment = new SettingsFragment();
 		getFragmentManager().beginTransaction()
-		.replace(android.R.id.content, new SettingsFragment())
+		.replace(android.R.id.content, mSettingsFragment)
 		.commit();
-	}
+	}	
 	
-	public static class SettingsFragment extends PreferenceFragment {
+	public static class SettingsFragment extends PreferenceFragment implements OnSharedPreferenceChangeListener {
 		private final String TAG = "TestSettingsActivity";
 		private PieTalkService mPieTalkService;
 		
+		@Override
+		public void onResume() {
+			super.onResume();
+			PieTalkLogger.d(TAG, "settings fragment on resume");
+			getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
+		}
+		
+		@Override
+		public void onPause() {
+			super.onPause();
+			getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
+		}
+		 
 		@Override
 		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
@@ -49,7 +66,19 @@ public class TestSettingsActivity extends Activity {
 			
 			EditTextPreference emailPref = (EditTextPreference) findPreference(getString(R.string.email_address));
 			emailPref.setSummary(mPieTalkService.getEmail());
-			emailPref.setText(mPieTalkService.getEmail());
+			//emailPref.setText(mPieTalkService.getEmail());
+			PieTalkLogger.i(TAG, "Setting email in preferences");
+			
+			initializeToDefaults();
+//			emailPref.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+//				
+//				@Override
+//				public boolean onPreferenceChange(Preference preference, Object newValue) {
+//					// TODO Auto-generated method stub
+//					PieTalkLogger.i(TAG, "pref changed: " + newValue);
+//					return true;
+//				}
+//			});
 			
 			Preference logoutPref = (Preference) findPreference(getString(R.string.log_out));
 			logoutPref.setOnPreferenceClickListener(new OnPreferenceClickListener() {				
@@ -59,6 +88,23 @@ public class TestSettingsActivity extends Activity {
 					return true;
 				}
 			});
+			
+		}
+
+		@Override
+		public void onSharedPreferenceChanged(
+				SharedPreferences sharedPreferences, String key) {
+			PieTalkLogger.d(TAG, "Preference changed for key: " + key);
+			Preference myPref = findPreference(key);
+			myPref.setSummary(sharedPreferences.getString(key, ""));
+		}
+		
+		private void initializeToDefaults() {
+			SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+			Preference receiveFromPref = (Preference) findPreference(getString(R.string.receive_pies_from));
+			receiveFromPref.setSummary(sharedPrefs.getString(getActivity().getResources().getString(R.string.receive_pies_from), ""));
+			Preference shareToPref = (Preference) findPreference(getString(R.string.share_stories_to));
+			shareToPref.setSummary(sharedPrefs.getString(getActivity().getResources().getString(R.string.share_stories_to), ""));
 			
 		}
 		

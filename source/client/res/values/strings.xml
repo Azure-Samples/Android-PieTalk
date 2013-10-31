@@ -88,5 +88,7 @@
     <string name="opened">- Opened</string>
     <string name="no_pies">You don\'t have any Pies :(</string>
     <string name="pending">Pending...</string>
+    <string name="enter_your_email">Enter your email</string>
+    <string name="save">Save</string>
 
 </resources>
