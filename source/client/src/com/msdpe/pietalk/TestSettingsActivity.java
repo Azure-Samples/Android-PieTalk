@@ -15,7 +15,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.WindowManager;
 
+import com.microsoft.windowsazure.mobileservices.ServiceFilterResponse;
+import com.microsoft.windowsazure.mobileservices.TableOperationCallback;
 import com.msdpe.pietalk.datamodels.UserPreferences;
+import com.msdpe.pietalk.util.NoNetworkConnectivityException;
 import com.msdpe.pietalk.util.PieTalkAlert;
 import com.msdpe.pietalk.util.PieTalkLogger;
 
@@ -90,31 +93,57 @@ public class TestSettingsActivity extends Activity {
 
 		@Override
 		public void onSharedPreferenceChanged(
-				SharedPreferences sharedPreferences, String key) {
+				final SharedPreferences sharedPreferences, final String key) {
 			PieTalkLogger.d(TAG, "Preference changed for key: " + key);
-			Preference myPref = findPreference(key);
+			final Preference myPref = findPreference(key);
 			
 			
-			Resources resources = getActivity().getResources();
-			UserPreferences preferences = mPieTalkService.getLocalPreferences();
+			final Resources resources = getActivity().getResources();
+			final UserPreferences localPreferences = mPieTalkService.getLocalPreferences();
 			
 			if (key == resources.getString(R.string.email_address)) {
-				String oldEmail = preferences.getEmail();
+				String oldEmail = localPreferences.getEmail();
 				String newEmail = sharedPreferences.getString(key, "");
 				if (!android.util.Patterns.EMAIL_ADDRESS.matcher(newEmail).matches()) {
 					SharedPreferences.Editor editor = sharedPreferences.edit();
 					editor.putString(key, oldEmail);
 					PieTalkAlert.showToast(getActivity(), "That email address is invalid!");
 					editor.commit();
-					//myPref.setSummary(oldEmail);
-					//myPref.setTitle(oldEmail);
 					EditTextPreference editPref = (EditTextPreference) myPref;
 					editPref.setText(oldEmail);
 					return;
+				} else {
+					//Save email address
+					localPreferences.setEmail(newEmail);
 				}
-			}
-			
+			}			
 			myPref.setSummary(sharedPreferences.getString(key, ""));
+			
+			mPieTalkService.updatePreferences(localPreferences, new TableOperationCallback<UserPreferences>() {				
+				@Override
+				public void onCompleted(UserPreferences resultsPreferences, Exception ex,
+						ServiceFilterResponse serviceFilterResponse) {	
+					//reset preferences if needed, otherwise say they've been saved
+					//if (key == resources.getString(R.string.email_address)) {
+					//	PieTalkAlert.showToast(getActivity(), "OH NO EMAIL ERROR");
+					//}
+					//Display error					
+					if (ex != null) {
+						if (NoNetworkConnectivityException.class.isInstance(ex))
+							return;	
+						PieTalkAlert.showSimpleErrorDialog(getActivity(), ex.getCause().getMessage());
+						SharedPreferences.Editor editor = sharedPreferences.edit();
+						String oldEmail = localPreferences.getEmail();
+						editor.putString(key, oldEmail);
+						PieTalkAlert.showToast(getActivity(), "That email address is invalid!");
+						editor.commit();
+						EditTextPreference editPref = (EditTextPreference) myPref;
+						editPref.setText(oldEmail);						
+					} else {
+						
+					}
+				}
+			});
 		}
 		
 		private void initializeToDefaults() {

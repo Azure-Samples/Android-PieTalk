@@ -660,6 +660,7 @@ public class PieTalkService {
 						preferencesEditor.putString(mContext.getResources().getString(R.string.email_address), mUserPrefs.getEmail());
 						preferencesEditor.commit();
 						//Broadcast that we've updated our user preferences
+						PieTalkLogger.i(TAG, "Preferences downloaded");
 						Intent broadcast = new Intent();
 						broadcast.setAction(Constants.BROADCAST_USER_PREFERENCES_UPDATED);
 						mContext.sendBroadcast(broadcast);					
