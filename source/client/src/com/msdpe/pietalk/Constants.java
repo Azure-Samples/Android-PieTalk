@@ -7,6 +7,7 @@ public final class Constants {
 	public static String BROADCAST_FRIENDS_UPDATED = "friends.updated";
 	public static String BROADCAST_PIES_UPDATED = "pies.updated";
 	public static String BROADCAST_PIE_SENT = "pie.sent";
+	public static String BROADCAST_USER_PREFERENCES_UPDATED = "pie.sent";
 	
 	public static String FRIENDS_UPDATE_STATUS = "friends.update.status";
 	public static String PIES_UPDATE_STATUS = "pies.update.status";

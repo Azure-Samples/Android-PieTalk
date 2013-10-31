@@ -130,6 +130,7 @@ public class RecordActivity extends BaseActivity implements NumberPicker.OnValue
 		if (NetworkUtilities.isNetworkOnline(mActivity)) {
 			mPieTalkService.getFriends();			
 			mPieTalkService.getPies();
+			mPieTalkService.getPreferences();
 		} else {
 			PieTalkAlert.showSimpleErrorDialog(mActivity, "You should connect to the internet and rerun PieTalk.");
 		}

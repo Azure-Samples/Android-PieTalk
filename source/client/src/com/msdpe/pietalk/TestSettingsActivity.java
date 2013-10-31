@@ -102,7 +102,8 @@ public class TestSettingsActivity extends Activity {
 			usernamePref.setSelectable(false);
 			//Set Email
 			EditTextPreference emailPref = (EditTextPreference) findPreference(getString(R.string.email_address));
-			emailPref.setSummary(mPieTalkService.getEmail());
+			//emailPref.setSummary(mPieTalkService.getEmail());
+			emailPref.setSummary(sharedPrefs.getString(getActivity().getResources().getString(R.string.email_address), ""));
 			//Set receive from and share to
 			Preference receiveFromPref = (Preference) findPreference(getString(R.string.receive_pies_from));
 			receiveFromPref.setSummary(sharedPrefs.getString(getActivity().getResources().getString(R.string.receive_pies_from), ""));

@@ -18,6 +18,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
@@ -43,6 +44,7 @@ import com.msdpe.pietalk.activities.SplashScreenActivity;
 import com.msdpe.pietalk.datamodels.Friend;
 import com.msdpe.pietalk.datamodels.Pie;
 import com.msdpe.pietalk.datamodels.PieFile;
+import com.msdpe.pietalk.datamodels.UserPreferences;
 import com.msdpe.pietalk.util.NetworkUtilities;
 import com.msdpe.pietalk.util.NoNetworkConnectivityException;
 import com.msdpe.pietalk.util.PieTalkAlert;
@@ -60,12 +62,14 @@ public class PieTalkService {
 	private GoogleCloudMessaging mGcm;
 	private NotificationHub      mHub;
 	private String mRegistrationId;
+	private UserPreferences mUserPrefs;
 	
 	//Mobile Services objects
 	private MobileServiceClient mClient;
 	private MobileServiceTable<Friend> mFriendTable;	
 	private MobileServiceTable<Pie> mPieTable;
 	private MobileServiceTable<PieFile> mPieFileTable;
+	private MobileServiceTable<UserPreferences> mUserPreferencesTable;
 	
 	//Local data
 	private List<Friend> mFriends;
@@ -84,6 +88,7 @@ public class PieTalkService {
 			mFriendTable = mClient.getTable("Friends", Friend.class);
 			mPieTable = mClient.getTable("Messages", Pie.class);
 			mPieFileTable = mClient.getTable("PieFile", PieFile.class);
+			mUserPreferencesTable = mClient.getTable(UserPreferences.class);
 			
 			mFriends = new ArrayList<Friend>();
 			mFriendNames = new ArrayList<String>();
@@ -282,7 +287,15 @@ public class PieTalkService {
 		SharedPreferences settings = mContext.getSharedPreferences("UserData", 0);
         SharedPreferences.Editor preferencesEditor = settings.edit();
         preferencesEditor.clear();
-        preferencesEditor.commit();						
+        preferencesEditor.commit();	
+        
+        //Clear settings shared preferences
+        SharedPreferences settingsPrefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+        if (settingsPrefs != null) {
+        		preferencesEditor = settingsPrefs.edit();
+        		preferencesEditor.clear();
+        		preferencesEditor.commit();
+        }
 		mClient.logout();			
 		//Take the user back to the splash screen activity to relogin if requested
 		if (shouldRedirectToLogin) {
@@ -623,4 +636,36 @@ public class PieTalkService {
  		     }
  		   }.execute(null, null, null);
  	}
+ 	
+ 	public void getPreferences() {
+		mUserPreferencesTable.where().execute(new TableQueryCallback<UserPreferences>() {
+
+			@Override
+			public void onCompleted(List<UserPreferences> results, int count,
+					Exception ex, ServiceFilterResponse serverFilterResponse) {
+				// TODO Auto-generated method stub
+				if (ex != null) {
+					if (NoNetworkConnectivityException.class.isInstance(ex))
+						return;
+					PieTalkLogger.e(TAG, "Error getting user preferences: " + ex.getCause().getMessage());
+				} else {
+					if (results == null || results.size() == 0) {
+						PieTalkLogger.e(TAG, "Error getting user preferences: No results returned");
+						return;
+					} else {				
+						mUserPrefs = results.get(0);
+						//Update local shared preferences with preferences pulled down
+						SharedPreferences settingsPrefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+						SharedPreferences.Editor preferencesEditor = settingsPrefs.edit();
+						preferencesEditor.putString(mContext.getResources().getString(R.string.email_address), mUserPrefs.getEmail());
+						preferencesEditor.commit();
+						//Broadcast that we've updated our user preferences
+						Intent broadcast = new Intent();
+						broadcast.setAction(Constants.BROADCAST_USER_PREFERENCES_UPDATED);
+						mContext.sendBroadcast(broadcast);					
+					}
+				}
+			}			
+		});
+	}
 }
