@@ -24,7 +24,7 @@ import com.msdpe.pietalk.util.PieTalkLogger;
 
 public class TestSettingsActivity extends Activity {
 	private final String TAG = "TestSettingsActivity";
-	private SettingsFragment mSettingsFragment;
+	private SettingsFragment mSettingsFragment;	
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +43,7 @@ public class TestSettingsActivity extends Activity {
 	public static class SettingsFragment extends PreferenceFragment implements OnSharedPreferenceChangeListener {
 		private final String TAG = "TestSettingsActivity";
 		private PieTalkService mPieTalkService;
+		private boolean mIsResettingValue;
 		
 		@Override
 		public void onResume() {
@@ -61,7 +62,7 @@ public class TestSettingsActivity extends Activity {
 		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
 			
-			
+			mIsResettingValue = false;
 			addPreferencesFromResource(R.xml.preferences);
 			PieTalkApplication app = (PieTalkApplication) getActivity().getApplication();
 			mPieTalkService = app.getPieTalkService();
@@ -95,6 +96,11 @@ public class TestSettingsActivity extends Activity {
 		public void onSharedPreferenceChanged(
 				final SharedPreferences sharedPreferences, final String key) {
 			PieTalkLogger.d(TAG, "Preference changed for key: " + key);
+			if (mIsResettingValue) {
+				mIsResettingValue = false;
+				return;
+			}
+			
 			final Preference myPref = findPreference(key);
 			
 			
@@ -109,6 +115,7 @@ public class TestSettingsActivity extends Activity {
 					SharedPreferences.Editor editor = sharedPreferences.edit();
 					editor.putString(key, oldValue);
 					PieTalkAlert.showToast(getActivity(), "That email address is invalid!");
+					mIsResettingValue = true;
 					editor.commit();
 					EditTextPreference editPref = (EditTextPreference) myPref;
 					editPref.setText(oldValue);
@@ -138,6 +145,7 @@ public class TestSettingsActivity extends Activity {
 						SharedPreferences.Editor editor = sharedPreferences.edit();
 						String oldEmail = backupPrefs.getEmail();
 						editor.putString(key, oldEmail);
+						
 						editor.commit();
 						EditTextPreference editPref = (EditTextPreference) myPref;
 						editPref.setText(oldEmail);	
