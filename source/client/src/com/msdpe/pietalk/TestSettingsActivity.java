@@ -140,12 +140,12 @@ public class TestSettingsActivity extends Activity {
 					if (ex != null) {
 						if (NoNetworkConnectivityException.class.isInstance(ex))
 							return;	
+						mIsResettingValue = true;
 						UserPreferences backupPrefs = mPieTalkService.getBackupPreferences();
 						PieTalkAlert.showSimpleErrorDialog(getActivity(), ex.getCause().getMessage());
 						SharedPreferences.Editor editor = sharedPreferences.edit();
 						String oldEmail = backupPrefs.getEmail();
-						editor.putString(key, oldEmail);
-						
+						editor.putString(key, oldEmail);						
 						editor.commit();
 						EditTextPreference editPref = (EditTextPreference) myPref;
 						editPref.setText(oldEmail);	
