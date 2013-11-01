@@ -138,20 +138,38 @@ public class TestSettingsActivity extends Activity {
 					//Display error	
 					PieTalkLogger.e(TAG, "Callback!");
 					if (ex != null) {
+						PieTalkLogger.i(TAG, "ERrror in callback");
 						if (NoNetworkConnectivityException.class.isInstance(ex))
 							return;	
 						mIsResettingValue = true;
 						UserPreferences backupPrefs = mPieTalkService.getBackupPreferences();
-						PieTalkAlert.showSimpleErrorDialog(getActivity(), ex.getCause().getMessage());
-						SharedPreferences.Editor editor = sharedPreferences.edit();
-						String oldEmail = backupPrefs.getEmail();
-						editor.putString(key, oldEmail);						
-						editor.commit();
-						EditTextPreference editPref = (EditTextPreference) myPref;
-						editPref.setText(oldEmail);	
-						editPref.setSummary(oldEmail);
-					} else {
+						//PieTalkAlert.showSimpleErrorDialog(getActivity(), ex.getCause().getMessage().replace("\"", ""));
+						String error = ex.getCause().getMessage();
 						
+						//Check for unexpected 500 errors
+						if (error.contains("500")) {
+							//PieTalkAlert.showToast(getActivity(), "There was an error.  Please try again later.");
+							PieTalkAlert.showToast(mPieTalkService.getActivityContext(), "There was an error.  Please try again later.");
+						} else {
+//							PieTalkAlert.showToast(getActivity(), ex.getCause().getMessage().replace("\"", ""));
+							PieTalkAlert.showToast(mPieTalkService.getActivityContext(), ex.getCause().getMessage().replace("\"", ""));
+						}
+						SharedPreferences.Editor editor = sharedPreferences.edit();
+						String oldValue = "";
+						if (key == resources.getString(R.string.email_address))
+							oldValue = backupPrefs.getEmail();
+						editor.putString(key, oldValue);						
+						editor.commit();
+						myPref.setSummary(oldValue);
+						
+						if (EditTextPreference.class.isInstance(myPref)) {
+							EditTextPreference editPref = (EditTextPreference) myPref;
+							editPref.setText(oldValue);	
+						}
+						
+					} else {
+						if (getActivity() != null)
+							PieTalkAlert.showToast(getActivity(), "Setting updated");
 					}
 				}
 			});
