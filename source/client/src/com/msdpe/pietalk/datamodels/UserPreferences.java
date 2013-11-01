@@ -14,6 +14,17 @@ public class UserPreferences {
 	@com.google.gson.annotations.SerializedName("id")
 	private int mId;
 	
+	public UserPreferences getCopy() {
+		UserPreferences copy = new UserPreferences();
+		copy.mUsername = mUsername;
+		copy.mMobileNumber = mMobileNumber;
+		copy.mEmail = mEmail;
+		copy.mReceiveFrom = mReceiveFrom;
+		copy.mShareTo = mShareTo;
+		copy.mId = mId;
+		return copy;
+	}
+	
 	public int getId() { return mId; } 
 	public String getUsername() { return mUsername; }
 	public String getMobileNumber() { return mMobileNumber; }

@@ -63,6 +63,7 @@ public class PieTalkService {
 	private NotificationHub      mHub;
 	private String mRegistrationId;
 	private UserPreferences mUserPrefs;
+	private UserPreferences mBackupPrefs;
 	
 	//Mobile Services objects
 	private MobileServiceClient mClient;
@@ -654,6 +655,7 @@ public class PieTalkService {
 						return;
 					} else {				
 						mUserPrefs = results.get(0);
+						mBackupPrefs = mUserPrefs.getCopy();
 						//Update local shared preferences with preferences pulled down
 						SharedPreferences settingsPrefs = PreferenceManager.getDefaultSharedPreferences(mContext);
 						SharedPreferences.Editor preferencesEditor = settingsPrefs.edit();
@@ -671,6 +673,7 @@ public class PieTalkService {
 	}
  	
  	public UserPreferences getLocalPreferences() { return mUserPrefs; }
+ 	public UserPreferences getBackupPreferences() { return mBackupPrefs; }
  	
  	public void updatePreferences(UserPreferences prefs, TableOperationCallback<UserPreferences> callback) {
  		mUserPrefs = prefs;

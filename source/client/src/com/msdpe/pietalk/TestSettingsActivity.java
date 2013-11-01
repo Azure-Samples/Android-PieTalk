@@ -100,17 +100,18 @@ public class TestSettingsActivity extends Activity {
 			
 			final Resources resources = getActivity().getResources();
 			final UserPreferences localPreferences = mPieTalkService.getLocalPreferences();
+			//final String oldValue= "";
 			
 			if (key == resources.getString(R.string.email_address)) {
-				String oldEmail = localPreferences.getEmail();
+				String oldValue = localPreferences.getEmail();
 				String newEmail = sharedPreferences.getString(key, "");
 				if (!android.util.Patterns.EMAIL_ADDRESS.matcher(newEmail).matches()) {
 					SharedPreferences.Editor editor = sharedPreferences.edit();
-					editor.putString(key, oldEmail);
+					editor.putString(key, oldValue);
 					PieTalkAlert.showToast(getActivity(), "That email address is invalid!");
 					editor.commit();
 					EditTextPreference editPref = (EditTextPreference) myPref;
-					editPref.setText(oldEmail);
+					editPref.setText(oldValue);
 					return;
 				} else {
 					//Save email address
@@ -127,13 +128,15 @@ public class TestSettingsActivity extends Activity {
 					//if (key == resources.getString(R.string.email_address)) {
 					//	PieTalkAlert.showToast(getActivity(), "OH NO EMAIL ERROR");
 					//}
-					//Display error					
+					//Display error	
+					PieTalkLogger.e(TAG, "Callback!");
 					if (ex != null) {
 						if (NoNetworkConnectivityException.class.isInstance(ex))
 							return;	
+						UserPreferences backupPrefs = mPieTalkService.getBackupPreferences();
 						PieTalkAlert.showSimpleErrorDialog(getActivity(), ex.getCause().getMessage());
 						SharedPreferences.Editor editor = sharedPreferences.edit();
-						String oldEmail = localPreferences.getEmail();
+						String oldEmail = backupPrefs.getEmail();
 						editor.putString(key, oldEmail);
 						editor.commit();
 						EditTextPreference editPref = (EditTextPreference) myPref;
