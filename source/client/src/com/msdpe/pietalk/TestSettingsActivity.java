@@ -107,11 +107,15 @@ public class TestSettingsActivity extends Activity {
 			final Resources resources = getActivity().getResources();
 			final UserPreferences localPreferences = mPieTalkService.getLocalPreferences();
 			//final String oldValue= "";
+			String oldValue = "";
+			String newValue = "";
+			int preferenceId = 0;
 			
 			if (key == resources.getString(R.string.email_address)) {
-				String oldValue = localPreferences.getEmail();
-				String newEmail = sharedPreferences.getString(key, "");
-				if (!android.util.Patterns.EMAIL_ADDRESS.matcher(newEmail).matches()) {
+				preferenceId = R.string.email_address;
+				oldValue = localPreferences.getEmail();
+				newValue = sharedPreferences.getString(key, "");
+				if (!android.util.Patterns.EMAIL_ADDRESS.matcher(newValue).matches()) {
 					SharedPreferences.Editor editor = sharedPreferences.edit();
 					editor.putString(key, oldValue);
 					PieTalkAlert.showToast(getActivity(), "That email address is invalid!");
@@ -120,11 +124,18 @@ public class TestSettingsActivity extends Activity {
 					EditTextPreference editPref = (EditTextPreference) myPref;
 					editPref.setText(oldValue);
 					return;
-				} else {
-					//Save email address
-					localPreferences.setEmail(newEmail);
 				}
-			}			
+			} else if (key == resources.getString(R.string.receive_pies_from)) {
+				preferenceId = R.string.receive_pies_from;
+				oldValue = localPreferences.getReceiveFrom();
+				newValue = sharedPreferences.getString(key, "");
+			} else if (key == resources.getString(R.string.share_stories_to)) {
+				preferenceId = R.string.share_stories_to;
+				oldValue = localPreferences.getShareTo();
+				newValue = sharedPreferences.getString(key, "");
+			}
+			//localPreferences.setEmail(newValue);
+			localPreferences.setValueForPreference(preferenceId, newValue);
 			myPref.setSummary(sharedPreferences.getString(key, ""));
 			
 			mPieTalkService.updatePreferences(localPreferences, new TableOperationCallback<UserPreferences>() {				

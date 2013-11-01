@@ -1,5 +1,7 @@
 package com.msdpe.pietalk.datamodels;
 
+import com.msdpe.pietalk.R;
+
 public class UserPreferences {
 	@com.google.gson.annotations.SerializedName("username")
 	private String mUsername;
@@ -35,6 +37,20 @@ public class UserPreferences {
 	public void setReceiveFrom(String receiveFrom) { mReceiveFrom  = receiveFrom; }
 	public String getShareTo() { return mShareTo; }
 	public void setShareTo(String shareTo) { mShareTo = shareTo; }
+	
+	public void setValueForPreference(int preference, String value) {
+		switch (preference) {
+			case R.string.email_address:
+				this.setEmail(value);
+			break;
+			case R.string.receive_pies_from:
+				this.setReceiveFrom(value);
+				break;
+			case R.string.share_stories_to:
+				this.setShareTo(value);
+				break;
+		}
+	}
 	
 	@Override
 	public boolean equals(Object o) {
